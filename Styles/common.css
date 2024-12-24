@@ -1,0 +1,140 @@
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #818cf8;
+    --background-color: #f3f4f6;
+    --sidebar-color: #1f2937;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --border-color: #e5e7eb;
+    --white: #ffffff;
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-color);
+    color: var(--white);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-speed) ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.side-nav {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.nav-item:hover, .nav-item.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+/* Top Navigation Styles */
+.top-nav {
+    background-color: var(--white);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-speed) ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 80px;
+    }
+    
+    .logo-container h2,
+    .nav-item span {
+        display: none;
+    }
+    
+    .nav-item {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        height: 100vh;
+        z-index: 1000;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+}
