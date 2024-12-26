@@ -224,6 +224,10 @@
     margin: 0.5rem 0;
 }
 
+.user-name {
+    cursor: pointer;
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         width: 80px;
