@@ -148,14 +148,5 @@ class Calendar {
     }
 }
 
-// Sidebar toggle functionality with animation
-document.getElementById('menu-toggle').addEventListener('click', () => {
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('active');
-    
-    // Add smooth transition
-    sidebar.style.transition = 'all 0.3s ease';
-});
-
 // Initialize calendar
 const calendar = new Calendar();
