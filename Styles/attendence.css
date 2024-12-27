@@ -1,15 +1,15 @@
-.timetable{
+.attendence{
     padding : 40px;
 }
 
-.table_header{
+.attendance_title{
     padding : 20px;
     text-align: center;
     background-color: var(--sidebar-color);
     color: white;
 } 
 
-.table_header th {
+.attendance_title th {
     padding:17px;
 }
 
