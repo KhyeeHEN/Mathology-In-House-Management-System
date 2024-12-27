@@ -11,6 +11,15 @@ class Calendar {
     initializeCalendar() {
         this.updateCalendarHeader();
         this.renderCalendarDays();
+        this.updateDatePicker();
+    }
+
+    updateDatePicker() {
+        const datePicker = document.getElementById('datePicker');
+        const year = this.currentDate.getFullYear();
+        const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
+        const day = String(this.currentDate.getDate()).padStart(2, '0');
+        datePicker.value = `${year}-${month}-${day}`;
     }
 
     updateCalendarHeader() {
@@ -127,7 +136,7 @@ class Calendar {
         ];
     }
 
-    setupEventListeners() {
+     setupEventListeners() {
         document.getElementById('prevMonth').addEventListener('click', () => {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
             this.initializeCalendar();
@@ -138,12 +147,15 @@ class Calendar {
             this.initializeCalendar();
         });
 
-        // View options buttons
-        document.querySelectorAll('.view-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                document.querySelector('.view-btn.active').classList.remove('active');
-                e.target.classList.add('active');
-            });
+        document.getElementById('datePicker').addEventListener('change', (e) => {
+            this.currentDate = new Date(e.target.value);
+            this.initializeCalendar();
+        });
+
+        document.getElementById('goToDate').addEventListener('click', () => {
+            const datePicker = document.getElementById('datePicker');
+            this.currentDate = new Date(datePicker.value);
+            this.initializeCalendar();
         });
     }
 }
