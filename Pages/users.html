@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Settings</title>
     <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/profile.css">
+    <link rel="stylesheet" href="../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -24,11 +24,11 @@
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="timetable.html" class="nav-item">
+                <a href="timetable.html" class="nav-item ">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Timetable</span>
                 </a>
-                <a href="users.html" class="nav-item">
+                <a href="users.html" class="nav-item active">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
@@ -47,7 +47,7 @@
                     <button id="menu-toggle" class="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1>Profile Settings</h1>
+                    <h1>Timetable</h1>
                 </div>
                 <div class="nav-right">
                     <div class="nav-links">
@@ -77,52 +77,8 @@
                 </div>
             </nav>
 
-            <!-- Profile Content -->
-            <div class="profile-container">
-                <div class="profile-header">
-                    <h1>Profile Settings</h1>
-                    <p>Manage your personal information and account settings</p>
-                </div>
-
-                <div class="profile-content">
-                    <div class="profile-image-section">
-                        <div class="image-container">
-                            <img src="https://ui-avatars.com/api/?name=Hen+Khyee" alt="Profile" class="profile-image">
-                            <label for="profile-upload" class="image-upload-label">
-                                <i class="fas fa-camera"></i>
-                                <input type="file" id="profile-upload" accept="image/*" class="hidden">
-                            </label>
-                        </div>
-                    </div>
-
-                    <form class="profile-form">
-                        <div class="form-group">
-                            <label for="name">Full Name</label>
-                            <input type="text" id="name" name="name" value="Darrshan" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" value="darrshan@example.com" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" value="+1234567890" class="form-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bio">Bio</label>
-                            <textarea id="bio" name="bio" rows="4" class="form-textarea">Mathematics enthusiast and lifelong learner</textarea>
-                        </div>
-
-                        <button type="submit" class="save-button">
-                            <i class="fas fa-save"></i>
-                            Save Changes
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <!-- Do your content here -->
+            
         </main>
     </div>
     <script type="module" src="../Scripts/common.js"></script>
