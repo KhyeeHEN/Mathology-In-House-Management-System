@@ -46,30 +46,31 @@
     transform: scale(1.1);
 }
 
-.view-options {
+.date-picker-container {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
 }
 
-.view-btn {
-    padding: 0.5rem 1rem;
+.date-picker {
+    padding: 0.5rem;
     border: 1px solid var(--border-color);
-    background: var(--white);
     border-radius: 0.375rem;
-    cursor: pointer;
+    font-family: inherit;
     color: var(--text-color);
+    background-color: var(--white);
+    cursor: pointer;
     transition: all var(--transition-speed) ease;
 }
 
-.view-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.date-picker:hover {
+    border-color: var(--primary-color);
 }
 
-.view-btn.active {
-    background-color: var(--primary-color);
-    color: var(--white);
+.date-picker:focus {
+    outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
 }
 
 .calendar-grid {
@@ -141,4 +142,92 @@
 .event-1 { background-color: var(--event-color-1); }
 .event-2 { background-color: var(--event-color-2); }
 .event-3 { background-color: var(--event-color-3); }
+
+/* Popover */
+.event-popover {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 300px;
+    z-index: 1000;
+    animation: popoverFadeIn 0.2s ease;
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-popover-header {
+    padding: 12px 16px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-popover-header h3 {
+    margin: 0;
+    color: black;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.event-popover-header.event-1 { background-color: var(--event-color-1); }
+.event-popover-header.event-2 { background-color: var(--event-color-2); }
+.event-popover-header.event-3 { background-color: var(--event-color-3); }
+
+.close-popover {
+    background: none;
+    border: none;
+    color: black;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.close-popover:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.event-popover-content {
+    padding: 16px;
+}
+
+.event-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.event-detail:last-child {
+    margin-bottom: 0;
+}
+
+.event-detail i {
+    color: var(--text-light);
+    width: 16px;
+}
+
+.event-detail span {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
 
