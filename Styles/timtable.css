@@ -1,0 +1,19 @@
+.timetable{
+    padding : 40px;
+}
+
+.table_header{
+    padding : 20px;
+    text-align: center;
+    background-color: var(--sidebar-color);
+    color: white;
+} 
+
+.table_header th {
+    padding:20px;
+}
+
+td{
+    padding : 20px;
+    text-align: center;
+}
