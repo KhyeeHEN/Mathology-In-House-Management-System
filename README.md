@@ -41,7 +41,8 @@ This repository is for the Mathology In-House Management System. The system is d
 
 ### 8. Security & Access Control
 - Secure logins with role-based access.  
-- Parents/guardians can access student accounts; older students have limited access.  
+- Parents/guardians can access student accounts; older students have limited access.
+- Secuirty measures must be in place for the entire systems 
 
 ### 9. Technical & UI Considerations
 - Calendar-based scheduling with minimal clicks.  
