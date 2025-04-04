@@ -1,9 +1,9 @@
 <?php
 // Database configuration
-$host = 'localhost';
+$host = 'localhost:3307';
 $user = 'root';  // Replace with your username
 $password = '';  // Replace with your password (leave empty if none)
-$database = 'test';
+$database = 'swefyp_db';
 
 // Create a connection
 $conn = new mysqli($host, $user, $password, $database);
