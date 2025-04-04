@@ -30,7 +30,7 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span>Timetable</span>
                 </a>
-                <a href="users.html" class="nav-item active">
+                <a href="users.php" class="nav-item active">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
