@@ -28,3 +28,30 @@ h1 {
     color: #333;
     margin-bottom: 20px;
 }
+
+/* Button styling */
+.filter-buttons {
+    margin-bottom: 20px;
+}
+.filter-buttons button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.filter-buttons button.active {
+    background-color: #0056b3;
+}
+.filter-buttons button:hover {
+    background-color: #0056b3;
+}
+
+/* Hide tables initially */
+.table-container {
+    display: none;
+}
+.table-container.active {
+    display: block;
+}
