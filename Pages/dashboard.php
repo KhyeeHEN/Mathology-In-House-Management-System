@@ -1,3 +1,44 @@
+<?php
+require_once 'darrshan_dbconnect.php';
+
+// Fetch events from database
+$stmt = $pdo->prepare("SELECT * FROM subjects WHERE student_name = 'Darrshan'");
+$stmt->execute();
+$events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+function calculateDuration($start, $end) {
+    $startTime = new DateTime($start);
+    $endTime = new DateTime($end);
+    $interval = $startTime->diff($endTime);
+    
+    $hours = $interval->h;
+    $minutes = $interval->i;
+    
+    if ($hours > 0 && $minutes > 0) {
+        return "$hours hours $minutes minutes";
+    } elseif ($hours > 0) {
+        return "$hours hours";
+    } else {
+        return "$minutes minutes";
+    }
+}
+
+// Convert database events to calendar format
+$calendarEvents = [];
+foreach ($events as $event) {
+    $calendarEvents[] = [
+        'title' => $event['subject_name'],
+        'date' => $event['class_date'], // Keep as YYYY-MM-DD string
+        'type' => '1',
+        'time' => date('h:i A', strtotime($event['start_time'])),
+        'duration' => calculateDuration($event['start_time'], $event['end_time']),
+        'venue' => $event['venue'],
+        'lecturer' => $event['lecturer'],
+        'description' => $event['description']
+    ];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,20 +54,18 @@
         <!-- Aside Navigation -->
         <aside class="sidebar">
             <div class="logo-container">
-                <!-- <img src="/logo.svg" alt="Logo" class="logo"> -->
-                <!-- <img src="/MathologyLogo.jpg" alt="Logo" class="logo"> -->
                 <h2>Mathology</h2>
             </div>
             <nav class="side-nav">
-                <a href="dashboard.html" class="nav-item active">
+                <a href="dashboard.php" class="nav-item active">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                <a href="attendance.html" class="nav-item">
+                <a href="attendance.php" class="nav-item">
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="timetable.html" class="nav-item">
+                <a href="timetable.php" class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Timetable</span>
                 </a>
@@ -53,7 +92,7 @@
                 </div>
                 <div class="nav-right">
                     <div class="nav-links">
-                        <a href="dashboard.html" class="nav-link">Home</a>
+                        <a href="dashboard.php" class="nav-link">Home</a>
                         <a href="#" class="nav-link">Courses</a>
                         <a href="#" class="nav-link">Resources</a>
                         <a href="#" class="nav-link">Help</a>
@@ -65,7 +104,7 @@
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="dropdown-menu">
-                            <a href="profile.html" class="dropdown-item">
+                            <a href="profile.php" class="dropdown-item">
                                 <i class="fas fa-user"></i>
                                 <span>View Profile</span>
                             </a>
@@ -86,7 +125,7 @@
                         <button class="nav-btn" id="prevMonth">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <h2 id="currentMonth">September 2023</h2>
+                        <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
                         <button class="nav-btn" id="nextMonth">
                             <i class="fas fa-chevron-right"></i>
                         </button>
@@ -112,6 +151,13 @@
             </div>
         </main>
     </div>
+    
+    <script>
+        // Pass PHP events to JavaScript with proper formatting
+        const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
+            console.log('Loaded events:', calendarEvents); // Debug output
+    </script>
+    
     <script type="module" src="../scripts/dashboard.js"></script>
     <script type="module" src="../scripts/common.js"></script>
 </body>

@@ -1,4 +1,4 @@
-/* Calendar Styles */
+/* Calendar Container */
 .calendar-container {
     padding: 2rem;
     flex: 1;
@@ -19,6 +19,7 @@
     }
 }
 
+/* Calendar Header */
 .calendar-header {
     display: flex;
     justify-content: space-between;
@@ -46,6 +47,7 @@
     transform: scale(1.1);
 }
 
+/* Date Picker */
 .date-picker-container {
     display: flex;
     gap: 0.5rem;
@@ -73,6 +75,7 @@
     box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
 }
 
+/* Calendar Grid */
 .calendar-grid {
     background-color: var(--white);
     border-radius: 0.5rem;
@@ -86,6 +89,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Weekdays */
 .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -96,6 +100,7 @@
     padding-bottom: 0.75rem;
 }
 
+/* Calendar Days Grid */
 .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -104,6 +109,7 @@
     margin-top: 1px;
 }
 
+/* Individual Day Cells */
 .calendar-day {
     background-color: var(--white);
     min-height: 120px;
@@ -125,6 +131,7 @@
     margin-bottom: 0.25rem;
 }
 
+/* Calendar Events */
 .calendar-event {
     font-size: 0.875rem;
     padding: 0.25rem 0.5rem;
@@ -132,6 +139,9 @@
     margin-bottom: 0.25rem;
     cursor: pointer;
     transition: all var(--transition-speed) ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .calendar-event:hover {
@@ -139,11 +149,21 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.event-1 { background-color: var(--event-color-1); }
-.event-2 { background-color: var(--event-color-2); }
-.event-3 { background-color: var(--event-color-3); }
+/* Event Type Colors */
+.event-1 { 
+    background-color: var(--event-color-1);
+    color: white;
+}
+.event-2 { 
+    background-color: var(--event-color-2);
+    color: white;
+}
+.event-3 { 
+    background-color: var(--event-color-3);
+    color: white;
+}
 
-/* Popover */
+/* Event Popover */
 .event-popover {
     position: absolute;
     background: white;
@@ -176,7 +196,7 @@
 
 .event-popover-header h3 {
     margin: 0;
-    color: black;
+    color: white;
     font-size: 1rem;
     font-weight: 500;
 }
@@ -188,7 +208,7 @@
 .close-popover {
     background: none;
     border: none;
-    color: black;
+    color: white;
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
@@ -230,4 +250,3 @@
     font-size: 0.9rem;
     line-height: 1.4;
 }
-
