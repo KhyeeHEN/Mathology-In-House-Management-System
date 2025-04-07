@@ -137,6 +137,40 @@
     gap: 0.35rem;
     transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
     position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Border Animation */
+.calendar-day::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 0 solid var(--primary-color);
+    transition: border-width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+}
+
+.calendar-day:hover::before {
+    border-width: 2px;
+    opacity: 0.7;
+    animation: borderIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; /* Use 'forwards' to maintain end state */
+}
+
+@keyframes borderIn {
+    0% {
+        border-width: 0;
+        opacity: 0;
+    }
+    100% {
+        border-width: 2px;
+        opacity: 0.7;
+    }
 }
 
 .calendar-day:hover {
@@ -198,11 +232,11 @@
 }
 .event-2 { 
     background-color: var(--event-color-2);
-    color: white;
+    color: black;
 }
 .event-3 { 
     background-color: var(--event-color-3);
-    color: white;
+    color: black;
 }
 
 /* Event Popover */
@@ -253,7 +287,7 @@
 .close-popover {
     background: none;
     border: none;
-    color: white;
+    color: black;
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
