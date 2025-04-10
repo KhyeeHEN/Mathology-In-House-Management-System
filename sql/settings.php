@@ -1,9 +1,9 @@
 <?php
 // Database configuration
-$host = 'localhost:3307';
+$host = 'localhost:3310';
 $user = 'root';  // Replace with your username
 $password = '';  // Replace with your password (leave empty if none)
-$database = 'swefyp_db';
+$database = 'mathology';
 
 // Create a connection
 $conn = new mysqli($host, $user, $password, $database);
