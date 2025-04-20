@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost';
+$host = 'localhost'; 
 $dbname = 'mathology';
 $username = 'root';
 $password = '';
