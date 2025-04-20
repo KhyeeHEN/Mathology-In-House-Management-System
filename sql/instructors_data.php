@@ -11,6 +11,7 @@ if ($result->num_rows > 0) {
     echo "<h1>Instructor Data</h1>";
     echo "<table border='1'>
             <tr>
+                <th>Instructor ID</th>
                 <th>Last Name</th>
                 <th>First Name</th>
                 <th>Gender</th>
@@ -21,6 +22,7 @@ if ($result->num_rows > 0) {
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
+                <td>" . $row['instructor_id'] . "</td>
                 <td>" . $row['Last_Name'] . "</td>
                 <td>" . $row['First_Name'] . "</td>
                 <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
