@@ -2,8 +2,32 @@
 // Include the database settings
 include 'settings.php';
 
-// Example query to retrieve data from the students table
-$sql = "SELECT * FROM students";  
+// Get the search term (if any) from the GET request
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+
+// If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
+$sql = "SELECT * FROM students";
+if (!empty($search)) {
+    $sql = "
+        SELECT * FROM students
+        WHERE
+            student_id = '$search' OR
+            Last_Name = '$search' OR
+            First_Name = '$search'
+        UNION
+        SELECT * FROM students
+        WHERE 
+            student_id LIKE BINARY '%$search%' OR
+            Last_Name LIKE BINARY '%$search%' OR
+            First_Name LIKE BINARY '%$search%'
+        UNION
+        SELECT * FROM students
+        WHERE 
+            student_id LIKE '%$search%' OR
+            Last_Name LIKE '%$search%' OR
+            First_Name LIKE '%$search%'
+    ";
+}
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {

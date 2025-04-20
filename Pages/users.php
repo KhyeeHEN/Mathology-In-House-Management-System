@@ -83,9 +83,16 @@
 
             <!-- Filter Buttons -->
             <div class="filter-buttons">
-                <button onclick="showTable('students-table')" class="active">Students</button>
-                <button onclick="showTable('instructors-table')">Instructors</button>
+                <button onclick="showTable('students-table')" id="students-btn" class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
+                <button onclick="showTable('instructors-table')" id="instructors-btn" class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
             </div>
+
+            <!-- Search Form -->
+            <form method="GET" action="">
+                <input type="text" name="search" placeholder="Search users by name or ID" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                <input type="hidden" name="active_tab" id="active_tab" value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                <button type="submit">Search</button>
+            </form>
 
             <!-- Display User Data -->
             <div class="table-container active" id="students-table">
