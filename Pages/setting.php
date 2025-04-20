@@ -17,6 +17,4 @@ if ($conn->connect_error) {
           Database connection successful!
           </div>";
 }
-
-// Rest of your PHP code...
 ?>
