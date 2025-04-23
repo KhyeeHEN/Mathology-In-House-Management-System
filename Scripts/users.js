@@ -21,25 +21,28 @@ function showTable(tableId) {
         activeTabInput.value = tableId === 'students-table' ? 'students' : 'instructors';
     }
 }
-// Automatically set the active table based on the "active_tab" hidden input field
+
 document.addEventListener('DOMContentLoaded', () => {
-    const activeTabInput = document.getElementById('active_tab');
-    if (activeTabInput) {
-        const activeTabValue = activeTabInput.value;
-        const tableId = activeTabValue === 'instructors' ? 'instructors-table' : 'students-table';
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('active_tab') || 'students';
 
-        // Simulate a button click to show the correct table
-        const button = document.querySelector(
-            activeTabValue === 'instructors' ? '#instructors-btn' : '#students-btn'
-        );
-        if (button) {
-            button.click();
-        }
+    // Activate the appropriate tab and table
+    const tableId = activeTab === 'instructors' ? 'instructors-table' : 'students-table';
+    const buttonId = activeTab === 'instructors' ? 'instructors-btn' : 'students-btn';
 
-        // Ensure the correct table is displayed
-        document.querySelectorAll('.table-container').forEach(table => {
-            table.classList.remove('active');
-        });
-        document.getElementById(tableId).classList.add('active');
-    }
+    // Highlight the active button
+    document.querySelectorAll('.filter-buttons button').forEach(button => {
+        button.classList.remove('active');
+    });
+    document.getElementById(buttonId).classList.add('active');
+
+    // Show the correct table
+    document.querySelectorAll('.table-container').forEach(table => {
+        table.classList.remove('active');
+    });
+    document.getElementById(tableId).classList.add('active');
 });
+
+function setActiveTab(tab) {
+    document.getElementById('active_tab').value = tab;
+}

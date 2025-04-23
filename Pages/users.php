@@ -83,22 +83,32 @@
 
             <!-- Filter Buttons -->
             <div class="filter-buttons">
-                <button onclick="showTable('students-table')" id="students-btn" class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
-                <button onclick="showTable('instructors-table')" id="instructors-btn" class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
+                <button onclick="showTable('students-table')" id="students-btn"
+                    class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
+                <button onclick="showTable('instructors-table')" id="instructors-btn"
+                    class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
             </div>
 
             <!-- Search Form -->
-            <form method="GET" action="">
-                <input type="text" name="search" placeholder="Search users by name or ID" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                <input type="hidden" name="active_tab" id="active_tab" value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+            <form method="GET" action="users.php">
+                <input type="text" name="search" placeholder="Search users by name or ID"
+                    value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                <input type="hidden" name="active_tab" id="active_tab"
+                    value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                <input type="hidden" name="students_page"
+                    value="<?php echo isset($_GET['students_page']) ? $_GET['students_page'] : 1; ?>">
+                <input type="hidden" name="instructors_page"
+                    value="<?php echo isset($_GET['instructors_page']) ? $_GET['instructors_page'] : 1; ?>">
                 <button type="submit">Search</button>
             </form>
 
             <!-- Display User Data -->
-            <div class="table-container active" id="students-table">
+            <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
+                id="students-table">
                 <?php include '../sql/students_data.php'; ?>
             </div>
-            <div class="table-container" id="instructors-table">
+            <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>"
+                id="instructors-table">
                 <?php include '../sql/instructors_data.php'; ?>
             </div>
         </main>
@@ -106,5 +116,4 @@
     <script type="module" src="../scripts/common.js"></script>
     <script src="../scripts/users.js"></script>
 </body>
-
 </html>
