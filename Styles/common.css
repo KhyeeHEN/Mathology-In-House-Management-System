@@ -232,16 +232,16 @@
     .sidebar {
         width: 80px;
     }
-    
+
     .logo-container h2,
     .nav-item span {
         display: none;
     }
-    
+
     .nav-item {
         justify-content: center;
     }
-    
+
     .nav-item i {
         margin: 0;
     }
@@ -251,18 +251,18 @@
     .menu-toggle {
         display: block;
     }
-    
+
     .sidebar {
         position: fixed;
         left: -260px;
         height: 100vh;
         z-index: 1000;
     }
-    
+
     .sidebar.active {
         left: 0;
     }
-    
+
     .nav-links {
         display: none;
     }

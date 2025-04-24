@@ -20,7 +20,7 @@
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="payment.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
