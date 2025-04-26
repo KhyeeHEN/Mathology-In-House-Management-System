@@ -1,5 +1,6 @@
 <?php
 require_once 'setting.php';
+
 // Check if user is admin
 // if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
 //     header("Location: unauthorized.php");
@@ -47,28 +48,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get current tab selection
-$current_tab = $_GET['tab'] ?? 'students';
+// Check if we're viewing a specific student
+$student_id = $_GET['student_id'] ?? null;
+$student_details = null;
+$student_timetable = null;
 
-// Fetch data based on selected tab
-if ($current_tab === 'students') {
-    $pending = $conn->query("SELECT r.*, s.Current_School_Grade, s.School, s.Mathology_Level 
-                            FROM student_timetable_requests r
-                            JOIN Students s ON r.last_name = s.Last_Name AND r.first_name = s.First_Name
-                            WHERE r.status = 'pending'");
+if ($student_id) {
+    // Get student details
+    $student_details = $conn->query("SELECT * FROM Students WHERE student_id = $student_id")->fetch_assoc();
     
-    $current = $conn->query("SELECT t.*, s.Current_School_Grade, s.School, s.Mathology_Level 
-                            FROM student_timetable t
-                            JOIN Students s ON t.last_name = s.Last_Name AND t.first_name = s.First_Name");
-} else {
-    $pending = $conn->query("SELECT r.*, i.Highest_Education, i.Remark, i.Training_Status 
-                            FROM instructor_timetable_requests r
-                            JOIN Instructor i ON r.last_name = i.Last_Name AND r.first_name = i.First_Name
-                            WHERE r.status = 'pending'");
-    
-    $current = $conn->query("SELECT t.*, i.Highest_Education, i.Remark, i.Training_Status 
-                            FROM instructor_timetable t
-                            JOIN Instructor i ON t.last_name = i.Last_Name AND t.first_name = i.First_Name");
+    // Get student's current timetable
+    $student_timetable = $conn->query("SELECT * FROM student_timetable 
+                                     WHERE last_name = '{$student_details['Last_Name']}' 
+                                     AND first_name = '{$student_details['First_Name']}'");
+}
+
+// Get current tab selection (only if not viewing specific student)
+$current_tab = !$student_id ? ($_GET['tab'] ?? 'students') : null;
+
+// Fetch data based on selected tab if not viewing specific student
+if (!$student_id) {
+    if ($current_tab === 'students') {
+        $pending = $conn->query("SELECT r.*, s.student_id, s.Current_School_Grade, s.School, s.Mathology_Level 
+                                FROM student_timetable_requests r
+                                JOIN Students s ON r.last_name = s.Last_Name AND r.first_name = s.First_Name
+                                WHERE r.status = 'pending'");
+        
+        $current = $conn->query("SELECT s.student_id, s.Last_Name, s.First_Name, 
+                                COUNT(t.id) as timetable_count
+                                FROM Students s
+                                LEFT JOIN student_timetable t ON t.last_name = s.Last_Name AND t.first_name = s.First_Name
+                                GROUP BY s.student_id, s.Last_Name, s.First_Name");
+    } else {
+        $pending = $conn->query("SELECT r.*, i.Highest_Education, i.Remark, i.Training_Status 
+                                FROM instructor_timetable_requests r
+                                JOIN Instructor i ON r.last_name = i.Last_Name AND r.first_name = i.First_Name
+                                WHERE r.status = 'pending'");
+        
+        $current = $conn->query("SELECT t.*, i.Highest_Education, i.Remark, i.Training_Status 
+                                FROM instructor_timetable t
+                                JOIN Instructor i ON t.last_name = i.Last_Name AND t.first_name = i.First_Name");
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -86,6 +106,8 @@ if ($current_tab === 'students') {
         .tab.active { border-color: #4CAF50; font-weight: bold; }
         .section { margin-bottom: 40px; }
         .section-title { font-size: 1.2em; margin-bottom: 15px; color: #333; }
+        
+        /* Updated Entry Card Styles */
         .entry-card { 
             background: white; 
             padding: 15px; 
@@ -93,8 +115,24 @@ if ($current_tab === 'students') {
             border-radius: 5px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border-left: 4px solid #ffc107;
+            transition: all 0.3s;
         }
-        .approved-entry { border-left-color: #4CAF50; }
+        .pending-entry {
+            border-left: 4px solid #ffc107; /* Yellow for pending */
+            background-color: #fffaf0; /* Light yellow background */
+        }
+        .current-entry {
+            border-left: 4px solid #4CAF50; /* Green for approved */
+            background-color: #f8fff8; /* Light green background */
+        }
+        .student-card {
+            cursor: pointer;
+        }
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
         .actions { display: flex; gap: 10px; margin-top: 10px; }
         .reject-form { display: flex; gap: 10px; align-items: center; }
         .reject-form input { flex-grow: 1; padding: 5px; }
@@ -102,6 +140,52 @@ if ($current_tab === 'students') {
         .user-info { font-weight: bold; margin-bottom: 5px; }
         .info-row { display: flex; gap: 15px; margin-bottom: 5px; }
         .info-label { font-weight: bold; min-width: 120px; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .back-link i {
+            margin-right: 5px;
+        }
+        .timetable-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .timetable-table th, .timetable-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .timetable-table th {
+            background-color: #f5f5f5;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -177,83 +261,32 @@ if ($current_tab === 'students') {
                 <h1><i class="fas fa-clipboard-check"></i> Timetable Approval</h1>
             </div>
 
-            <!-- Tab Navigation -->
-            <div class="tab-container">
-                <a href="?tab=students" class="tab <?= $current_tab === 'students' ? 'active' : '' ?>">
-                    <i class="fas fa-user-graduate"></i> Students
+            <?php if ($student_id): ?>
+                <!-- Student Details View -->
+                <a href="timetable_approve.php?tab=students" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Students
                 </a>
-                <a href="?tab=instructors" class="tab <?= $current_tab === 'instructors' ? 'active' : '' ?>">
-                    <i class="fas fa-chalkboard-teacher"></i> Instructors
-                </a>
-            </div>
 
-            <!-- Pending Requests Section -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-clock"></i> Pending Requests</h2>
-                
-                <?php if ($pending->num_rows > 0): ?>
-                    <?php while ($entry = $pending->fetch_assoc()): ?>
-                        <div class="entry-card">
-                            <div class="info-row">
-                                <div class="info-label">Name:</div>
-                                <div><?= htmlspecialchars($entry['last_name']) ?>, <?= htmlspecialchars($entry['first_name']) ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Course:</div>
-                                <div><?= htmlspecialchars($entry['course']) ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Day:</div>
-                                <div><?= htmlspecialchars($entry['day']) ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Time:</div>
-                                <div><?= date('h:i A', strtotime($entry['start_time'])) ?> - <?= date('h:i A', strtotime($entry['end_time'])) ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><?= $current_tab === 'students' ? 'Mathology Level' : 'Training Status' ?>:</div>
-                                <div><?= htmlspecialchars($entry[$current_tab === 'students' ? 'Mathology_Level' : 'Training_Status']) ?></div>
-                            </div>
-                            
-                            <div class="actions">
-                                <form method="POST">
-                                    <input type="hidden" name="id" value="<?= $entry['id'] ?>">
-                                    <input type="hidden" name="type" value="<?= $current_tab ?>">
-                                    <button type="submit" name="approve" class="btn btn-success">
-                                        <i class="fas fa-check"></i> Approve
-                                    </button>
-                                </form>
-                                
-                                <form method="POST" class="reject-form">
-                                    <input type="hidden" name="id" value="<?= $entry['id'] ?>">
-                                    <input type="hidden" name="type" value="<?= $current_tab ?>">
-                                    <input type="text" name="reason" placeholder="Rejection reason (optional)">
-                                    <button type="submit" name="reject" class="btn btn-danger">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <div class="no-entries">
-                        <i class="fas fa-check-circle"></i>
-                        <p>No pending requests for <?= $current_tab ?></p>
+                <div class="student-info">
+                    <h2><?= htmlspecialchars($student_details['First_Name'] . ' ' . $student_details['Last_Name']) ?></h2>
+                    <div class="info-row">
+                        <div class="info-label">School:</div>
+                        <div><?= htmlspecialchars($student_details['School']) ?></div>
                     </div>
-                <?php endif; ?>
-            </div>
+                    <div class="info-row">
+                        <div class="info-label">Grade:</div>
+                        <div><?= htmlspecialchars($student_details['Current_School_Grade']) ?></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Mathology Level:</div>
+                        <div><?= htmlspecialchars($student_details['Mathology_Level']) ?></div>
+                    </div>
+                </div>
 
-            <!-- Current Timetable Section -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Current Timetable</h2>
-                
-                <?php if ($current->num_rows > 0): ?>
-                    <?php while ($entry = $current->fetch_assoc()): ?>
-                        <div class="entry-card approved-entry">
-                            <div class="info-row">
-                                <div class="info-label">Name:</div>
-                                <div><?= htmlspecialchars($entry['last_name']) ?>, <?= htmlspecialchars($entry['first_name']) ?></div>
-                            </div>
+                <h3>Current Timetable</h3>
+                <?php if ($student_timetable->num_rows > 0): ?>
+                    <?php while ($entry = $student_timetable->fetch_assoc()): ?>
+                        <div class="entry-card current-entry">
                             <div class="info-row">
                                 <div class="info-label">Course:</div>
                                 <div><?= htmlspecialchars($entry['course']) ?></div>
@@ -267,19 +300,168 @@ if ($current_tab === 'students') {
                                 <div><?= date('h:i A', strtotime($entry['start_time'])) ?> - <?= date('h:i A', strtotime($entry['end_time'])) ?></div>
                             </div>
                             <div class="info-row">
-                                <div class="info-label"><?= $current_tab === 'students' ? 'Mathology Level' : 'Training Status' ?>:</div>
-                                <div><?= htmlspecialchars($entry[$current_tab === 'students' ? 'Mathology_Level' : 'Training_Status']) ?></div>
+                                <div class="info-label">Approved At:</div>
+                                <div><?= date('M j, Y', strtotime($entry['approved_at'])) ?></div>
+                            </div>
+                            <div class="actions">
+                                <form method="POST" style="display: inline;">
+                                    <input type="hidden" name="id" value="<?= $entry['id'] ?>">
+                                    <input type="hidden" name="type" value="student">
+                                    <button type="submit" name="remove" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
                     <div class="no-entries">
                         <i class="fas fa-info-circle"></i>
-                        <p>No timetable entries found for <?= $current_tab ?></p>
+                        <p>No timetable entries found for this student</p>
                     </div>
                 <?php endif; ?>
-            </div>
 
+                <div style="margin-top: 20px;">
+                    <a href="timetable_reschedule.php?student_id=<?= $student_id ?>">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-calendar-alt"></i> Reschedule Timetable
+                        </button>
+                    </a>
+                </div>
+
+            <?php else: ?>
+                <!-- Main Approval Interface -->
+                <!-- Tab Navigation -->
+                <div class="tab-container">
+                    <a href="?tab=students" class="tab <?= $current_tab === 'students' ? 'active' : '' ?>">
+                        <i class="fas fa-user-graduate"></i> Students
+                    </a>
+                    <a href="?tab=instructors" class="tab <?= $current_tab === 'instructors' ? 'active' : '' ?>">
+                        <i class="fas fa-chalkboard-teacher"></i> Instructors
+                    </a>
+                </div>
+
+                <!-- Pending Requests Section -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-clock"></i> Pending Requests</h2>
+                    
+                    <?php if ($pending->num_rows > 0): ?>
+                        <?php while ($entry = $pending->fetch_assoc()): ?>
+                            <div class="entry-card pending-entry">
+                                <div class="info-row">
+                                    <div class="info-label">Name:</div>
+                                    <div><?= htmlspecialchars($entry['last_name']) ?>, <?= htmlspecialchars($entry['first_name']) ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Course:</div>
+                                    <div><?= htmlspecialchars($entry['course']) ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Day:</div>
+                                    <div><?= htmlspecialchars($entry['day']) ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Time:</div>
+                                    <div><?= date('h:i A', strtotime($entry['start_time'])) ?> - <?= date('h:i A', strtotime($entry['end_time'])) ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label"><?= $current_tab === 'students' ? 'Mathology Level' : 'Training Status' ?>:</div>
+                                    <div><?= htmlspecialchars($entry[$current_tab === 'students' ? 'Mathology_Level' : 'Training_Status']) ?></div>
+                                </div>
+                                
+                                <div class="actions">
+                                    <form method="POST">
+                                        <input type="hidden" name="id" value="<?= $entry['id'] ?>">
+                                        <input type="hidden" name="type" value="<?= $current_tab ?>">
+                                        <button type="submit" name="approve" class="btn btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    
+                                    <form method="POST" class="reject-form">
+                                        <input type="hidden" name="id" value="<?= $entry['id'] ?>">
+                                        <input type="hidden" name="type" value="<?= $current_tab ?>">
+                                        <input type="text" name="reason" placeholder="Rejection reason (optional)">
+                                        <button type="submit" name="reject" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="no-entries">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No pending requests for <?= $current_tab ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Current Timetable Section -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Current Timetable</h2>
+                    
+                    <?php if ($current_tab === 'students'): ?>
+                        <!-- Student List View -->
+                        <?php if ($current->num_rows > 0): ?>
+                            <?php while ($student = $current->fetch_assoc()): ?>
+                                <a href="timetable_approve.php?student_id=<?= $student['student_id'] ?>" class="entry-card student-card current-entry">
+                                    <div class="info-row">
+                                        <div class="info-label">Name:</div>
+                                        <div><?= htmlspecialchars($student['Last_Name']) ?>, <?= htmlspecialchars($student['First_Name']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">School:</div>
+                                        <div><?= htmlspecialchars($student['School']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Grade:</div>
+                                        <div><?= htmlspecialchars($student['Current_School_Grade']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Scheduled Sessions:</div>
+                                        <div><?= $student['timetable_count'] ?></div>
+                                    </div>
+                                </a>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="no-entries">
+                                <i class="fas fa-info-circle"></i>
+                                <p>No students found</p>
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <!-- Instructor Timetable View -->
+                        <?php if ($current->num_rows > 0): ?>
+                            <?php while ($entry = $current->fetch_assoc()): ?>
+                                <div class="entry-card current-entry">
+                                    <div class="info-row">
+                                        <div class="info-label">Name:</div>
+                                        <div><?= htmlspecialchars($entry['last_name']) ?>, <?= htmlspecialchars($entry['first_name']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Course:</div>
+                                        <div><?= htmlspecialchars($entry['course']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Day:</div>
+                                        <div><?= htmlspecialchars($entry['day']) ?></div>
+                                    </div>
+                                    <div class="info-row">
+                                        <div class="info-label">Time:</div>
+                                        <div><?= date('h:i A', strtotime($entry['start_time'])) ?> - <?= date('h:i A', strtotime($entry['end_time'])) ?></div>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="no-entries">
+                                <i class="fas fa-info-circle"></i>
+                                <p>No timetable entries found for <?= $current_tab ?></p>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </main>
     </div>
     <script type="module" src="../scripts/common.js"></script>
