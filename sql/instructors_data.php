@@ -84,14 +84,22 @@ if ($result->num_rows > 0) {
               </tr>";
     }
     echo "</table>";
-    
+
     // Pagination controls
     echo "<div class='pagination'>";
     if ($page > 1) {
         echo "<a href='?instructors_page=" . ($page - 1) . "&active_tab=instructors&search=$search'>Previous</a>";
+    } else {
+        echo "<a class='disabled'>Previous</a>";
+    }
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $activeClass = $i == $page ? 'active' : '';
+        echo "<a href='?instructors_page=$i&active_tab=instructors&search=$search' class='$activeClass'>$i</a>";
     }
     if ($page < $totalPages) {
         echo "<a href='?instructors_page=" . ($page + 1) . "&active_tab=instructors&search=$search'>Next</a>";
+    } else {
+        echo "<a class='disabled'>Next</a>";
     }
     echo "</div>";
 } else {

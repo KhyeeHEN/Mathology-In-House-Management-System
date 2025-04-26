@@ -29,17 +29,21 @@
             </div>
 
             <!-- Search Form -->
-            <form method="GET" action="users.php">
-                <input type="text" name="search" placeholder="Search users by name or ID"
-                    value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                <input type="hidden" name="active_tab" id="active_tab"
-                    value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
-                <input type="hidden" name="students_page"
-                    value="<?php echo isset($_GET['students_page']) ? $_GET['students_page'] : 1; ?>">
-                <input type="hidden" name="instructors_page"
-                    value="<?php echo isset($_GET['instructors_page']) ? $_GET['instructors_page'] : 1; ?>">
-                <button type="submit">Search</button>
-            </form>
+            <div class="search-bar">
+                <form method="GET" action="users.php" id="search-form">
+                    <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
+                        value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                    <input type="hidden" name="active_tab" id="active_tab"
+                        value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                    <input type="hidden" name="students_page"
+                        value="<?php echo isset($_GET['students_page']) ? $_GET['students_page'] : 1; ?>">
+                    <input type="hidden" name="instructors_page"
+                        value="<?php echo isset($_GET['instructors_page']) ? $_GET['instructors_page'] : 1; ?>">
+                    <button type="submit">Search</button>
+                    <!-- Reset button -->
+                    <button type="button" id="reset-button">Reset</button>
+                </form>
+            </div>
 
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
