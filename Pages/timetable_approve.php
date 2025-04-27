@@ -457,71 +457,12 @@ if (!$viewing_id && !$show_search_results) {
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <h2>Mathology</h2>
-            </div>
-            <nav class="side-nav">
-                <a href="dashboard.php" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-                <a href="attendance.php" class="nav-item">
-                    <i class="fas fa-user-check"></i>
-                    <span>Attendance</span>
-                </a>
-                <a href="timetable.php" class="nav-item active">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Timetable</span>
-                </a>
-                <a href="users.php" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Payments</span>
-                </a>
-            </nav>
-        </aside>
+        <?php require("Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <nav class="top-nav">
-                <div class="nav-left">
-                    <button id="menu-toggle" class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1>Timetable</h1>
-                </div>
-                <div class="nav-right">
-                    <div class="nav-links">
-                        <a href="dashboard.php" class="nav-link">Home</a>
-                        <a href="#" class="nav-link">Courses</a>
-                        <a href="#" class="nav-link">Resources</a>
-                        <a href="#" class="nav-link">Help</a>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($currentUser); ?>" alt="Profile" class="profile-img">
-                        <div class="profile-dropdown">
-                            <span class="user-name"><?php echo htmlspecialchars($currentUser); ?></span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown-menu">
-                            <a href="profile.php" class="dropdown-item">
-                                <i class="fas fa-user"></i>
-                                <span>View Profile</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="logout.php" class="dropdown-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Logout</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <?php require("Top_Nav_Bar.php"); ?>
 
             <div class="content-header">
                 <h1><i class="fas fa-clipboard-check"></i> Timetable Approval</h1>

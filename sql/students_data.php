@@ -93,9 +93,17 @@ if ($result->num_rows > 0) {
     echo "<div class='pagination'>";
     if ($page > 1) {
         echo "<a href='?students_page=" . ($page - 1) . "&active_tab=students&search=$search'>Previous</a>";
+    } else {
+        echo "<a class='disabled'>Previous</a>";
+    }
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $activeClass = $i == $page ? 'active' : '';
+        echo "<a href='?students_page=$i&active_tab=students&search=$search' class='$activeClass'>$i</a>";
     }
     if ($page < $totalPages) {
         echo "<a href='?students_page=" . ($page + 1) . "&active_tab=students&search=$search'>Next</a>";
+    } else {
+        echo "<a class='disabled'>Next</a>";
     }
     echo "</div>";
 } else {

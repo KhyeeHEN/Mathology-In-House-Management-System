@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
         table.classList.remove('active');
     });
     document.getElementById(tableId).classList.add('active');
+
+     // Reset button functionality
+    const resetButton = document.getElementById('reset-button');
+    const searchInput = document.getElementById('search-input');
+    const searchForm = document.getElementById('search-form');
+
+    resetButton.addEventListener('click', () => {
+        searchInput.value = ''; // Clear the search input
+        searchForm.submit(); // Submit the form immediately
+    });
 });
 
 function setActiveTab(tab) {
