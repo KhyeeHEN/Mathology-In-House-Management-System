@@ -1,13 +1,19 @@
 <?php
 require_once 'setting.php';
+error_log("Script accessed: " . date('Y-m-d H:i:s'));
+error_log("POST data: " . print_r($_POST, true));
 
+if (isset($_POST['approve']) || isset($_POST['reject'])) {
+    error_log("Approval/Rejection action detected");
+    // Rest of your existing code...
+}
 // Handle approval/rejection
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['approve'])) {
         $id = (int)$_POST['id'];
         $type = $_POST['type']; // 'student' or 'instructor'
         
-        // Define table and column names based on your actual schema
+        // Define table configurations with proper initialization
         $tables = [
             'student' => [
                 'request_table' => 'student_timetable_requests',
@@ -25,58 +31,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]
         ];
         
+        // Safely get configuration
+        if (!isset($tables[$type])) {
+            $_SESSION['error'] = "Invalid request type";
+            header("Location: timetable_approve.php");
+            exit();
+        }
         $cfg = $tables[$type];
         
         $conn->begin_transaction();
         try {
-            // 1. Verify request exists and is pending - FIXED SYNTAX
-            $verifyQuery = "SELECT * FROM {$cfg['request_table']} WHERE id = ? AND status = 'pending'";
-            $stmt = $conn->prepare($verifyQuery);
+            // 1. First verify the basic request exists
+            $verifySql = "SELECT * FROM {$cfg['request_table']} WHERE id = ? AND status = 'pending'";
+            error_log("Verification SQL: " . $verifySql);
+            
+            $stmt = $conn->prepare($verifySql);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $stmt->bind_param("i", $id);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
             $request = $stmt->get_result()->fetch_assoc();
             
             if (!$request) {
-                throw new Exception("Invalid or already processed request (ID: $id)");
+                throw new Exception("Request not found or already processed");
             }
     
-            // 2. Get complete request details with course information - FIXED JOIN
-            $detailsQuery = "
-                SELECT r.*, c.course_name, sc.course_id 
-                FROM {$cfg['request_table']} r
-                JOIN {$cfg['courses_table']} sc ON r.{$cfg['request_course_id']} = sc.{$cfg['courses_pk']}
-                JOIN courses c ON sc.course_id = c.course_id
-                WHERE r.id = ?
-            ";
+            // 2. Get complete request details with course info
+            $detailsSql = "SELECT r.*, c.course_name, sc.course_id
+                          FROM {$cfg['request_table']} r
+                          JOIN {$cfg['courses_table']} sc ON r.{$cfg['request_course_id']} = sc.{$cfg['courses_pk']}
+                          JOIN courses c ON sc.course_id = c.course_id
+                          WHERE r.id = ?";
             
-            $stmt = $conn->prepare($detailsQuery);
+            error_log("Details SQL: " . $detailsSql);
+            
+            $stmt = $conn->prepare($detailsSql);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $stmt->bind_param("i", $id);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
             $fullRequest = $stmt->get_result()->fetch_assoc();
             
             if (!$fullRequest) {
-                throw new Exception("Request details not found. Check if course assignment exists.");
+                throw new Exception("Course details not found for this request");
             }
     
-            // 3. Insert into main timetable - FIXED COLUMN LIST
-            $insertQuery = "
-                INSERT INTO {$cfg['timetable_table']} 
-                ({$cfg['request_course_id']}, day, start_time, end_time, approved_at, course)
-                VALUES (?, ?, ?, NOW(), ?)
-            ";
+            // 3. Insert into timetable
+            $insertSql = "INSERT INTO {$cfg['timetable_table']} 
+                         ({$cfg['request_course_id']}, day, start_time, end_time, approved_at, course)
+                         VALUES (?, ?, ?, ?, NOW(), ?)";
             
-            $stmt = $conn->prepare($insertQuery);
+            error_log("Insert SQL: " . $insertSql);
+            
+            $stmt = $conn->prepare($insertSql);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $stmt->bind_param(
-                "isss",
+                "issss", 
                 $fullRequest[$cfg['request_course_id']],
                 $fullRequest['day'],
                 $fullRequest['start_time'],
@@ -85,35 +103,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             
             if (!$stmt->execute()) {
-                throw new Exception("Insert failed: " . $stmt->error);
+                throw new Exception("Execute failed: " . $stmt->error);
             }
     
             // 4. Update request status
-            $updateQuery = "
-                UPDATE {$cfg['request_table']} 
-                SET status = 'approved', rejection_reason = NULL 
-                WHERE id = ?
-            ";
+            $updateSql = "UPDATE {$cfg['request_table']} 
+                         SET status = 'approved', rejection_reason = NULL 
+                         WHERE id = ?";
             
-            $stmt = $conn->prepare($updateQuery);
+            error_log("Update SQL: " . $updateSql);
+            
+            $stmt = $conn->prepare($updateSql);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $stmt->bind_param("i", $id);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
             
             $conn->commit();
             $_SESSION['message'] = "Timetable entry approved successfully!";
         } catch (Exception $e) {
             $conn->rollback();
             $_SESSION['error'] = "Approval failed: " . $e->getMessage();
-            
-            // Enhanced error logging
-            error_log("Approval Error: " . $e->getMessage());
-            if (isset($verifyQuery)) error_log("Verify Query: $verifyQuery");
-            if (isset($detailsQuery)) error_log("Details Query: $detailsQuery");
-            if (isset($insertQuery)) error_log("Insert Query: $insertQuery");
-            if ($conn->error) error_log("DB Error: " . $conn->error);
+            error_log("FULL ERROR: " . $e->getMessage());
         }
     }
     elseif (isset($_POST['reject'])) {
@@ -686,18 +700,18 @@ if (!$viewing_id && !$show_search_results) {
 
                                     <div class="actions">
                                         <?php if ($result['type'] === 'Pending Request'): ?>
-                                            <form method="POST">
-                                                <input type="hidden" name="id" value="<?= $result['id'] ?>">
-                                                <input type="hidden" name="type" value="<?= htmlspecialchars($current_tab) ?>">
+                                            <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure?');">
+                                                <input type="hidden" name="id" value="<?= $request['id'] ?>">
+                                                <input type="hidden" name="type" value="student"> <!-- or 'instructor' -->
                                                 <button type="submit" name="approve" class="btn btn-success">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
                                             </form>
 
-                                            <form method="POST" class="reject-form">
-                                                <input type="hidden" name="id" value="<?= htmlspecialchars($result['id']) ?>">
-                                                <input type="hidden" name="type" value="<?= htmlspecialchars($current_tab) ?>">
-                                                <input type="text" name="reason" placeholder="Rejection reason (optional)">
+                                            <form method="POST" action="timetable_approve.php">
+                                                <input type="hidden" name="id" value="<?= $request['id'] ?>">
+                                                <input type="hidden" name="type" value="student"> <!-- or 'instructor' -->
+                                                <input type="text" name="reason" placeholder="Rejection reason">
                                                 <button type="submit" name="reject" class="btn btn-danger">
                                                     <i class="fas fa-times"></i> Reject
                                                 </button>
@@ -763,17 +777,18 @@ if (!$viewing_id && !$show_search_results) {
                                         </div>
                                     <?php endif; ?>
                                     <div class="actions">
-                                        <form method="POST">
+                                        <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure?');">
                                             <input type="hidden" name="id" value="<?= $request['id'] ?>">
-                                            <input type="hidden" name="type" value="<?= $current_tab ?>">
+                                            <input type="hidden" name="type" value="student"> <!-- or 'instructor' -->
                                             <button type="submit" name="approve" class="btn btn-success">
                                                 <i class="fas fa-check"></i> Approve
                                             </button>
                                         </form>
-                                        <form method="POST" class="reject-form">
+
+                                        <form method="POST" action="timetable_approve.php">
                                             <input type="hidden" name="id" value="<?= $request['id'] ?>">
-                                            <input type="hidden" name="type" value="<?= $current_tab ?>">
-                                            <input type="text" name="reason" placeholder="Rejection reason (optional)">
+                                            <input type="hidden" name="type" value="student"> <!-- or 'instructor' -->
+                                            <input type="text" name="reason" placeholder="Rejection reason">
                                             <button type="submit" name="reject" class="btn btn-danger">
                                                 <i class="fas fa-times"></i> Reject
                                             </button>
