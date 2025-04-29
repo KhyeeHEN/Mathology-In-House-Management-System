@@ -7,64 +7,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)$_POST['id'];
         $type = $_POST['type']; // 'student' or 'instructor'
         
+        // Define table and column names based on your actual schema
+        $tables = [
+            'student' => [
+                'request_table' => 'student_timetable_requests',
+                'timetable_table' => 'student_timetable',
+                'courses_table' => 'student_courses',
+                'request_course_id' => 'student_course_id',
+                'courses_pk' => 'student_course_id'
+            ],
+            'instructor' => [
+                'request_table' => 'instructor_timetable_requests',
+                'timetable_table' => 'instructor_timetable',
+                'courses_table' => 'instructor_courses',
+                'request_course_id' => 'instructor_course_id',
+                'courses_pk' => 'instructor_course_id'
+            ]
+        ];
+        
+        $cfg = $tables[$type];
+        
         $conn->begin_transaction();
         try {
-            // Verify the request exists and is pending
-            $check = $conn->query("SELECT id FROM {$type}_timetable_requests WHERE id = $id AND status = 'pending'")->num_rows;
-            if ($check == 0) {
-                throw new Exception("Invalid or already processed request");
+            // 1. Verify request exists and is pending - FIXED SYNTAX
+            $verifyQuery = "SELECT * FROM {$cfg['request_table']} WHERE id = ? AND status = 'pending'";
+            $stmt = $conn->prepare($verifyQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
             }
-
-            // Get the request details with course information
-            $request = $conn->query("
-                SELECT r.*, c.course_name 
-                FROM {$type}_timetable_requests r
-                JOIN {$type}_courses sc ON r.{$type}_course_id = sc.{$type}_course_id
-                JOIN courses c ON sc.course_id = c.course_id
-                WHERE r.id = $id
-            ")->fetch_assoc();
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $request = $stmt->get_result()->fetch_assoc();
             
             if (!$request) {
-                throw new Exception("Request details not found");
+                throw new Exception("Invalid or already processed request (ID: $id)");
             }
-
-            // Insert into main timetable
-            $insertQuery = $conn->prepare("
-                INSERT INTO {$type}_timetable 
-                ({$type}_course_id, day, start_time, end_time, approved_at) 
-                VALUES (?, ?, ?, ?, NOW())
-            ");
-            $insertQuery->bind_param(
-                "isss",
-                $request["{$type}_course_id"],
-                $request['day'],
-                $request['start_time'],
-                $request['end_time']
-            );
-            $insertQuery->execute();
+    
+            // 2. Get complete request details with course information - FIXED JOIN
+            $detailsQuery = "
+                SELECT r.*, c.course_name, sc.course_id 
+                FROM {$cfg['request_table']} r
+                JOIN {$cfg['courses_table']} sc ON r.{$cfg['request_course_id']} = sc.{$cfg['courses_pk']}
+                JOIN courses c ON sc.course_id = c.course_id
+                WHERE r.id = ?
+            ";
             
-            if ($insertQuery->affected_rows === 0) {
-                throw new Exception("Failed to create timetable entry");
+            $stmt = $conn->prepare($detailsQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
             }
-
-            // Update request status
-            $updateQuery = $conn->prepare("
-                UPDATE {$type}_timetable_requests 
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $fullRequest = $stmt->get_result()->fetch_assoc();
+            
+            if (!$fullRequest) {
+                throw new Exception("Request details not found. Check if course assignment exists.");
+            }
+    
+            // 3. Insert into main timetable - FIXED COLUMN LIST
+            $insertQuery = "
+                INSERT INTO {$cfg['timetable_table']} 
+                ({$cfg['request_course_id']}, day, start_time, end_time, approved_at, course)
+                VALUES (?, ?, ?, NOW(), ?)
+            ";
+            
+            $stmt = $conn->prepare($insertQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+            $stmt->bind_param(
+                "isss",
+                $fullRequest[$cfg['request_course_id']],
+                $fullRequest['day'],
+                $fullRequest['start_time'],
+                $fullRequest['end_time'],
+                $fullRequest['course_name']
+            );
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Insert failed: " . $stmt->error);
+            }
+    
+            // 4. Update request status
+            $updateQuery = "
+                UPDATE {$cfg['request_table']} 
                 SET status = 'approved', rejection_reason = NULL 
                 WHERE id = ?
-            ");
-            $updateQuery->bind_param("i", $id);
-            $updateQuery->execute();
+            ";
             
-            if ($updateQuery->affected_rows === 0) {
-                throw new Exception("Failed to update request status");
+            $stmt = $conn->prepare($updateQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
             }
-
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            
             $conn->commit();
             $_SESSION['message'] = "Timetable entry approved successfully!";
         } catch (Exception $e) {
             $conn->rollback();
             $_SESSION['error'] = "Approval failed: " . $e->getMessage();
+            
+            // Enhanced error logging
+            error_log("Approval Error: " . $e->getMessage());
+            if (isset($verifyQuery)) error_log("Verify Query: $verifyQuery");
+            if (isset($detailsQuery)) error_log("Details Query: $detailsQuery");
+            if (isset($insertQuery)) error_log("Insert Query: $insertQuery");
+            if ($conn->error) error_log("DB Error: " . $conn->error);
         }
     }
     elseif (isset($_POST['reject'])) {
