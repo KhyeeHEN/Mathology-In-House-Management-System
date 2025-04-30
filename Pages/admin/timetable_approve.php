@@ -1,5 +1,5 @@
 <?php
-require_once 'setting.php';
+require_once '../setting.php';
 error_log("Script accessed: " . date('Y-m-d H:i:s'));
 error_log("POST data: " . print_r($_POST, true));
 
@@ -355,8 +355,8 @@ if (!$viewing_id && !$show_search_results) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Timetable Approval</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/timtable.css">
+    <link rel="stylesheet" href="../../styles/common.css">
+    <link rel="stylesheet" href="../../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .tab-container { display: flex; margin-bottom: 20px; }
@@ -520,12 +520,12 @@ if (!$viewing_id && !$show_search_results) {
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <div class="content-header">
                 <h1><i class="fas fa-clipboard-check"></i> Timetable Approval</h1>

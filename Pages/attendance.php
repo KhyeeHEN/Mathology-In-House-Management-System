@@ -11,12 +11,12 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("includes/Top_Nav_Bar.php"); ?>
 
    <!-- Attendance Table -->
    <div style="padding: 1rem 2rem;">

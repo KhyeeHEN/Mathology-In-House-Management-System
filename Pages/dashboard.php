@@ -1,5 +1,5 @@
 <?php
-require_once 'darrshan_dbconnect.php';
+require_once '../setting.php';
 
 // Fetch events from database
 $stmt = $pdo->prepare("SELECT * FROM subjects WHERE student_name = 'Darrshan'");
@@ -51,11 +51,11 @@ foreach ($events as $event) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("includes/Aside_Nav.php"); ?>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("includes/Top_Nav_Bar.php"); ?>
 
             <!-- Calendar Section -->
             <div class="calendar-container">

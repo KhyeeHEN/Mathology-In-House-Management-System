@@ -19,12 +19,12 @@ $result = $conn->query($sql);
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("includes/Top_Nav_Bar.php"); ?>
 
             <!-- Page Content -->
             <section class="timetable-section">

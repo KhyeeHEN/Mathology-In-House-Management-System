@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/users.css">
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../Styles/users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
     <div class="dashboard-container">
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <!-- Do your content here -->
 
