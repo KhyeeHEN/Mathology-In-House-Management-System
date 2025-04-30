@@ -35,12 +35,10 @@
                         value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
                     <input type="hidden" name="active_tab" id="active_tab"
                         value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
-                    <input type="hidden" name="students_page"
-                        value="<?php echo isset($_GET['students_page']) ? $_GET['students_page'] : 1; ?>">
-                    <input type="hidden" name="instructors_page"
-                        value="<?php echo isset($_GET['instructors_page']) ? $_GET['instructors_page'] : 1; ?>">
+                    <input type="hidden" name="students_page" id="students_page" value="1"> <!-- Reset to page 1 -->
+                    <input type="hidden" name="instructors_page" id="instructors_page" value="1">
+                    <!-- Reset to page 1 -->
                     <button type="submit">Search</button>
-                    <!-- Reset button -->
                     <button type="button" id="reset-button">Reset</button>
                 </form>
             </div>

@@ -42,14 +42,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById(tableId).classList.add('active');
 
-     // Reset button functionality
+    // Reset button functionality
     const resetButton = document.getElementById('reset-button');
     const searchInput = document.getElementById('search-input');
     const searchForm = document.getElementById('search-form');
 
     resetButton.addEventListener('click', () => {
         searchInput.value = ''; // Clear the search input
+        document.getElementById('students_page').value = '1'; // Reset to page 1
+        document.getElementById('instructors_page').value = '1'; // Reset to page 1
         searchForm.submit(); // Submit the form immediately
+    });
+
+    // Ensure pagination parameters reset to 1 on search
+    searchForm.addEventListener('submit', () => {
+        document.getElementById('students_page').value = '1'; // Reset to page 1
+        document.getElementById('instructors_page').value = '1'; // Reset to page 1
     });
 });
 
