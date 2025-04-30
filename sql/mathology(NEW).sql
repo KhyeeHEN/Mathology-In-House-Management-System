@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3310
--- Generation Time: Apr 13, 2025 at 01:59 PM
+-- Generation Time: Apr 27, 2025 at 12:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,6 +61,31 @@ INSERT INTO `attendance_records` (`record_id`, `student_id`, `instructor_id`, `t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `courses`
+--
+
+CREATE TABLE `courses` (
+  `course_id` int(11) NOT NULL,
+  `course_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `level` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `courses`
+--
+
+INSERT INTO `courses` (`course_id`, `course_name`, `description`, `level`, `created_at`) VALUES
+(1, 'IGCSE Math Prep', 'Preparation for IGCSE Mathematics exam', 'Intermediate', '2025-04-25 12:52:47'),
+(2, 'SPM Add Math', 'Additional Mathematics for SPM level', 'Advanced', '2025-04-25 12:52:47'),
+(3, 'Elementary Math', 'Basic mathematics for primary school', 'Beginner', '2025-04-25 12:52:47'),
+(4, 'Physics Basics', 'Introduction to Physics concepts', 'Beginner', '2025-04-25 15:16:00'),
+(5, 'Advanced Physics', 'Higher level Physics topics', 'Advanced', '2025-04-25 15:16:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `instructor`
 --
 
@@ -104,30 +129,55 @@ INSERT INTO `instructor` (`instructor_id`, `Last_Name`, `First_Name`, `Gender`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `instructor_courses`
+--
+
+CREATE TABLE `instructor_courses` (
+  `instructor_course_id` int(11) NOT NULL,
+  `instructor_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `assigned_date` date NOT NULL,
+  `status` enum('active','inactive') DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `instructor_courses`
+--
+
+INSERT INTO `instructor_courses` (`instructor_course_id`, `instructor_id`, `course_id`, `assigned_date`, `status`) VALUES
+(1, 1, 1, '2023-09-01', 'active'),
+(2, 1, 2, '2023-09-01', 'active'),
+(3, 2, 3, '2023-09-01', 'active'),
+(4, 3, 4, '2023-09-01', 'active'),
+(5, 4, 5, '2023-09-01', 'active');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `instructor_timetable`
 --
 
 CREATE TABLE `instructor_timetable` (
   `id` int(11) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `course` varchar(100) NOT NULL,
   `day` varchar(10) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
-  `approved_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `approved_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('active','cancelled') DEFAULT 'active',
+  `instructor_course_id` int(11) DEFAULT NULL,
+  `course` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `instructor_timetable`
 --
 
-INSERT INTO `instructor_timetable` (`id`, `last_name`, `first_name`, `course`, `day`, `start_time`, `end_time`, `approved_at`) VALUES
-(1, 'Chew', 'Teck Guan', 'Chemistry Basics', 'Monday', '09:00:00', '11:00:00', '2023-10-15 06:30:00'),
-(2, 'Yap', 'Sook Fun', 'Probability', 'Wednesday', '13:00:00', '15:00:00', '2023-10-16 02:15:00'),
-(3, 'Khoo', 'Wei Ming', 'Statistics', 'Friday', '10:00:00', '12:00:00', '2023-10-17 03:20:00'),
-(4, 'Chan', 'Mei Chen', 'English for Math', 'Tuesday', '14:00:00', '16:00:00', '2023-10-18 01:45:00'),
-(5, 'Goh', 'Kok Seng', 'Linear Algebra', 'Thursday', '11:00:00', '13:00:00', '2023-10-19 08:10:00');
+INSERT INTO `instructor_timetable` (`id`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `instructor_course_id`, `course`) VALUES
+(1, 'Monday', '09:00:00', '11:00:00', '2023-10-15 06:30:00', 'active', NULL, ''),
+(2, 'Wednesday', '13:00:00', '15:00:00', '2023-10-16 02:15:00', 'active', NULL, ''),
+(3, 'Friday', '10:00:00', '12:00:00', '2023-10-17 03:20:00', 'active', NULL, ''),
+(4, 'Tuesday', '14:00:00', '16:00:00', '2023-10-18 01:45:00', 'active', NULL, ''),
+(5, 'Thursday', '11:00:00', '13:00:00', '2023-10-19 08:10:00', 'active', NULL, '');
 
 -- --------------------------------------------------------
 
@@ -137,27 +187,26 @@ INSERT INTO `instructor_timetable` (`id`, `last_name`, `first_name`, `course`, `
 
 CREATE TABLE `instructor_timetable_requests` (
   `id` int(11) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `course` varchar(100) NOT NULL,
   `day` varchar(10) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
   `status` enum('pending','approved','rejected') DEFAULT 'pending',
   `rejection_reason` text DEFAULT NULL,
-  `requested_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `instructor_course_id` int(11) DEFAULT NULL,
+  `course` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `instructor_timetable_requests`
 --
 
-INSERT INTO `instructor_timetable_requests` (`id`, `last_name`, `first_name`, `course`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`) VALUES
-(1, 'Tan', 'Kok Wei', 'Advanced Calculus', 'Monday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-01 01:15:00'),
-(2, 'Lim', 'Mei Ling', 'Algebra Basics', 'Wednesday', '10:00:00', '12:00:00', 'pending', NULL, '2023-11-02 02:30:00'),
-(3, 'Chong', 'Ahmad bin', 'Physics Fundamentals', 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2023-11-03 03:45:00'),
-(4, 'Ng', 'Siew Yee', 'Geometry', 'Tuesday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-04 06:20:00'),
-(5, 'Lee', 'Chin Fatt', 'Trigonometry', 'Thursday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-05 00:50:00');
+INSERT INTO `instructor_timetable_requests` (`id`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`, `instructor_course_id`, `course`) VALUES
+(1, 'Monday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-01 01:15:00', NULL, NULL),
+(2, 'Wednesday', '10:00:00', '12:00:00', 'pending', NULL, '2023-11-02 02:30:00', NULL, NULL),
+(3, 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2023-11-03 03:45:00', NULL, NULL),
+(4, 'Tuesday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-04 06:20:00', NULL, NULL),
+(5, 'Thursday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-05 00:50:00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -329,54 +378,150 @@ CREATE TABLE `students` (
   `School_Intake` tinyint(1) DEFAULT NULL,
   `Current_School_Grade` text DEFAULT NULL,
   `School` varchar(100) DEFAULT NULL,
-  `Mathology_Level` text DEFAULT NULL
+  `Mathology_Level` text DEFAULT NULL,
+  `enrollment_date` date DEFAULT NULL,
+  `status` enum('active','inactive','graduated') DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`student_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`, `School_Syllabus`, `School_Intake`, `Current_School_Grade`, `School`, `Mathology_Level`) VALUES
-(1, 'Tan', 'Wei Jie', 1, '2008-05-12', 'IGCSE, Math, Science', 1, 'Year 10', 'Kingsway International School', 'Intermediate'),
-(2, 'Lim', 'Mei Ling', 0, '2007-09-23', 'SPM, Math, English', 1, 'Form 4', 'SMK Damansara Jaya', 'Advanced'),
-(3, 'Chong', 'Kai Wen', 1, '2009-03-15', 'IGCSE, Physics, Chemistry', 0, 'Year 9', 'Sri KDU International School', 'Beginner'),
-(4, 'Ng', 'Xiu Mei', 0, '2006-11-07', 'SPM, Biology, History', 1, 'Form 5', 'SMK Taman Connaught', 'Intermediate'),
-(5, 'Lee', 'Jun Hao', 1, '2010-01-19', 'KSSR, Math, Malay', 1, 'Standard 6', 'SJK(C) Chung Hwa', 'Beginner'),
-(6, 'Wong', 'Siew Ling', 0, '2008-07-30', 'IGCSE, Math, Economics', 1, 'Year 11', 'Garden International School', 'Advanced'),
-(7, 'Chew', 'Boon Keat', 1, '2007-12-04', 'SPM, Chemistry, Add Math', 1, 'Form 4', 'SMK Sri Permata', 'Intermediate'),
-(8, 'Yap', 'Hui Xin', 0, '2009-06-18', 'IGCSE, English, Geography', 0, 'Year 10', 'Cempaka International School', 'Beginner'),
-(9, 'Khoo', 'Zhi Wei', 1, '2006-08-22', 'SPM, Physics, Math', 1, 'Form 5', 'SMK Kepong Baru', 'Advanced'),
-(10, 'Chan', 'Yi Ting', 0, '2011-02-14', 'KSSR, Science, English', 1, 'Standard 5', 'SJK(C) Lick Hung', 'Beginner'),
-(11, 'Goh', 'Jia Hao', 1, '2008-04-09', 'IGCSE, Math, Business', 1, 'Year 10', 'Sunway International School', 'Intermediate'),
-(12, 'Lau', 'Xin Yi', 0, '2007-10-27', 'SPM, Biology, English', 1, 'Form 4', 'SMK Bukit Jalil', 'Advanced'),
-(13, 'Teo', 'Ming Zhe', 1, '2009-09-11', 'IGCSE, Chemistry, Math', 0, 'Year 9', 'Taylor’s International School', 'Beginner'),
-(14, 'Ho', 'Pei Ling', 0, '2006-03-25', 'SPM, Add Math, Physics', 1, 'Form 5', 'SMK Seri Bintang Utara', 'Intermediate'),
-(15, 'Ong', 'Wei Kang', 1, '2010-05-03', 'KSSR, Math, Malay', 1, 'Standard 6', 'SJK(C) Yuk Chai', 'Beginner'),
-(16, 'Low', 'Shu Fen', 0, '2008-12-16', 'IGCSE, Economics, Math', 1, 'Year 11', 'British International School', 'Advanced'),
-(17, 'Soh', 'Jian Wei', 1, '2007-06-29', 'SPM, Chemistry, Math', 1, 'Form 4', 'SMK Taman Desa', 'Intermediate'),
-(18, 'Chua', 'Mei Qi', 0, '2009-08-08', 'IGCSE, English, Science', 0, 'Year 10', 'Nexus International School', 'Beginner'),
-(19, 'Pang', 'Wei Jun', 1, '2006-10-13', 'SPM, Physics, Add Math', 1, 'Form 5', 'SMK Seafield', 'Advanced'),
-(20, 'Yeoh', 'Xin Ru', 0, '2011-07-21', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Kuen Cheng', 'Beginner'),
-(21, 'Sim', 'Kai Jie', 1, '2008-02-17', 'IGCSE, Math, Physics', 1, 'Year 10', 'HELP International School', 'Intermediate'),
-(22, 'Kong', 'Hui Min', 0, '2007-11-05', 'SPM, Biology, Chemistry', 1, 'Form 4', 'SMK Bandar Utama', 'Advanced'),
-(23, 'Foo', 'Jun Wei', 1, '2009-04-28', 'IGCSE, Geography, Math', 0, 'Year 9', 'St. John’s International School', 'Beginner'),
-(24, 'Liew', 'Xin Yi', 0, '2006-12-09', 'SPM, Math, English', 1, 'Form 5', 'SMK Taman SEA', 'Intermediate'),
-(25, 'Tay', 'Zhi Hao', 1, '2010-03-14', 'KSSR, Science, Malay', 1, 'Standard 6', 'SJK(C) Han Chiang', 'Beginner'),
-(26, 'Koh', 'Pei Wen', 0, '2008-09-02', 'IGCSE, Economics, Math', 1, 'Year 11', 'Uplands International School', 'Advanced'),
-(27, 'Chin', 'Wei Xiang', 1, '2007-08-19', 'SPM, Physics, Add Math', 1, 'Form 4', 'SMK Subang Utama', 'Intermediate'),
-(28, 'Toh', 'Jia Yi', 0, '2009-10-25', 'IGCSE, English, Chemistry', 0, 'Year 10', 'Alice Smith School', 'Beginner'),
-(29, 'Heng', 'Jun Kai', 1, '2006-05-31', 'SPM, Math, Biology', 1, 'Form 5', 'SMK Damansara Utama', 'Advanced'),
-(30, 'Poon', 'Xin Tong', 0, '2011-01-08', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Puay Chai', 'Beginner'),
-(31, 'Kwan', 'Wei Lun', 1, '2008-06-14', 'IGCSE, Math, Physics', 1, 'Year 10', 'Kolej Tuanku Ja’afar', 'Intermediate'),
-(32, 'Liang', 'Shu Qi', 0, '2007-03-22', 'SPM, Chemistry, English', 1, 'Form 4', 'SMK Sultan Ismail', 'Advanced'),
-(33, 'Yeap', 'Zhi Cong', 1, '2009-07-16', 'IGCSE, Geography, Math', 0, 'Year 9', 'Marlborough College Malaysia', 'Beginner'),
-(34, 'Ooi', 'Hui Shan', 0, '2006-09-28', 'SPM, Add Math, Physics', 1, 'Form 5', 'SMK Convent Green Lane', 'Intermediate'),
-(35, 'Tham', 'Wei Jie', 1, '2010-11-11', 'KSSR, Science, Malay', 1, 'Standard 6', 'SJK(C) Jalan Davidson', 'Beginner'),
-(36, 'See', 'Xin Wei', 0, '2008-01-30', 'IGCSE, Math, Economics', 1, 'Year 11', 'Fairview International School', 'Advanced'),
-(37, 'Phang', 'Jun Wei', 1, '2007-05-07', 'SPM, Physics, Math', 1, 'Form 4', 'SMK Seri Hartamas', 'Intermediate'),
-(38, 'Chia', 'Mei Xin', 0, '2009-12-20', 'IGCSE, English, Science', 0, 'Year 10', 'IGB International School', 'Beginner'),
-(39, 'Tiew', 'Zhi Yang', 1, '2006-04-15', 'SPM, Add Math, Chemistry', 1, 'Form 5', 'SMK Aminuddin Baki', 'Advanced'),
-(40, 'Law', 'Jia Wen', 0, '2011-06-23', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Chung Kwok', 'Beginner');
+INSERT INTO `students` (`student_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`, `School_Syllabus`, `School_Intake`, `Current_School_Grade`, `School`, `Mathology_Level`, `enrollment_date`, `status`) VALUES
+(1, 'Tan', 'Wei Jie', 1, '2008-05-12', 'IGCSE, Math, Science', 1, 'Year 10', 'Kingsway International School', 'Intermediate', NULL, 'active'),
+(2, 'Lim', 'Mei Ling', 0, '2007-09-23', 'SPM, Math, English', 1, 'Form 4', 'SMK Damansara Jaya', 'Advanced', NULL, 'active'),
+(3, 'Chong', 'Kai Wen', 1, '2009-03-15', 'IGCSE, Physics, Chemistry', 0, 'Year 9', 'Sri KDU International School', 'Beginner', NULL, 'active'),
+(4, 'Ng', 'Xiu Mei', 0, '2006-11-07', 'SPM, Biology, History', 1, 'Form 5', 'SMK Taman Connaught', 'Intermediate', NULL, 'active'),
+(5, 'Lee', 'Jun Hao', 1, '2010-01-19', 'KSSR, Math, Malay', 1, 'Standard 6', 'SJK(C) Chung Hwa', 'Beginner', NULL, 'active'),
+(6, 'Wong', 'Siew Ling', 0, '2008-07-30', 'IGCSE, Math, Economics', 1, 'Year 11', 'Garden International School', 'Advanced', NULL, 'active'),
+(7, 'Chew', 'Boon Keat', 1, '2007-12-04', 'SPM, Chemistry, Add Math', 1, 'Form 4', 'SMK Sri Permata', 'Intermediate', NULL, 'active'),
+(8, 'Yap', 'Hui Xin', 0, '2009-06-18', 'IGCSE, English, Geography', 0, 'Year 10', 'Cempaka International School', 'Beginner', NULL, 'active'),
+(9, 'Khoo', 'Zhi Wei', 1, '2006-08-22', 'SPM, Physics, Math', 1, 'Form 5', 'SMK Kepong Baru', 'Advanced', NULL, 'active'),
+(10, 'Chan', 'Yi Ting', 0, '2011-02-14', 'KSSR, Science, English', 1, 'Standard 5', 'SJK(C) Lick Hung', 'Beginner', NULL, 'active'),
+(11, 'Goh', 'Jia Hao', 1, '2008-04-09', 'IGCSE, Math, Business', 1, 'Year 10', 'Sunway International School', 'Intermediate', NULL, 'active'),
+(12, 'Lau', 'Xin Yi', 0, '2007-10-27', 'SPM, Biology, English', 1, 'Form 4', 'SMK Bukit Jalil', 'Advanced', NULL, 'active'),
+(13, 'Teo', 'Ming Zhe', 1, '2009-09-11', 'IGCSE, Chemistry, Math', 0, 'Year 9', 'Taylor’s International School', 'Beginner', NULL, 'active'),
+(14, 'Ho', 'Pei Ling', 0, '2006-03-25', 'SPM, Add Math, Physics', 1, 'Form 5', 'SMK Seri Bintang Utara', 'Intermediate', NULL, 'active'),
+(15, 'Ong', 'Wei Kang', 1, '2010-05-03', 'KSSR, Math, Malay', 1, 'Standard 6', 'SJK(C) Yuk Chai', 'Beginner', NULL, 'active'),
+(16, 'Low', 'Shu Fen', 0, '2008-12-16', 'IGCSE, Economics, Math', 1, 'Year 11', 'British International School', 'Advanced', NULL, 'active'),
+(17, 'Soh', 'Jian Wei', 1, '2007-06-29', 'SPM, Chemistry, Math', 1, 'Form 4', 'SMK Taman Desa', 'Intermediate', NULL, 'active'),
+(18, 'Chua', 'Mei Qi', 0, '2009-08-08', 'IGCSE, English, Science', 0, 'Year 10', 'Nexus International School', 'Beginner', NULL, 'active'),
+(19, 'Pang', 'Wei Jun', 1, '2006-10-13', 'SPM, Physics, Add Math', 1, 'Form 5', 'SMK Seafield', 'Advanced', NULL, 'active'),
+(20, 'Yeoh', 'Xin Ru', 0, '2011-07-21', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Kuen Cheng', 'Beginner', NULL, 'active'),
+(21, 'Sim', 'Kai Jie', 1, '2008-02-17', 'IGCSE, Math, Physics', 1, 'Year 10', 'HELP International School', 'Intermediate', NULL, 'active'),
+(22, 'Kong', 'Hui Min', 0, '2007-11-05', 'SPM, Biology, Chemistry', 1, 'Form 4', 'SMK Bandar Utama', 'Advanced', NULL, 'active'),
+(23, 'Foo', 'Jun Wei', 1, '2009-04-28', 'IGCSE, Geography, Math', 0, 'Year 9', 'St. John’s International School', 'Beginner', NULL, 'active'),
+(24, 'Liew', 'Xin Yi', 0, '2006-12-09', 'SPM, Math, English', 1, 'Form 5', 'SMK Taman SEA', 'Intermediate', NULL, 'active'),
+(25, 'Tay', 'Zhi Hao', 1, '2010-03-14', 'KSSR, Science, Malay', 1, 'Standard 6', 'SJK(C) Han Chiang', 'Beginner', NULL, 'active'),
+(26, 'Koh', 'Pei Wen', 0, '2008-09-02', 'IGCSE, Economics, Math', 1, 'Year 11', 'Uplands International School', 'Advanced', NULL, 'active'),
+(27, 'Chin', 'Wei Xiang', 1, '2007-08-19', 'SPM, Physics, Add Math', 1, 'Form 4', 'SMK Subang Utama', 'Intermediate', NULL, 'active'),
+(28, 'Toh', 'Jia Yi', 0, '2009-10-25', 'IGCSE, English, Chemistry', 0, 'Year 10', 'Alice Smith School', 'Beginner', NULL, 'active'),
+(29, 'Heng', 'Jun Kai', 1, '2006-05-31', 'SPM, Math, Biology', 1, 'Form 5', 'SMK Damansara Utama', 'Advanced', NULL, 'active'),
+(30, 'Poon', 'Xin Tong', 0, '2011-01-08', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Puay Chai', 'Beginner', NULL, 'active'),
+(31, 'Kwan', 'Wei Lun', 1, '2008-06-14', 'IGCSE, Math, Physics', 1, 'Year 10', 'Kolej Tuanku Ja’afar', 'Intermediate', NULL, 'active'),
+(32, 'Liang', 'Shu Qi', 0, '2007-03-22', 'SPM, Chemistry, English', 1, 'Form 4', 'SMK Sultan Ismail', 'Advanced', NULL, 'active'),
+(33, 'Yeap', 'Zhi Cong', 1, '2009-07-16', 'IGCSE, Geography, Math', 0, 'Year 9', 'Marlborough College Malaysia', 'Beginner', NULL, 'active'),
+(34, 'Ooi', 'Hui Shan', 0, '2006-09-28', 'SPM, Add Math, Physics', 1, 'Form 5', 'SMK Convent Green Lane', 'Intermediate', NULL, 'active'),
+(35, 'Tham', 'Wei Jie', 1, '2010-11-11', 'KSSR, Science, Malay', 1, 'Standard 6', 'SJK(C) Jalan Davidson', 'Beginner', NULL, 'active'),
+(36, 'See', 'Xin Wei', 0, '2008-01-30', 'IGCSE, Math, Economics', 1, 'Year 11', 'Fairview International School', 'Advanced', NULL, 'active'),
+(37, 'Phang', 'Jun Wei', 1, '2007-05-07', 'SPM, Physics, Math', 1, 'Form 4', 'SMK Seri Hartamas', 'Intermediate', NULL, 'active'),
+(38, 'Chia', 'Mei Xin', 0, '2009-12-20', 'IGCSE, English, Science', 0, 'Year 10', 'IGB International School', 'Beginner', NULL, 'active'),
+(39, 'Tiew', 'Zhi Yang', 1, '2006-04-15', 'SPM, Add Math, Chemistry', 1, 'Form 5', 'SMK Aminuddin Baki', 'Advanced', NULL, 'active'),
+(40, 'Law', 'Jia Wen', 0, '2011-06-23', 'KSSR, Math, English', 1, 'Standard 5', 'SJK(C) Chung Kwok', 'Beginner', NULL, 'active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_courses`
+--
+
+CREATE TABLE `student_courses` (
+  `student_course_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `enrollment_date` date NOT NULL,
+  `status` enum('active','completed','dropped') DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student_courses`
+--
+
+INSERT INTO `student_courses` (`student_course_id`, `student_id`, `course_id`, `enrollment_date`, `status`) VALUES
+(1, 10, 1, '2025-04-25', 'active'),
+(2, 7, 1, '2025-04-25', 'active'),
+(3, 38, 1, '2025-04-25', 'active'),
+(4, 27, 1, '2025-04-25', 'active'),
+(5, 3, 1, '2025-04-25', 'active'),
+(6, 18, 1, '2025-04-25', 'active'),
+(7, 23, 1, '2025-04-25', 'active'),
+(8, 11, 1, '2025-04-25', 'active'),
+(9, 29, 1, '2025-04-25', 'active'),
+(10, 14, 1, '2025-04-25', 'active'),
+(11, 9, 1, '2025-04-25', 'active'),
+(12, 26, 1, '2025-04-25', 'active'),
+(13, 22, 1, '2025-04-25', 'active'),
+(14, 31, 1, '2025-04-25', 'active'),
+(15, 12, 1, '2025-04-25', 'active'),
+(16, 40, 1, '2025-04-25', 'active'),
+(17, 5, 1, '2025-04-25', 'active'),
+(18, 32, 1, '2025-04-25', 'active'),
+(19, 24, 1, '2025-04-25', 'active'),
+(20, 2, 1, '2025-04-25', 'active'),
+(21, 16, 1, '2025-04-25', 'active'),
+(22, 4, 1, '2025-04-25', 'active'),
+(23, 15, 1, '2025-04-25', 'active'),
+(24, 34, 1, '2025-04-25', 'active'),
+(25, 19, 1, '2025-04-25', 'active'),
+(26, 37, 1, '2025-04-25', 'active'),
+(27, 30, 1, '2025-04-25', 'active'),
+(28, 36, 1, '2025-04-25', 'active'),
+(29, 21, 1, '2025-04-25', 'active'),
+(30, 17, 1, '2025-04-25', 'active'),
+(31, 1, 1, '2025-04-25', 'active'),
+(32, 25, 1, '2025-04-25', 'active'),
+(33, 13, 1, '2025-04-25', 'active'),
+(34, 35, 1, '2025-04-25', 'active'),
+(35, 39, 1, '2025-04-25', 'active'),
+(36, 28, 1, '2025-04-25', 'active'),
+(37, 6, 1, '2025-04-25', 'active'),
+(38, 8, 1, '2025-04-25', 'active'),
+(39, 33, 1, '2025-04-25', 'active'),
+(40, 20, 1, '2025-04-25', 'active'),
+(64, 10, 2, '2025-04-25', 'active'),
+(65, 7, 2, '2025-04-25', 'active'),
+(66, 27, 1, '2025-04-25', 'active'),
+(67, 3, 1, '2025-04-25', 'active'),
+(68, 18, 1, '2025-04-25', 'active'),
+(69, 23, 3, '2025-04-25', 'active'),
+(70, 11, 3, '2025-04-25', 'active'),
+(71, 29, 3, '2025-04-25', 'active'),
+(72, 14, 3, '2025-04-25', 'active'),
+(73, 9, 1, '2025-04-25', 'active'),
+(74, 26, 3, '2025-04-25', 'active'),
+(75, 22, 2, '2025-04-25', 'active'),
+(76, 12, 1, '2025-04-25', 'active'),
+(77, 5, 3, '2025-04-25', 'active'),
+(78, 24, 1, '2025-04-25', 'active'),
+(79, 2, 3, '2025-04-25', 'active'),
+(80, 16, 2, '2025-04-25', 'active'),
+(81, 4, 2, '2025-04-25', 'active'),
+(82, 15, 1, '2025-04-25', 'active'),
+(83, 19, 2, '2025-04-25', 'active'),
+(84, 30, 1, '2025-04-25', 'active'),
+(85, 21, 1, '2025-04-25', 'active'),
+(86, 17, 3, '2025-04-25', 'active'),
+(87, 1, 2, '2025-04-25', 'active'),
+(88, 25, 2, '2025-04-25', 'active'),
+(89, 13, 2, '2025-04-25', 'active'),
+(90, 28, 2, '2025-04-25', 'active'),
+(91, 6, 1, '2025-04-25', 'active'),
+(92, 8, 3, '2025-04-25', 'active'),
+(93, 20, 3, '2025-04-25', 'active'),
+(95, 1, 1, '2023-09-01', 'active'),
+(96, 1, 2, '2023-09-01', 'active'),
+(97, 2, 3, '2023-09-01', 'active'),
+(98, 3, 4, '2023-09-01', 'active');
 
 -- --------------------------------------------------------
 
@@ -386,25 +531,40 @@ INSERT INTO `students` (`student_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`
 
 CREATE TABLE `student_timetable` (
   `id` int(11) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
   `course` varchar(100) NOT NULL,
   `day` varchar(10) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
-  `approved_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `approved_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('active','cancelled') DEFAULT 'active',
+  `student_course_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student_timetable`
 --
 
-INSERT INTO `student_timetable` (`id`, `last_name`, `first_name`, `course`, `day`, `start_time`, `end_time`, `approved_at`) VALUES
-(1, 'Wong', 'Siew Ling', 'Economics Math', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00'),
-(2, 'Chew', 'Boon Keat', 'Chemistry Math', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00'),
-(3, 'Yap', 'Hui Xin', 'English for Science', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00'),
-(4, 'Khoo', 'Zhi Wei', 'Advanced Physics', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00'),
-(5, 'Chan', 'Yi Ting', 'Basic Science', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00');
+INSERT INTO `student_timetable` (`id`, `course`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `student_course_id`) VALUES
+(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 37),
+(2, 'IGCSE Math Prep', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00', 'active', 2),
+(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 38),
+(4, 'IGCSE Math Prep', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00', 'active', 11),
+(5, 'IGCSE Math Prep', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00', 'active', 1);
+
+--
+-- Triggers `student_timetable`
+--
+DELIMITER $$
+CREATE TRIGGER `set_student_course_name` BEFORE INSERT ON `student_timetable` FOR EACH ROW BEGIN
+    DECLARE course_name VARCHAR(100);
+    SELECT c.course_name INTO course_name 
+    FROM courses c
+    JOIN student_courses sc ON c.course_id = sc.course_id
+    WHERE sc.student_course_id = NEW.student_course_id;
+    SET NEW.course = course_name;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -414,27 +574,26 @@ INSERT INTO `student_timetable` (`id`, `last_name`, `first_name`, `course`, `day
 
 CREATE TABLE `student_timetable_requests` (
   `id` int(11) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `course` varchar(100) NOT NULL,
   `day` varchar(10) NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
   `status` enum('pending','approved','rejected') DEFAULT 'pending',
   `rejection_reason` text DEFAULT NULL,
-  `requested_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `student_course_id` int(11) DEFAULT NULL,
+  `course` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student_timetable_requests`
 --
 
-INSERT INTO `student_timetable_requests` (`id`, `last_name`, `first_name`, `course`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`) VALUES
-(1, 'Tan', 'Wei Jie', 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-01 04:30:00'),
-(2, 'Lim', 'Mei Ling', 'SPM Add Math', 'Wednesday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-02 05:45:00'),
-(3, 'Chong', 'Kai Wen', 'Physics Basics', 'Friday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-03 02:20:00'),
-(4, 'Ng', 'Xiu Mei', 'Biology Concepts', 'Tuesday', '11:00:00', '13:00:00', 'pending', NULL, '2023-11-04 07:10:00'),
-(5, 'Lee', 'Jun Hao', 'Elementary Math', 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00');
+INSERT INTO `student_timetable_requests` (`id`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`, `student_course_id`, `course`) VALUES
+(1, 'Monday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-01 04:30:00', 31, 'IGCSE Math Prep'),
+(2, 'Wednesday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-02 05:45:00', NULL, NULL),
+(3, 'Friday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-03 02:20:00', NULL, NULL),
+(4, 'Tuesday', '11:00:00', '13:00:00', 'pending', NULL, '2023-11-04 07:10:00', NULL, NULL),
+(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math');
 
 --
 -- Indexes for dumped tables
@@ -450,6 +609,12 @@ ALTER TABLE `attendance_records`
   ADD KEY `idx_timetable_date` (`timetable_datetime`);
 
 --
+-- Indexes for table `courses`
+--
+ALTER TABLE `courses`
+  ADD PRIMARY KEY (`course_id`);
+
+--
 -- Indexes for table `instructor`
 --
 ALTER TABLE `instructor`
@@ -457,16 +622,26 @@ ALTER TABLE `instructor`
   ADD KEY `idx_instructor_names` (`Last_Name`,`First_Name`);
 
 --
+-- Indexes for table `instructor_courses`
+--
+ALTER TABLE `instructor_courses`
+  ADD PRIMARY KEY (`instructor_course_id`),
+  ADD UNIQUE KEY `instructor_id` (`instructor_id`,`course_id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
 -- Indexes for table `instructor_timetable`
 --
 ALTER TABLE `instructor_timetable`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `instructor_course_id` (`instructor_course_id`);
 
 --
 -- Indexes for table `instructor_timetable_requests`
 --
 ALTER TABLE `instructor_timetable_requests`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `instructor_course_id` (`instructor_course_id`);
 
 --
 -- Indexes for table `payment`
@@ -484,16 +659,26 @@ ALTER TABLE `students`
   ADD KEY `idx_student_names` (`Last_Name`,`First_Name`);
 
 --
+-- Indexes for table `student_courses`
+--
+ALTER TABLE `student_courses`
+  ADD PRIMARY KEY (`student_course_id`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
 -- Indexes for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_student_course` (`student_course_id`);
 
 --
 -- Indexes for table `student_timetable_requests`
 --
 ALTER TABLE `student_timetable_requests`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_course_id` (`student_course_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -506,10 +691,22 @@ ALTER TABLE `attendance_records`
   MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `courses`
+--
+ALTER TABLE `courses`
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `instructor`
 --
 ALTER TABLE `instructor`
   MODIFY `instructor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `instructor_courses`
+--
+ALTER TABLE `instructor_courses`
+  MODIFY `instructor_course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `instructor_timetable`
@@ -536,6 +733,12 @@ ALTER TABLE `students`
   MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
+-- AUTO_INCREMENT for table `student_courses`
+--
+ALTER TABLE `student_courses`
+  MODIFY `student_course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
+
+--
 -- AUTO_INCREMENT for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
@@ -559,10 +762,48 @@ ALTER TABLE `attendance_records`
   ADD CONSTRAINT `attendance_records_ibfk_2` FOREIGN KEY (`instructor_id`) REFERENCES `instructor` (`instructor_id`);
 
 --
+-- Constraints for table `instructor_courses`
+--
+ALTER TABLE `instructor_courses`
+  ADD CONSTRAINT `instructor_courses_ibfk_1` FOREIGN KEY (`instructor_id`) REFERENCES `instructor` (`instructor_id`),
+  ADD CONSTRAINT `instructor_courses_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`);
+
+--
+-- Constraints for table `instructor_timetable`
+--
+ALTER TABLE `instructor_timetable`
+  ADD CONSTRAINT `instructor_timetable_ibfk_1` FOREIGN KEY (`instructor_course_id`) REFERENCES `instructor_courses` (`instructor_course_id`);
+
+--
+-- Constraints for table `instructor_timetable_requests`
+--
+ALTER TABLE `instructor_timetable_requests`
+  ADD CONSTRAINT `instructor_timetable_requests_ibfk_1` FOREIGN KEY (`instructor_course_id`) REFERENCES `instructor_courses` (`instructor_course_id`);
+
+--
 -- Constraints for table `payment`
 --
 ALTER TABLE `payment`
   ADD CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`);
+
+--
+-- Constraints for table `student_courses`
+--
+ALTER TABLE `student_courses`
+  ADD CONSTRAINT `student_courses_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`),
+  ADD CONSTRAINT `student_courses_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`);
+
+--
+-- Constraints for table `student_timetable`
+--
+ALTER TABLE `student_timetable`
+  ADD CONSTRAINT `fk_student_course` FOREIGN KEY (`student_course_id`) REFERENCES `student_courses` (`student_course_id`);
+
+--
+-- Constraints for table `student_timetable_requests`
+--
+ALTER TABLE `student_timetable_requests`
+  ADD CONSTRAINT `student_timetable_requests_ibfk_1` FOREIGN KEY (`student_course_id`) REFERENCES `student_courses` (`student_course_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
