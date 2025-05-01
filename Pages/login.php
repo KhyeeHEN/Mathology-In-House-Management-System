@@ -1,79 +1,116 @@
 <?php
 session_start();
-require_once 'setting.php'; // Your database connection file
+require_once 'setting.php';
 
-// Check if user is already logged in
+// Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
     exit;
 }
 
+// Initialize variables
+$error = '';
+$email = '';
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $remember = isset($_POST['remember']);
-    
+
     // Validate inputs
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required';
     } else {
-        // Fetch user from database
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
+        try {
+            // Fetch user from database
+            $stmt = $conn->prepare("SELECT user_id, email, password, role, name FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                
+                // Verify password
+                if (password_verify($password, $user['password'])) {
+                    // Regenerate session ID for security
+                    session_regenerate_id(true);
+                    
+                    // Set session variables
+                    $_SESSION['user_id'] = $user['user_id'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['role'] = $user['role'];
+                    $_SESSION['name'] = $user['name'];
+                    
+                    // Set secure remember me cookie if checked
+                    if ($remember) {
+                        $token = bin2hex(random_bytes(32));
+                        $expiry = time() + (86400 * 30); // 30 days
+                        
+                        // Store token in database
+                        $updateStmt = $conn->prepare("UPDATE users SET remember_token = ?, token_expiry = ? WHERE user_id = ?");
+                        $updateStmt->bind_param("ssi", $token, date('Y-m-d H:i:s', $expiry), $user['user_id']);
+                        $updateStmt->execute();
+                        
+                        setcookie(
+                            'remember_me',
+                            $token,
+                            [
+                                'expires' => $expiry,
+                                'path' => '/',
+                                'domain' => '',
+                                'secure' => true,
+                                'httponly' => true,
+                                'samesite' => 'Strict'
+                            ]
+                        );
+                    }
+                    
+                    // Redirect to dashboard
+                    header('Location: dashboard.php');
+                    exit;
+                } else {
+                    $error = 'Invalid email or password';
+                }
+            } else {
+                $error = 'Invalid email or password';
+            }
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
+            $error = 'A system error occurred. Please try again.';
+        }
+    }
+}
+
+// Handle remember me cookie
+if (empty($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
+    try {
+        $token = $_COOKIE['remember_me'];
+        $stmt = $conn->prepare("SELECT user_id, email, role, name FROM users WHERE remember_token = ? AND token_expiry > NOW()");
+        $stmt->bind_param("s", $token);
         $stmt->execute();
         $result = $stmt->get_result();
         
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
             
-            // Verify password
-            if (password_verify($password, $user['password'])) {
-                // Login successful
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['name'] = $user['name'];
-                
-                // Set remember me cookie if checked
-                if ($remember) {
-                    $cookie_value = base64_encode($user['email'] . ':' . password_hash($user['password'], PASSWORD_DEFAULT));
-                    setcookie('remember_me', $cookie_value, time() + (86400 * 30), "/"); // 30 days
-                }
-                
-                // Redirect to dashboard with role alert
-                $_SESSION['login_success'] = "Logged in as " . ucfirst($user['role']);
-                header('Location: dashboard.php');
-                exit;
-            } else {
-                $error = 'Invalid email or password';
-            }
-        } else {
-            $error = 'Invalid email or password';
-        }
-    }
-}
-
-// Check for remember me cookie
-if (empty($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
-    $cookie_data = base64_decode($_COOKIE['remember_me']);
-    list($email, $token) = explode(':', $cookie_data);
-    
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        if (password_verify($user['password'], $token)) {
+            // Regenerate session ID
+            session_regenerate_id(true);
+            
+            // Set session variables
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['name'] = $user['name'];
+            
             header('Location: dashboard.php');
             exit;
         }
+    } catch (Exception $e) {
+        error_log("Remember me error: " . $e->getMessage());
+        // Clear invalid cookie
+        setcookie('remember_me', '', time() - 3600, '/');
     }
 }
 ?>

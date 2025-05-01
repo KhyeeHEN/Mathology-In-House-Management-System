@@ -20,18 +20,85 @@ $user_name = $_SESSION['name'];
 
 // Fetch events based on user role
 if ($user_role === 'admin') {
-    // Admin sees all events
-    $query = "SELECT * FROM subjects";
+    // Admin sees all events from all tables
+    $query = "SELECT 
+                'student' AS type, 
+                course AS title, 
+                CONCAT(YEAR(CURDATE()), '-', MONTH(CURDATE()), '-', DAY(CURDATE())) AS class_date,
+                start_time, 
+                end_time, 
+                'Classroom' AS venue, 
+                'Instructor' AS lecturer, 
+                'Scheduled class' AS description
+              FROM student_timetable
+              UNION ALL
+              SELECT 
+                'instructor' AS type, 
+                course AS title, 
+                CONCAT(YEAR(CURDATE()), '-', MONTH(CURDATE()), '-', DAY(CURDATE())) AS class_date,
+                start_time, 
+                end_time, 
+                'Classroom' AS venue, 
+                'Teaching' AS lecturer, 
+                'Teaching session' AS description
+              FROM instructor_timetable";
     $result = $conn->query($query);
+    
 } elseif ($user_role === 'instructor') {
-    // Instructor sees only their classes
-    $stmt = $conn->prepare("SELECT * FROM subjects WHERE lecturer = ?");
+    // Instructor sees their timetable and their classes
+    $stmt = $conn->prepare("SELECT 
+                            course AS title, 
+                            CONCAT(YEAR(CURDATE()), '-', MONTH(CURDATE()), '-', DAY(CURDATE())) AS class_date,
+                            start_time, 
+                            end_time, 
+                            'Classroom' AS venue, 
+                            'You' AS lecturer, 
+                            'Teaching session' AS description
+                          FROM instructor_timetable
+                          WHERE id IN (
+                              SELECT instructor_timetable_id 
+                              FROM instructor_courses 
+                              WHERE instructor_id = (
+                                  SELECT instructor_id 
+                                  FROM instructor 
+                                  WHERE CONCAT(First_Name, ' ', Last_Name) = ?
+                              )
+                          )");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $result = $stmt->get_result();
+    
 } else {
-    // Student sees their own classes
-    $stmt = $conn->prepare("SELECT * FROM subjects WHERE student_name = ?");
+    // Student sees their own timetable
+    $stmt = $conn->prepare("SELECT 
+                            course AS subject_name, 
+                            CONCAT(YEAR(CURDATE()), '-', MONTH(CURDATE()), '-', DAY(CURDATE())) AS class_date,
+                            start_time, 
+                            end_time, 
+                            'Classroom' AS venue, 
+                            (SELECT CONCAT(First_Name, ' ', Last_Name) 
+                             FROM instructor 
+                             WHERE instructor_id = (
+                                 SELECT instructor_id 
+                                 FROM instructor_courses 
+                                 WHERE course_id = (
+                                     SELECT course_id 
+                                     FROM student_courses 
+                                     WHERE student_course_id = st.student_course_id
+                                 )
+                             )
+                            ) AS lecturer,
+                            'Scheduled class' AS description
+                          FROM student_timetable st
+                          WHERE student_course_id IN (
+                              SELECT student_course_id 
+                              FROM student_courses 
+                              WHERE student_id = (
+                                  SELECT student_id 
+                                  FROM students 
+                                  WHERE CONCAT(First_Name, ' ', Last_Name) = ?
+                              )
+                          )");
     $stmt->bind_param("s", $user_name);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -60,9 +127,9 @@ function calculateDuration($start, $end) {
 $calendarEvents = [];
 foreach ($events as $event) {
     $calendarEvents[] = [
-        'title' => $event['subject_name'],
+        'title' => $event['subject_name'] ?? $event['title'],
         'date' => $event['class_date'],
-        'type' => '1',
+        'type' => $event['type'] ?? 'class',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
         'venue' => $event['venue'],
@@ -94,6 +161,11 @@ foreach ($events as $event) {
             <div class="welcome-message">
                 <h1>Welcome, <?php echo htmlspecialchars($user_name); ?></h1>
                 <p>You are logged in as: <?php echo htmlspecialchars(ucfirst($user_role)); ?></p>
+                <?php if ($user_role === 'instructor'): ?>
+                    <p class="instructor-badge"><i class="fas fa-chalkboard-teacher"></i> Instructor View</p>
+                <?php elseif ($user_role === 'admin'): ?>
+                    <p class="admin-badge"><i class="fas fa-shield-alt"></i> Administrator View</p>
+                <?php endif; ?>
             </div>
 
             <!-- Calendar Section -->
@@ -108,9 +180,13 @@ foreach ($events as $event) {
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
-                    <div class="date-picker-container">
-                        <input type="date" id="datePicker" class="date-picker">
-                    </div>
+                    <?php if ($user_role === 'admin'): ?>
+                        <div class="admin-controls">
+                            <button id="addEvent" class="btn btn-small">
+                                <i class="fas fa-plus"></i> Add Event
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="calendar-grid">
                     <div class="calendar-weekdays">
@@ -130,20 +206,33 @@ foreach ($events as $event) {
 
             <!-- Event Details Section -->
             <div class="event-details-container">
-                <h3>Your Upcoming Classes</h3>
+                <h3><?php echo $user_role === 'instructor' ? 'Your Teaching Schedule' : 'Your Upcoming Classes'; ?></h3>
                 <div class="events-list">
                     <?php if (empty($calendarEvents)): ?>
-                        <p>No upcoming classes found.</p>
+                        <div class="no-events">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No scheduled <?php echo $user_role === 'instructor' ? 'teaching sessions' : 'classes'; ?> found</p>
+                        </div>
                     <?php else: ?>
                         <?php foreach ($calendarEvents as $event): ?>
                             <div class="event-card">
-                                <h4><?php echo htmlspecialchars($event['title']); ?></h4>
-                                <p><i class="fas fa-calendar-day"></i> <?php echo htmlspecialchars($event['date']); ?></p>
-                                <p><i class="fas fa-clock"></i> <?php echo htmlspecialchars($event['time']); ?></p>
-                                <p><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($event['venue']); ?></p>
-                                <?php if ($user_role === 'student'): ?>
-                                    <p><i class="fas fa-chalkboard-teacher"></i> <?php echo htmlspecialchars($event['lecturer']); ?></p>
-                                <?php endif; ?>
+                                <div class="event-header">
+                                    <h4><?php echo htmlspecialchars($event['title']); ?></h4>
+                                    <?php if ($user_role === 'admin'): ?>
+                                        <span class="event-type-badge"><?php echo ucfirst($event['type']); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="event-details">
+                                    <p><i class="fas fa-calendar-day"></i> <?php echo htmlspecialchars($event['date']); ?></p>
+                                    <p><i class="fas fa-clock"></i> <?php echo htmlspecialchars($event['time']); ?> (<?php echo $event['duration']; ?>)</p>
+                                    <p><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($event['venue']); ?></p>
+                                    <?php if ($user_role === 'student' && isset($event['lecturer'])): ?>
+                                        <p><i class="fas fa-chalkboard-teacher"></i> <?php echo htmlspecialchars($event['lecturer']); ?></p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($event['description'])): ?>
+                                        <p class="event-description"><?php echo htmlspecialchars($event['description']); ?></p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -154,7 +243,8 @@ foreach ($events as $event) {
     
     <script>
         const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-        console.log('Loaded events:', calendarEvents);
+        const currentUserRole = '<?php echo $user_role; ?>';
+        console.log('Loaded events for ' + currentUserRole + ':', calendarEvents);
     </script>
     
     <script type="module" src="../scripts/dashboard.js"></script>
