@@ -16,7 +16,7 @@
             <i class="fas fa-calendar-alt"></i>
             <span>Timetable</span>
         </a>
-        <a href="users.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
+        <a href="../admin/users.php" class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
             <i class="fas fa-users"></i>
             <span>Users</span>
         </a>
