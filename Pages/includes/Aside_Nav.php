@@ -4,27 +4,27 @@
         <h2>Mathology</h2>
     </div>
     <nav class="side-nav">
-        <a href="../Pages/dashboard.php"
+        <a href="../admin/dashboard.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="../Pages/attendance.php"
+        <a href="../admin/attendance.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'attendance.php' ? 'active' : ''; ?>">
             <i class="fas fa-user-check"></i>
             <span>Attendance</span>
         </a>
-        <a href="../Pages/timetable.php"
+        <a href="../admin/timetable.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Timetable</span>
         </a>
-        <a href="../Pages/admin/users.php"
+        <a href="../admin/users.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
             <i class="fas fa-users"></i>
             <span>Users</span>
         </a>
-        <a href="../Pages/payment.php"
+        <a href="../admin/payment.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'payment.php' ? 'active' : ''; ?>">
             <i class="fas fa-credit-card"></i>
             <span>Payments</span>

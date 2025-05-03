@@ -1,5 +1,5 @@
 <?php
-require_once 'setting.php'; // This will define $conn as the MySQL connection
+require_once '../setting.php'; // This will define $conn as the MySQL connection
 
 // Check connection
 if ($conn->connect_error) {
@@ -59,17 +59,17 @@ foreach ($events as $event) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="../styles/dashboard.css">
-    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../../styles/dashboard.css">
+    <link rel="stylesheet" href="../../styles/common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("includes/Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <!-- Calendar Section -->
             <div class="calendar-container">
@@ -111,7 +111,7 @@ foreach ($events as $event) {
         console.log('Loaded events:', calendarEvents); // Debug output
     </script>
     
-    <script type="module" src="../Scripts/dashboard.js"></script>
-    <script type="module" src="../Scripts/common.js"></script>
+    <script type="module" src="../../Scripts/dashboard.js"></script>
+    <script type="module" src="../../Scripts/common.js"></script>
 </body>
 </html>

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/attendence.css">
+    <link rel="stylesheet" href="../../styles/common.css">
+    <link rel="stylesheet" href="../../styles/attendence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                <a href="attendanceclient.php" class="nav-item active">
+                <a href="attendanceclient.php" class="nav-item">
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
@@ -28,11 +28,11 @@
                     <i class="fas fa-calendar-alt"></i>
                     <span>Schedule Replacement</span>
                 </a>
-                <a href="learninghours.php" class="nav-item">
+                <a href="learninghours.php" class="nav-item ">
                     <i class="fas fa-clock"></i>
                     <span>Learning Hours</span>
                 </a>
-                <a href="leave.php" class="nav-item">
+                <a href="leave.php" class="nav-item active">
                     <i class="fas fa-check"></i>
                     <span>Apply Leave</span>
                 </a>
@@ -51,7 +51,7 @@
                     <button id="menu-toggle" class="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1>Attendance</h1>
+                    <h1>Apply Leave</h1>
                 </div>
                 <div class="nav-right">
                     <div class="nav-links">
@@ -83,29 +83,8 @@
 
             <!-- Do your content here -->
 
-            <table class="attendence">
-                <tr class="attendance_title">
-                    <th>Class</th>
-                    <th>Date</th>
-                    <th>Check in</th>
-                    <th>Check out</th>  
-                </tr>
-                <tr>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-            </table>
-            
         </main>
     </div>
-    <script type="module" src="../scripts/common.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
 </body>
 </html>
