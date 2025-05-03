@@ -16,27 +16,27 @@
                 <h2>Mathology</h2>
             </div>
             <nav class="side-nav">
-                <a href="dashboardclient.html" class="nav-item">
+                <a href="dashboardclient.php" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                <a href="attendanceclient.html" class="nav-item">
+                <a href="attendanceclient.php" class="nav-item">
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="replacement.html" class="nav-item">
+                <a href="replacement.php" class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Schedule Replacement</span>
                 </a>
-                <a href="learninghours.html" class="nav-item active">
+                <a href="learninghours.php" class="nav-item active">
                     <i class="fas fa-clock"></i>
                     <span>Learning Hours</span>
                 </a>
-                <a href="leave.html" class="nav-item">
+                <a href="leave.php" class="nav-item">
                     <i class="fas fa-check"></i>
                     <span>Apply Leave</span>
                 </a>
-                <a href="payment.html" class="nav-item">
+                <a href="payment.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
