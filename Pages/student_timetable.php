@@ -1,5 +1,5 @@
 <?php
-include 'setting.php'; // adjust path as needed
+include '../setting.php'; // adjust path as needed
 
 // Fetch timetable data
 $sql = "SELECT * FROM student_timetable ORDER BY FIELD(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), start_time";

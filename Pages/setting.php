@@ -5,10 +5,6 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'mathology');
 
-// Error reporting (disable in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Create connection
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
