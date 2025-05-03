@@ -1,5 +1,6 @@
 <?php
 // Include the database settings
+include 'settings.php';
 
 // Fetch student data based on the student_id from the GET request
 $student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0;
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($conn->query($updateQuery)) {
         echo "Student updated successfully!";
-        header("Location: users.php?active_tab=students");
+        header("Location: ../Pages/admin/users.php?active_tab=students");
     } else {
         echo "Error updating student: " . $conn->error;
     }
@@ -81,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="Mathology_Level" name="Mathology_Level" value="<?php echo $student['Mathology_Level']; ?>" required><br>
 
         <button type="submit">Update</button>
-        <a href="users.php?active_tab=students">Cancel</a>
+        <a href="../Pages/admin/users.php?active_tab=students">Cancel</a>
     </form>
 </body>
 </html>
