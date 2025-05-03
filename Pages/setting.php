@@ -1,20 +1,22 @@
 <?php
-// Database configuration
-$host = 'localhost:3310';
-$user = 'root';  // Replace with your username
-$password = '';  // Replace with your password (leave empty if none)
-$database = 'mathology';
+// Database configuration - Update these with your actual credentials
+define('DB_HOST', 'localhost:3310');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'mathology');
 
-// Create a connection
-$conn = new mysqli($host, $user, $password, $database);
+// Create connection
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-// Check connection
+// Check connection and handle errors gracefully
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-} else {
-    // Connection successful - you can remove this message in production
-    echo "<div style='background: #d4edda; color: #155724; padding: 10px; margin: 10px; border-radius: 5px;'>
-          Database connection successful!
-          </div>";
+    error_log("Database connection failed: " . $conn->connect_error);
+    die("We're experiencing technical difficulties. Please try again later.");
 }
+
+// Set charset to utf8mb4 for full Unicode support
+$conn->set_charset("utf8mb4");
+
+// Optional: Timezone setting
+date_default_timezone_set('Asia/Kuala_Lumpur');
 ?>

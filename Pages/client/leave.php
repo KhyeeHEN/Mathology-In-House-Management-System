@@ -3,53 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-    <link rel="stylesheet" href="../styles/dashboard.css">
-    <link rel="stylesheet" href="../styles/common.css">
+    <title>Attendance</title>
+    <link rel="stylesheet" href="../../styles/common.css">
+    <link rel="stylesheet" href="../../styles/attendence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Aside Navigation -->
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo-container">
-                <!-- <img src="/logo.svg" alt="Logo" class="logo"> -->
-                <!-- <img src="/MathologyLogo.jpg" alt="Logo" class="logo"> -->
                 <h2>Mathology</h2>
             </div>
             <nav class="side-nav">
-                <a href="dashboard.html" class="nav-item active">
+                <a href="dashboardclient.php" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                <a href="attendance.html" class="nav-item">
+                <a href="attendanceclient.php" class="nav-item">
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="timetable.html" class="nav-item">
+                <a href="replacement.php" class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Timetable</span>
+                    <span>Schedule Replacement</span>
                 </a>
-                <a href="users.php" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
+                <a href="learninghours.php" class="nav-item ">
+                    <i class="fas fa-clock"></i>
+                    <span>Learning Hours</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="leave.php" class="nav-item active">
+                    <i class="fas fa-check"></i>
+                    <span>Apply Leave</span>
+                </a>
+                <a href="payment.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Navigation Bar -->
+            <!-- Top Navigation -->
             <nav class="top-nav">
                 <div class="nav-left">
                     <button id="menu-toggle" class="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1>Dashboard</h1>
+                    <h1>Apply Leave</h1>
                 </div>
                 <div class="nav-right">
                     <div class="nav-links">
@@ -79,40 +81,10 @@
                 </div>
             </nav>
 
-            <!-- Calendar Section -->
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <div class="calendar-navigation">
-                        <button class="nav-btn" id="prevMonth">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 id="currentMonth">September 2023</h2>
-                        <button class="nav-btn" id="nextMonth">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <div class="date-picker-container">
-                        <input type="date" id="datePicker" class="date-picker">
-                    </div>
-                </div>
-                <div class="calendar-grid">
-                    <div class="calendar-weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
-                    </div>
-                    <div class="calendar-days" id="calendarDays">
-                        <!-- Days will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
+            <!-- Do your content here -->
+
         </main>
     </div>
-    <script type="module" src="../scripts/dashboard.js"></script>
-    <script type="module" src="../scripts/common.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
 </body>
 </html>

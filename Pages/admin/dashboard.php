@@ -1,11 +1,25 @@
 <?php
-require_once 'darrshan_dbconnect.php';
+require_once '../setting.php'; // This will define $conn as the MySQL connection
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Fetch events from database
-$stmt = $pdo->prepare("SELECT * FROM subjects WHERE student_name = 'Darrshan'");
-$stmt->execute();
-$events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$query = "SELECT * FROM subjects WHERE student_name = ?";
+$stmt = $conn->prepare($query);
+$studentName = 'Darrshan';
+$stmt->bind_param("s", $studentName);
 
+if (!$stmt->execute()) {
+    die("Query execution failed: " . $stmt->error);
+}
+
+$result = $stmt->get_result();
+$events = $result->fetch_all(MYSQLI_ASSOC);
+
+// Helper function to calculate duration
 function calculateDuration($start, $end) {
     $startTime = new DateTime($start);
     $endTime = new DateTime($end);
@@ -28,7 +42,7 @@ $calendarEvents = [];
 foreach ($events as $event) {
     $calendarEvents[] = [
         'title' => $event['subject_name'],
-        'date' => $event['class_date'], // Keep as YYYY-MM-DD string
+        'date' => $event['class_date'],
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
@@ -45,17 +59,17 @@ foreach ($events as $event) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-    <link rel="stylesheet" href="../styles/dashboard.css">
-    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="../../styles/dashboard.css">
+    <link rel="stylesheet" href="../../styles/common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <!-- Calendar Section -->
             <div class="calendar-container">
@@ -94,10 +108,10 @@ foreach ($events as $event) {
     <script>
         // Pass PHP events to JavaScript with proper formatting
         const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-            console.log('Loaded events:', calendarEvents); // Debug output
+        console.log('Loaded events:', calendarEvents); // Debug output
     </script>
     
-    <script type="module" src="../scripts/dashboard.js"></script>
-    <script type="module" src="../scripts/common.js"></script>
+    <script type="module" src="../../Scripts/dashboard.js"></script>
+    <script type="module" src="../../Scripts/common.js"></script>
 </body>
 </html>

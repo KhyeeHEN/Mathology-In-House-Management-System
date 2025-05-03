@@ -4,7 +4,7 @@ require '../vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-include 'setting.php';
+include '../setting.php';
 
 if (isset($_GET['download_excel']) && $_GET['download_excel'] == '1' && isset($_GET['date'])) {
     $selectedDate = $_GET['date'];

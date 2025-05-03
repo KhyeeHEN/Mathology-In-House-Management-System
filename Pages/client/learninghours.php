@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/attendence.css">
+    <link rel="stylesheet" href="../../styles/common.css">
+    <link rel="stylesheet" href="../../styles/attendence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -16,27 +16,27 @@
                 <h2>Mathology</h2>
             </div>
             <nav class="side-nav">
-                <a href="dashboardclient.html" class="nav-item">
+                <a href="dashboardclient.php" class="nav-item">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
-                <a href="attendanceclient.html" class="nav-item">
+                <a href="attendanceclient.php" class="nav-item">
                     <i class="fas fa-user-check"></i>
                     <span>Attendance</span>
                 </a>
-                <a href="replacement.html" class="nav-item active">
+                <a href="replacement.php" class="nav-item">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Schedule Replacement</span>
                 </a>
-                <a href="learninghours.html" class="nav-item">
+                <a href="learninghours.php" class="nav-item active">
                     <i class="fas fa-clock"></i>
                     <span>Learning Hours</span>
                 </a>
-                <a href="leave.html" class="nav-item">
+                <a href="leave.php" class="nav-item">
                     <i class="fas fa-check"></i>
                     <span>Apply Leave</span>
                 </a>
-                <a href="payment.html" class="nav-item">
+                <a href="payment.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
@@ -51,7 +51,7 @@
                     <button id="menu-toggle" class="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1>Schedule Replacement</h1>
+                    <h1>View Learning Hours</h1>
                 </div>
                 <div class="nav-right">
                     <div class="nav-links">
@@ -85,6 +85,6 @@
 
         </main>
     </div>
-    <script type="module" src="../scripts/common.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
 </body>
 </html>

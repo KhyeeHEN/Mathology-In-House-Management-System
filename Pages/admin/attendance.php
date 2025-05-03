@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/attendence.css">
+    <link rel="stylesheet" href="../../styles/common.css">
+    <link rel="stylesheet" href="../../styles/attendence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
    <!-- Attendance Table -->
    <div style="padding: 1rem 2rem;">
@@ -25,7 +25,7 @@
     </a>
 </div>
 
-   <?php include 'setting.php'; ?>
+   <?php include '../setting.php'; ?>
 
    <table class="attendence">
        <tr class="attendance_title">

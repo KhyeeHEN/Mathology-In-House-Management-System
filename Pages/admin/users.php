@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/users.css">
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../Styles/users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
     <div class="dashboard-container">
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <!-- Do your content here -->
 
@@ -46,16 +46,16 @@
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
                 id="students-table">
-                <?php include '../sql/students_data.php'; ?>
+                <?php include '../../sql/students_data.php'; ?>
             </div>
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>"
                 id="instructors-table">
-                <?php include '../sql/instructors_data.php'; ?>
+                <?php include '../../sql/instructors_data.php'; ?>
             </div>
         </main>
     </div>
-    <script type="module" src="../scripts/common.js"></script>
-    <script src="../scripts/users.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
+    <script src="../../scripts/users.js"></script>
 </body>
 
 </html>

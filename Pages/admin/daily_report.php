@@ -1,5 +1,5 @@
 <?php
-include 'setting.php'; // Database connection
+include '../setting.php'; // Database connection
 date_default_timezone_set('Asia/Kuala_Lumpur');
 // Get the date from URL or default to today
 $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
