@@ -4,27 +4,27 @@
         <h2>Mathology</h2>
     </div>
     <nav class="side-nav">
-        <a href="/Mathology-In-House-Management-System/Pages/dashboard.php"
+        <a href="../Pages/dashboard.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="/Mathology-In-House-Management-System/Pages/attendance.php"
+        <a href="../Pages/attendance.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'attendance.php' ? 'active' : ''; ?>">
             <i class="fas fa-user-check"></i>
             <span>Attendance</span>
         </a>
-        <a href="/Mathology-In-House-Management-System/Pages/timetable.php"
+        <a href="../Pages/timetable.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Timetable</span>
         </a>
-        <a href="/Mathology-In-House-Management-System/Pages/admin/users.php"
+        <a href="../Pages/admin/users.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
             <i class="fas fa-users"></i>
             <span>Users</span>
         </a>
-        <a href="/Mathology-In-House-Management-System/Pages/payment.php"
+        <a href="../Pages/payment.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'payment.php' ? 'active' : ''; ?>">
             <i class="fas fa-credit-card"></i>
             <span>Payments</span>

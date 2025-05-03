@@ -11,33 +11,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <h2>Mathology</h2>
-            </div>
-            <nav class="side-nav">
-                <a href="dashboard.html" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-                <a href="attendance.html" class="nav-item">
-                    <i class="fas fa-user-check"></i>
-                    <span>Attendance</span>
-                </a>
-                <a href="timetable.html" class="nav-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Timetable</span>
-                </a>
-                <a href="users.php" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Payments</span>
-                </a>
-            </nav>
-        </aside>
+       <?php require("includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
