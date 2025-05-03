@@ -72,6 +72,7 @@ if ($result->num_rows > 0) {
                 <th>Current School Grade</th>
                 <th>School</th>
                 <th>Mathology Level</th>
+                <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
@@ -85,6 +86,9 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Current_School_Grade'] . "</td>
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
+                <td>
+                    <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
+                </td>
               </tr>";
     }
     echo "</table>";
