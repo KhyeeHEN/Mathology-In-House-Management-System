@@ -81,6 +81,10 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Highest_Education'] . "</td>
                 <td>" . $row['Remark'] . "</td>
                 <td>" . $row['Training_Status'] . "</td>
+                <td>
+                    <a href='../../sql/edit_instructor.php?instructor_id={$row['instructor_id']}'>Edit</a> 
+                    <a href='../../sql/delete_instructor.php?instructor_id={$row['instructor_id']}' onclick=\"return confirm('Are you sure you want to delete this instructor?');\">Delete</a>
+                </td>
               </tr>";
     }
     echo "</table>";
