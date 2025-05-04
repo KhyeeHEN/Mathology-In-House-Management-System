@@ -70,6 +70,7 @@ if ($result->num_rows > 0) {
                 <th>Highest Education</th>
                 <th>Remark</th>
                 <th>Training Status</th>
+                <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>

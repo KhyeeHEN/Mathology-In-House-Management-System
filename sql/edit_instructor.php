@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($conn->query($updateQuery)) {
         echo "Instructor updated successfully!";
-        header("Location: users.php?active_tab=instructors");
+        header("Location: ../Pages/admin/users.php?active_tab=instructors");
     } else {
         echo "Error updating instructor: " . $conn->error;
     }
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="Training_Status" name="Training_Status" value="<?php echo $instructor['Training_Status']; ?>" required><br>
 
         <button type="submit">Update</button>
-        <a href="users.php?active_tab=instructors">Cancel</a>
+        <a href="../Pages/admin/users.php?active_tab=instructors">Cancel</a>
     </form>
 </body>
 </html>
