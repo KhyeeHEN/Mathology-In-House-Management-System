@@ -1,59 +1,76 @@
 <?php
 require_once 'setting.php';
+session_start();
+
+// Initialize variables
+$student = null;
+$current_timetable = null;
+$student_id = null;
 
 // Check if student_id is provided
-$student_id = isset($_GET['student_id']) ? (int)$_GET['student_id'] : null;
-if (!$student_id) {
-    die("Student ID is required");
-}
-
-// Fetch student details
-$student = $conn->query("SELECT * FROM Students WHERE student_id = $student_id")->fetch_assoc();
-if (!$student) {
-    die("Student not found");
-}
-
-// Fetch current timetable
-$current_timetable = $conn->query("
-    SELECT t.*, c.course_name 
-    FROM student_timetable t
-    JOIN student_courses sc ON t.student_course_id = sc.student_course_id
-    JOIN courses c ON sc.course_id = c.course_id
-    WHERE sc.student_id = $student_id
-    ORDER BY FIELD(t.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), t.start_time
-");
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reschedule'])) {
-    $timetable_id = (int)$_POST['timetable_id'];
-    $new_day = $conn->real_escape_string($_POST['day']);
-    $new_start = $conn->real_escape_string($_POST['start_time']);
-    $new_end = $conn->real_escape_string($_POST['end_time']);
+if (isset($_GET['student_id'])) {
+    $student_id = (int)$_GET['student_id'];
     
-    $conn->begin_transaction();
-    try {
-        // 1. Create reschedule request
-        $stmt = $conn->prepare("
-            INSERT INTO student_timetable_requests 
-            (student_course_id, day, start_time, end_time, status, requested_at)
-            SELECT t.student_course_id, ?, ?, ?, 'pending', NOW()
+    // Fetch student details
+    $student_result = $conn->query("SELECT * FROM Students WHERE student_id = $student_id");
+    if ($student_result && $student_result->num_rows > 0) {
+        $student = $student_result->fetch_assoc();
+        
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reschedule'])) {
+            $timetable_id = (int)$_POST['timetable_id'];
+            $new_day = $conn->real_escape_string($_POST['day']);
+            $new_start = $conn->real_escape_string($_POST['start_time']);
+            $new_end = $conn->real_escape_string($_POST['end_time']);
+            
+            try {
+                // Update the timetable directly
+                $stmt = $conn->prepare("
+                    UPDATE student_timetable 
+                    SET day = ?, start_time = ?, end_time = ?, approved_at = NOW()
+                    WHERE id = ?
+                ");
+                
+                if ($stmt) {
+                    $stmt->bind_param("sssi", $new_day, $new_start, $new_end, $timetable_id);
+                    if ($stmt->execute()) {
+                        $_SESSION['message'] = "Timetable updated successfully!";
+                    } else {
+                        $_SESSION['error'] = "Failed to update timetable: " . $stmt->error;
+                    }
+                } else {
+                    $_SESSION['error'] = "Database error: " . $conn->error;
+                }
+                
+                // Redirect back to show changes
+                header("Location: timetable_reschedule.php?student_id=$student_id");
+                exit();
+                
+            } catch (Exception $e) {
+                $_SESSION['error'] = "Error: " . $e->getMessage();
+                header("Location: timetable_reschedule.php?student_id=$student_id");
+                exit();
+            }
+        }
+        
+        // Fetch current timetable
+        $current_timetable = $conn->query("
+            SELECT t.*, c.course_name 
             FROM student_timetable t
-            WHERE t.id = ?
+            JOIN student_courses sc ON t.student_course_id = sc.student_course_id
+            JOIN courses c ON sc.course_id = c.course_id
+            WHERE sc.student_id = $student_id
+            ORDER BY FIELD(t.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), t.start_time
         ");
-        $stmt->bind_param("sssi", $new_day, $new_start, $new_end, $timetable_id);
-        $stmt->execute();
-        
-        // 2. Optionally mark old timetable as cancelled
-        $conn->query("UPDATE student_timetable SET status = 'cancelled' WHERE id = $timetable_id");
-        
-        $conn->commit();
-        $_SESSION['message'] = "Reschedule request submitted successfully!";
-        header("Location: timetable_approve.php?student_id=$student_id");
+    } else {
+        $_SESSION['error'] = "Student not found";
+        header("Location: timetable_approve.php");
         exit();
-    } catch (Exception $e) {
-        $conn->rollback();
-        $_SESSION['error'] = "Reschedule failed: " . $e->getMessage();
     }
+} else {
+    $_SESSION['error'] = "Student ID is required";
+    header("Location: timetable_approve.php");
+    exit();
 }
 ?>
 
@@ -62,85 +79,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reschedule'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reschedule Timetable - <?= htmlspecialchars($student['First_Name'] . ' ' . htmlspecialchars($student['Last_Name']) )?></title>
+    <title>Reschedule Timetable - <?= htmlspecialchars($student['First_Name'] . ' ' . $student['Last_Name']) ?></title>
     <link rel="stylesheet" href="../styles/common.css">
     <link rel="stylesheet" href="../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .reschedule-container {
-            padding: 20px;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
         .student-info {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4CAF50;
         }
+        
         .timetable-card {
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .current-schedule {
+            background-color: #f8f9fa;
             padding: 15px;
+            border-radius: 6px;
             margin-bottom: 15px;
-            position: relative;
         }
-        .timetable-card h3 {
-            margin-top: 0;
-            color: #2c3e50;
-        }
+        
         .reschedule-form {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #ccc;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ddd;
         }
+        
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+        
         .form-control {
             width: 100%;
-            padding: 8px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        
         .btn {
-            padding: 8px 15px;
+            padding: 10px 20px;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
             font-size: 14px;
+            cursor: pointer;
         }
+        
         .btn-primary {
-            background-color: #3498db;
+            background-color: #4CAF50;
             color: white;
         }
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .back-link {
-            display: inline-block;
+        
+        .alert {
+            padding: 15px;
             margin-bottom: 20px;
-            color: #3498db;
-            text-decoration: none;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
         <?php require("Aside_Nav.php"); ?>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Navigation -->
             <?php require("Top_Nav_Bar.php"); ?>
+
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
+                <?php unset($_SESSION['message']); ?>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
 
             <div class="reschedule-container">
                 <a href="timetable_approve.php?student_id=<?= $student_id ?>" class="back-link">
@@ -148,51 +186,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reschedule'])) {
                 </a>
 
                 <div class="student-info">
-                    <h2><?= htmlspecialchars($student['First_Name'] . ' ' . htmlspecialchars($student['Last_Name'])) ?></h2>
-                    <p><strong>School:</strong> <?= htmlspecialchars($student['School']) ?></p>
-                    <p><strong>Grade:</strong> <?= htmlspecialchars($student['Current_School_Grade']) ?></p>
+                    <h2><?= htmlspecialchars($student['First_Name'] . ' ' . $student['Last_Name']) ?></h2>
+                    <div style="display: flex; gap: 20px;">
+                        <div><strong>School:</strong> <?= htmlspecialchars($student['School']) ?></div>
+                        <div><strong>Grade:</strong> <?= htmlspecialchars($student['Current_School_Grade']) ?></div>
+                    </div>
                 </div>
 
-                <h2>Current Timetable</h2>
+                <h2>Reschedule Timetable</h2>
                 
-                <?php if ($current_timetable->num_rows > 0): ?>
+                <?php if ($current_timetable && $current_timetable->num_rows > 0): ?>
                     <?php while ($entry = $current_timetable->fetch_assoc()): ?>
                         <div class="timetable-card">
                             <h3><?= htmlspecialchars($entry['course_name']) ?></h3>
-                            <p><strong>Day:</strong> <?= htmlspecialchars($entry['day']) ?></p>
-                            <p><strong>Time:</strong> 
-                                <?= date('h:i A', strtotime($entry['start_time'])) ?> - 
-                                <?= date('h:i A', strtotime($entry['end_time'])) ?>
-                            </p>
+                            
+                            <div class="current-schedule">
+                                <p><strong>Current Schedule:</strong></p>
+                                <p><?= htmlspecialchars($entry['day']) ?> from 
+                                <?= date('h:i A', strtotime($entry['start_time'])) ?> to 
+                                <?= date('h:i A', strtotime($entry['end_time'])) ?></p>
+                            </div>
                             
                             <div class="reschedule-form">
                                 <form method="POST" action="timetable_reschedule.php?student_id=<?= $student_id ?>">
                                     <input type="hidden" name="timetable_id" value="<?= $entry['id'] ?>">
                                     
                                     <div class="form-group">
-                                        <label for="day">New Day:</label>
-                                        <select name="day" id="day" class="form-control" required>
+                                        <label>Day</label>
+                                        <select name="day" class="form-control" required>
                                             <option value="">Select Day</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
+                                            <?php foreach (['Monday','Tuesday','Wednesday','Thursday','Friday'] as $day): ?>
+                                                <option value="<?= $day ?>" <?= $entry['day'] == $day ? 'selected' : '' ?>>
+                                                    <?= $day ?>
+                                                </option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="start_time">New Start Time:</label>
-                                        <input type="time" name="start_time" id="start_time" class="form-control" required>
+                                        <label>Start Time</label>
+                                        <input type="time" name="start_time" class="form-control" 
+                                               value="<?= date('H:i', strtotime($entry['start_time'])) ?>" required>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <label for="end_time">New End Time:</label>
-                                        <input type="time" name="end_time" id="end_time" class="form-control" required>
+                                        <label>End Time</label>
+                                        <input type="time" name="end_time" class="form-control" 
+                                               value="<?= date('H:i', strtotime($entry['end_time'])) ?>" required>
                                     </div>
                                     
                                     <button type="submit" name="reschedule" class="btn btn-primary">
-                                        <i class="fas fa-calendar-alt"></i> Submit Reschedule
+                                        <i class="fas fa-save"></i> Update Schedule
                                     </button>
                                 </form>
                             </div>
@@ -208,25 +252,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reschedule'])) {
     </div>
     
     <script>
-    // Set default time values to match current schedule when changing day
-    document.querySelectorAll('select[name="day"]').forEach(select => {
-        select.addEventListener('change', function() {
-            const card = this.closest('.timetable-card');
-            const currentStart = card.querySelector('p:nth-of-type(2)').textContent.split('-')[0].trim();
-            const currentEnd = card.querySelector('p:nth-of-type(2)').textContent.split('-')[1].trim();
-            
-            // Convert 12-hour format to 24-hour for time inputs
-            function convertTo24Hour(time12h) {
-                const [time, modifier] = time12h.split(' ');
-                let [hours, minutes] = time.split(':');
-                if (hours === '12') hours = '00';
-                if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
-                return `${hours}:${minutes}`;
+    document.querySelectorAll('form').forEach(form => {
+        const startTime = form.querySelector('input[name="start_time"]');
+        const endTime = form.querySelector('input[name="end_time"]');
+        
+        function validateTimes() {
+            if (startTime.value && endTime.value && startTime.value >= endTime.value) {
+                endTime.setCustomValidity('End time must be after start time');
+            } else {
+                endTime.setCustomValidity('');
             }
-            
-            card.querySelector('input[name="start_time"]').value = convertTo24Hour(currentStart);
-            card.querySelector('input[name="end_time"]').value = convertTo24Hour(currentEnd);
-        });
+        }
+        
+        startTime.addEventListener('change', validateTimes);
+        endTime.addEventListener('change', validateTimes);
     });
     </script>
 </body>
