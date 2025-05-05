@@ -28,6 +28,10 @@
                     class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
             </div>
 
+            <div class="add-entry-container">
+                <a href="../../sql/add_entry.php" class="add-entry-button">Add Entry</a>
+            </div>
+
             <!-- Search Form -->
             <div class="search-bar">
                 <form method="GET" action="users.php" id="search-form">
