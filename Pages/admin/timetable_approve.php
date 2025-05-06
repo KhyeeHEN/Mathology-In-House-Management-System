@@ -149,8 +149,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Removal failed: " . $e->getMessage();
         }
         
-        // Build redirect URL with preserved parameters
-        $params = [];
+        // In the remove functionality:
+        $params = [
+            "tab=" . $current_tab
+        ];
         if (isset($_GET['student_id'])) {
             $params[] = "student_id=" . $_GET['student_id'];
         } elseif (isset($_GET['instructor_id'])) {
@@ -159,10 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($search_query)) {
             $params[] = "search=" . urlencode($search_query);
         }
-        if (isset($_GET['tab'])) {
-            $params[] = "tab=" . $_GET['tab'];
-        }
-        
+
         header("Location: timetable_approve.php?" . implode('&', $params));
         exit();
     }
@@ -173,8 +172,13 @@ $student_id = $_GET['student_id'] ?? null;
 $instructor_id = $_GET['instructor_id'] ?? null;
 $viewing_id = $student_id ?? $instructor_id;
 $viewing_type = $student_id ? 'student' : 'instructor';
-$details = null;
-$timetable = null;
+
+// Preserve search query from GET parameters
+$search_query = trim($_GET['search'] ?? '');
+$show_search_results = !empty($search_query);
+
+// Get current tab selection (now preserves tab when viewing specific student/instructor)
+$current_tab = $_GET['tab'] ?? ($student_id ? 'students' : ($instructor_id ? 'instructors' : 'students'));
 
 if ($viewing_id) {
     // Get details with enrolled courses
@@ -553,7 +557,7 @@ if (!$viewing_id && !$show_search_results) {
 
             <?php if ($viewing_id): ?>
                 <!-- Student/Instructor Details View -->
-                <a href="timetable_approve.php?tab=<?= $viewing_type ?>s<?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="back-link">
+                <a href="timetable_approve.php?tab=<?= $current_tab ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="back-link">
                     <i class="fas fa-arrow-left"></i> Back to <?= ucfirst($viewing_type) ?>s
                 </a>
 
@@ -586,45 +590,163 @@ if (!$viewing_id && !$show_search_results) {
 
                 <h3>Current Timetable</h3>
                 <?php if ($timetable->num_rows > 0): ?>
-                    <?php while ($entry = $timetable->fetch_assoc()): ?>
-                        <div class="entry-card current-entry">
-                            <div class="info-row">
-                                <div class="info-label">Course:</div>
-                                <div><?= htmlspecialchars($entry['course'] ?? '') ?></div>
+                    <!-- Tab Navigation for View Options -->
+                    <div class="tab-container" style="margin-bottom: 20px;">
+                        <button class="tab view-tab active" data-view="list">List View</button>
+                        <button class="tab view-tab" data-view="table">Timetable View</button>
+                    </div>
+
+                    <!-- List View (Original Style) -->
+                    <div id="list-view" class="view-content">
+                        <?php while ($entry = $timetable->fetch_assoc()): ?>
+                            <div class="entry-card current-entry">
+                                <div class="info-row">
+                                    <div class="info-label">Course:</div>
+                                    <div><?= htmlspecialchars($entry['course'] ?? '') ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Day:</div>
+                                    <div><?= htmlspecialchars($entry['day'] ?? '') ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Time:</div>
+                                    <div><?= date('h:i A', strtotime($entry['start_time'] ?? '')) ?> - <?= date('h:i A', strtotime($entry['end_time'] ?? '')) ?></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Approved At:</div>
+                                    <div><?= date('M j, Y', strtotime($entry['approved_at'] ?? '')) ?></div>
+                                </div>
+                                <div class="actions">
+                                    <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure you want to remove this entry?');">
+                                        <input type="hidden" name="id" value="<?= $entry['id'] ?>">
+                                        <input type="hidden" name="type" value="<?= $viewing_type ?>">
+                                        <?php if (!empty($search_query)): ?>
+                                            <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
+                                        <?php endif; ?>
+                                        <button type="submit" name="remove" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="info-row">
-                                <div class="info-label">Day:</div>
-                                <div><?= htmlspecialchars($entry['day'] ?? '') ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Time:</div>
-                                <div><?= date('h:i A', strtotime($entry['start_time'] ?? '')) ?> - <?= date('h:i A', strtotime($entry['end_time'] ?? '')) ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Approved At:</div>
-                                <div><?= date('M j, Y', strtotime($entry['approved_at'] ?? '')) ?></div>
-                            </div>
-                            <div class="actions">
-                                <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure you want to remove this entry?');">
-                                    <input type="hidden" name="id" value="<?= $entry['id'] ?>">
-                                    <input type="hidden" name="type" value="<?= $viewing_type ?>">
-                                    <?php if (!empty($search_query)): ?>
-                                        <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
-                                    <?php endif; ?>
-                                    <button type="submit" name="remove" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Remove
-                                    </button>
-                                </form>
-                            </div>
+                        <?php endwhile; ?>
+                    </div>
+
+                    <!-- Timetable View (New Table Format) -->
+                    <div id="table-view" class="view-content" style="display: none;">
+                        <?php
+                        // Reset pointer to reuse the result set
+                        $timetable->data_seek(0);
+                        
+                        // Organize timetable data by time and day
+                        $timetableData = [];
+                        $allTimes = [];
+                        $daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                        
+                        while ($entry = $timetable->fetch_assoc()) {
+                            $day = $entry['day'];
+                            $startTime = date('H:i', strtotime($entry['start_time']));
+                            $endTime = date('H:i', strtotime($entry['end_time']));
+                            $timeSlot = "$startTime-$endTime";
+                            $displayTime = date('h:i A', strtotime($entry['start_time'])) . ' - ' . date('h:i A', strtotime($entry['end_time']));
+                            
+                            $timetableData[$timeSlot][$day] = [
+                                'course' => $entry['course'],
+                                'display_time' => $displayTime,
+                                'entry_id' => $entry['id']
+                            ];
+                            
+                            if (!in_array($timeSlot, $allTimes)) {
+                                $allTimes[] = $timeSlot;
+                            }
+                        }
+                        
+                        // Sort times chronologically
+                        usort($allTimes, function($a, $b) {
+                            $timeA = explode('-', $a)[0];
+                            $timeB = explode('-', $b)[0];
+                            return strtotime($timeA) - strtotime($timeB);
+                        });
+                        ?>
+                        
+                        <div class="timetable-container" style="overflow-x: auto; margin-bottom: 20px;">
+                            <table class="timetable" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;">Day/Time</th>
+                                        <?php foreach ($allTimes as $timeSlot): 
+                                            $times = explode('-', $timeSlot);
+                                            $displayTime = date('h:i A', strtotime($times[0])) . ' - ' . date('h:i A', strtotime($times[1]));
+                                        ?>
+                                            <th style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2;"><?= $displayTime ?></th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($daysOrder as $day): ?>
+                                        <tr>
+                                            <td style="border: 1px solid #ddd; padding: 8px; background-color: #f2f2f2; white-space: nowrap;">
+                                                <?= $day ?>
+                                            </td>
+                                            <?php foreach ($allTimes as $timeSlot): ?>
+                                                <td style="border: 1px solid #ddd; padding: 8px; min-width: 120px; height: 60px; vertical-align: top;">
+                                                    <?php if (isset($timetableData[$timeSlot][$day])): ?>
+                                                        <div class="course-slot" style="background-color: #e3f2fd; padding: 5px; border-radius: 4px; height: 100%;">
+                                                            <strong><?= htmlspecialchars($timetableData[$timeSlot][$day]['course']) ?></strong>
+                                                            <div class="actions" style="margin-top: 5px;">
+                                                                <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure you want to remove this entry?');" style="display: inline;">
+                                                                    <input type="hidden" name="id" value="<?= $timetableData[$timeSlot][$day]['entry_id'] ?>">
+                                                                    <input type="hidden" name="type" value="<?= $viewing_type ?>">
+                                                                    <?php if (!empty($search_query)): ?>
+                                                                        <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
+                                                                    <?php endif; ?>
+                                                                    <button type="submit" name="remove" class="btn btn-danger btn-sm" style="padding: 3px 6px; font-size: 12px;">
+                                                                        <i class="fas fa-trash"></i> Remove
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
-                    <?php endwhile; ?>
+                    </div>
+
+                    <!-- JavaScript to toggle views -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const viewTabs = document.querySelectorAll('.view-tab');
+                            
+                            viewTabs.forEach(tab => {
+                                tab.addEventListener('click', function() {
+                                    // Remove active class from all tabs
+                                    viewTabs.forEach(t => t.classList.remove('active'));
+                                    
+                                    // Add active class to clicked tab
+                                    this.classList.add('active');
+                                    
+                                    // Hide all view contents
+                                    document.querySelectorAll('.view-content').forEach(view => {
+                                        view.style.display = 'none';
+                                    });
+                                    
+                                    // Show selected view
+                                    const viewToShow = this.getAttribute('data-view');
+                                    document.getElementById(viewToShow + '-view').style.display = 'block';
+                                });
+                            });
+                        });
+                    </script>
                 <?php else: ?>
                     <div class="no-entries">
                         <i class="fas fa-info-circle"></i>
                         <p>No timetable entries found for this <?= $viewing_type ?></p>
                     </div>
                 <?php endif; ?>
-
                 <div style="margin-top: 20px;">
                     <a href="timetable_reschedule.php?<?= $viewing_type ?>_id=<?= $viewing_id ?>" class="btn btn-primary">
                         <i class="fas fa-calendar-alt"></i> Reschedule Timetable
@@ -736,8 +858,13 @@ if (!$viewing_id && !$show_search_results) {
                                                 </button>
                                             </form>
                                         <?php else: ?>
-                                            <a href="timetable_approve.php?<?= $current_tab ?>_id=<?= htmlspecialchars($result['id']) ?>&search=<?= urlencode($search_query) ?>" class="btn btn-primary">
-                                                <i class="fas fa-eye"></i> View Details
+                                            <?php 
+                                                // Determine the correct ID parameter based on current tab
+                                                $id_param = ($current_tab === 'students') ? 'student_id' : 'instructor_id';
+                                            ?>
+                                            <a href="timetable_approve.php?<?= $id_param ?>=<?= htmlspecialchars($result['id']) ?>&search=<?= urlencode($search_query) ?>&tab=<?= $current_tab ?>" 
+                                            class="btn btn-primary">
+                                                <i class="fas fa-eye"></i> View Timetable
                                             </a>
                                         <?php endif; ?>
                                     </div>
