@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$studentId = $_SESSION['user_id']; // Assuming this stores student_id
+$studentId = $_SESSION['user_id']; 
 
 // Fetch events from student_timetable
 $query = "SELECT course, day, start_time, end_time, status FROM student_timetable WHERE student_course_id = ? AND status = 'active'";
