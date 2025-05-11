@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3310
--- Generation Time: May 01, 2025 at 04:30 PM
+-- Generation Time: May 04, 2025 at 04:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -202,11 +202,16 @@ CREATE TABLE `instructor_timetable_requests` (
 --
 
 INSERT INTO `instructor_timetable_requests` (`id`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`, `instructor_course_id`, `course`) VALUES
-(1, 'Monday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-01 01:15:00', NULL, NULL),
-(2, 'Wednesday', '10:00:00', '12:00:00', 'pending', NULL, '2023-11-02 02:30:00', NULL, NULL),
-(3, 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2023-11-03 03:45:00', NULL, NULL),
-(4, 'Tuesday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-04 06:20:00', NULL, NULL),
-(5, 'Thursday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-05 00:50:00', NULL, NULL);
+(1, 'Monday', '09:00:00', '11:00:00', 'pending', NULL, '2025-05-01 13:52:45', 1, 'IGCSE Math Prep'),
+(2, 'Wednesday', '13:00:00', '15:00:00', 'pending', NULL, '2025-05-02 13:52:45', 1, 'IGCSE Math Prep'),
+(3, 'Tuesday', '10:00:00', '12:00:00', 'pending', NULL, '2025-04-30 13:52:45', 3, 'Elementary Math'),
+(4, 'Friday', '14:00:00', '16:00:00', 'approved', NULL, '2025-04-28 13:52:45', 3, 'Elementary Math'),
+(5, 'Thursday', '11:00:00', '13:00:00', 'rejected', 'Time conflict with existing class', '2025-04-29 13:52:45', 4, 'Physics Basics'),
+(6, 'Monday', '16:00:00', '18:00:00', 'pending', NULL, '2025-05-01 13:52:45', 4, 'Physics Basics'),
+(7, 'Wednesday', '09:00:00', '11:00:00', 'pending', NULL, '2025-05-02 13:52:45', 5, 'Advanced Physics'),
+(8, 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2025-05-03 13:52:45', 5, 'Advanced Physics'),
+(9, 'Tuesday', '14:00:00', '16:00:00', 'approved', NULL, '2025-04-30 13:52:45', 1, 'IGCSE Math Prep'),
+(10, 'Thursday', '10:00:00', '12:00:00', 'rejected', 'Instructor not available', '2025-04-27 13:52:45', 1, 'IGCSE Math Prep');
 
 -- --------------------------------------------------------
 
@@ -545,12 +550,13 @@ CREATE TABLE `student_timetable` (
 --
 
 INSERT INTO `student_timetable` (`id`, `course`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `student_course_id`) VALUES
-(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 37),
+(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 22),
 (2, 'IGCSE Math Prep', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00', 'active', 2),
-(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 38),
+(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 4),
 (4, 'IGCSE Math Prep', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00', 'active', 11),
 (5, 'IGCSE Math Prep', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00', 'active', 1),
-(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 31);
+(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 15),
+(7, 'IGCSE Math Prep', 'Friday', '01:00:00', '04:00:00', '2025-05-04 14:17:08', 'active', 22);
 
 --
 -- Triggers `student_timetable`
@@ -594,7 +600,10 @@ INSERT INTO `student_timetable_requests` (`id`, `day`, `start_time`, `end_time`,
 (2, 'Wednesday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-02 05:45:00', NULL, NULL),
 (3, 'Friday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-03 02:20:00', NULL, NULL),
 (4, 'Tuesday', '11:00:00', '13:00:00', 'pending', NULL, '2023-11-04 07:10:00', NULL, NULL),
-(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math');
+(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math'),
+(6, 'Monday', '19:00:00', '20:00:00', 'pending', NULL, '2025-05-04 13:39:11', 22, 'IGCSE Math Prep'),
+(7, 'Wednesday', '19:00:00', '21:00:00', 'pending', NULL, '2025-05-04 13:39:30', 22, 'IGCSE Math Prep'),
+(8, 'Friday', '01:00:00', '04:00:00', 'approved', NULL, '2025-05-04 14:16:38', 22, 'IGCSE Math Prep');
 
 -- --------------------------------------------------------
 
@@ -856,7 +865,7 @@ ALTER TABLE `instructor_timetable`
 -- AUTO_INCREMENT for table `instructor_timetable_requests`
 --
 ALTER TABLE `instructor_timetable_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `payment`
@@ -880,13 +889,13 @@ ALTER TABLE `student_courses`
 -- AUTO_INCREMENT for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `student_timetable_requests`
 --
 ALTER TABLE `student_timetable_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `subjects`

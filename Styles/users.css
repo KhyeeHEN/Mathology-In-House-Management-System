@@ -66,6 +66,7 @@ h1 {
     height: 120px; /* Adjust height as needed */
     display: flex;
     padding: 1rem 2rem;
+    z-index: 1000; /* Keep it above other elements */
 }
 
 /* Add spacing to the main content */
@@ -83,6 +84,8 @@ h1 {
     height: 100%;
     top: 0;
     left: 0;
+    width: 260px;
+    z-index: 1000
 }
 
 /* Style for the search bar */

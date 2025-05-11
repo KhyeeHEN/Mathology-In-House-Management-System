@@ -11,7 +11,10 @@ $offset = ($page - 1) * $limit;
 // Get total rows for pagination
 $countQuery = "SELECT COUNT(*) AS total FROM students";
 if (!empty($search)) {
-    $countQuery .= " WHERE student_id LIKE '%$search%' OR Last_Name LIKE '%$search%' OR First_Name LIKE '%$search%'";
+        $countQuery .= " WHERE students.student_id LIKE '%$search%' 
+                     OR students.Last_Name LIKE '%$search%' 
+                     OR students.First_Name LIKE '%$search%'
+                     OR attendance_records.course LIKE '%$search%'";
 }
 $countResult = $conn->query($countQuery);
 $totalRows = $countResult->fetch_assoc()['total'];
@@ -26,7 +29,14 @@ if ($page < 1) {
 }
 
 // Base query
-$sql = "SELECT * FROM students";
+$sql = "
+    SELECT 
+        students.*, 
+        attendance_records.course, 
+        attendance_records.timetable_datetime 
+    FROM students
+    LEFT JOIN attendance_records ON students.student_id = attendance_records.student_id
+";
 
 // If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
 if (!empty($search)) {
@@ -52,7 +62,7 @@ if (!empty($search)) {
 }
 
 // Add pagination
-$sql .= " LIMIT $limit OFFSET $offset";
+$sql .= " GROUP BY students.student_id LIMIT $limit OFFSET $offset";
 
 // Execute the query
 $result = $conn->query($sql);
@@ -72,6 +82,8 @@ if ($result->num_rows > 0) {
                 <th>Current School Grade</th>
                 <th>School</th>
                 <th>Mathology Level</th>
+                <th>Course</th>
+                <th>Timetable</th>
                 <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
@@ -86,6 +98,8 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Current_School_Grade'] . "</td>
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
+                <td>" . ($row['course'] ? $row['course'] : 'N/A') . "</td>
+                <td>" . ($row['timetable_datetime'] ? $row['timetable_datetime'] : 'N/A') . "</td>
                 <td>
                     <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
                     <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
