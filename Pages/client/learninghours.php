@@ -36,7 +36,7 @@
                     <i class="fas fa-check"></i>
                     <span>Apply Leave</span>
                 </a>
-                <a href="payment.php" class="nav-item">
+                <a href="paymentclient.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
