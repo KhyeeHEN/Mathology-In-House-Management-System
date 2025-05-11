@@ -2,31 +2,31 @@
 require_once '../setting.php';
 session_start();
 
-// Ensure student is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+// Ensure instructor is logged in
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
     header("Location: ../login.php");
     exit();
 }
 
-$studentId = $_SESSION['user_id']; 
+$instructorId = $_SESSION['user_id']; 
 
-// First get the student_id from users table
-$query = "SELECT student_id FROM users WHERE user_id = ?";
+// First get the instructor_id from users table
+$query = "SELECT instructor_id FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $studentId);
+$stmt->bind_param("i", $instructorId);
 $stmt->execute();
 $result = $stmt->get_result();
 $userData = $result->fetch_assoc();
-$actualStudentId = $userData['student_id'];
+$actualInstructorId = $userData['instructor_id'];
 
-// Fetch student's timetable
-$query = "SELECT st.id, c.course_name, st.day, st.start_time, st.end_time, st.status 
-          FROM student_timetable st
-          JOIN student_courses sc ON st.student_course_id = sc.student_course_id
-          JOIN courses c ON sc.course_id = c.course_id
-          WHERE sc.student_id = ? AND st.status = 'active'";
+// Fetch instructor's timetable
+$query = "SELECT it.id, c.course_name, it.day, it.start_time, it.end_time, it.status 
+          FROM instructor_timetable it
+          JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
+          JOIN courses c ON ic.course_id = c.course_id
+          WHERE ic.instructor_id = ? AND it.status = 'active'";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $actualStudentId);
+$stmt->bind_param("i", $actualInstructorId);
 
 if (!$stmt->execute()) {
     die("Query execution failed: " . $stmt->error);
@@ -64,8 +64,7 @@ foreach ($events as $event) {
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
-        'venue' => 'TBD', // Optional placeholder
-        'lecturer' => 'TBD', // Optional placeholder
+        'venue' => 'TBD', // Can be added to instructor_timetable if needed
         'description' => ''
     ];
 }
@@ -75,7 +74,7 @@ foreach ($events as $event) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+    <title>Instructor Dashboard</title>
     <link rel="stylesheet" href="../../styles/dashboard.css">
     <link rel="stylesheet" href="../../styles/common.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
