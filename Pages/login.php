@@ -52,19 +52,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login to Your Account</title>
   <link rel="stylesheet" href="../Styles/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
   <div class="login-container">
-    <h2>Login</h2>
+    <h2>Welcome Back</h2>
+    
     <?php if ($error): ?>
-      <p class="error"><?= htmlspecialchars($error) ?></p>
+      <div class="error">
+        <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
+      </div>
     <?php endif; ?>
+    
     <form method="POST">
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login</button>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+      
+      <button type="submit">
+        Sign In <i class="fas fa-arrow-right"></i>
+      </button>
+      
+      <a href="#" class="forgot-password">Forgot password?</a>
+      
+      <div class="register-link">
+        Don't have an account? <a href="register.php">Sign up</a>
+      </div>
     </form>
   </div>
 </body>
