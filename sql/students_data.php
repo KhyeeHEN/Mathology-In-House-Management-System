@@ -11,10 +11,7 @@ $offset = ($page - 1) * $limit;
 // Get total rows for pagination
 $countQuery = "SELECT COUNT(*) AS total FROM students";
 if (!empty($search)) {
-        $countQuery .= " WHERE students.student_id LIKE '%$search%' 
-                     OR students.Last_Name LIKE '%$search%' 
-                     OR students.First_Name LIKE '%$search%'
-                     OR attendance_records.course LIKE '%$search%'";
+    $countQuery .= " WHERE student_id LIKE '%$search%' OR Last_Name LIKE '%$search%' OR First_Name LIKE '%$search%'";
 }
 $countResult = $conn->query($countQuery);
 $totalRows = $countResult->fetch_assoc()['total'];
@@ -28,41 +25,48 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query
+// Base query with JOIN for credentials and GROUP_CONCAT for timetable
 $sql = "
     SELECT 
-        students.*, 
-        attendance_records.course, 
-        attendance_records.timetable_datetime 
-    FROM students
-    LEFT JOIN attendance_records ON students.student_id = attendance_records.student_id
+        s.student_id, 
+        s.Last_Name, 
+        s.First_Name, 
+        s.Gender, 
+        s.DOB, 
+        s.School_Syllabus, 
+        s.School_Intake, 
+        s.Current_School_Grade, 
+        s.School, 
+        s.Mathology_Level,
+        u.email AS user_email, 
+        u.role AS user_role,
+        c.course_name,
+        GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
+    FROM 
+        students s
+    LEFT JOIN 
+        users u ON s.student_id = u.related_id AND u.role = 'student'
+    LEFT JOIN 
+        student_courses sc ON s.student_id = sc.student_id
+    LEFT JOIN 
+        courses c ON sc.course_id = c.course_id
+    LEFT JOIN 
+        student_timetable st ON sc.student_course_id = st.student_course_id
 ";
 
 // If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
 if (!empty($search)) {
-    $sql = "
-        SELECT * FROM students
-        WHERE
-            student_id = '$search' OR
-            Last_Name = '$search' OR
-            First_Name = '$search'
-        UNION
-        SELECT * FROM students
-        WHERE 
-            student_id LIKE BINARY '%$search%' OR
-            Last_Name LIKE BINARY '%$search%' OR
-            First_Name LIKE BINARY '%$search%'
-        UNION
-        SELECT * FROM students
-        WHERE 
-            student_id LIKE '%$search%' OR
-            Last_Name LIKE '%$search%' OR
-            First_Name LIKE '%$search%'
-    ";
+    $sql .= " WHERE 
+        s.student_id = '$search' OR
+        s.Last_Name = '$search' OR
+        s.First_Name = '$search'";
 }
 
+// Group by student to avoid duplicate rows
+$sql .= " GROUP BY s.student_id";
+
 // Add pagination
-$sql .= " GROUP BY students.student_id LIMIT $limit OFFSET $offset";
+$sql .= " LIMIT $limit OFFSET $offset";
 
 // Execute the query
 $result = $conn->query($sql);
@@ -82,6 +86,8 @@ if ($result->num_rows > 0) {
                 <th>Current School Grade</th>
                 <th>School</th>
                 <th>Mathology Level</th>
+                <th>User Email</th>
+                <th>User Role</th>
                 <th>Course</th>
                 <th>Timetable</th>
                 <th>Actions</th>
@@ -98,8 +104,10 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Current_School_Grade'] . "</td>
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
-                <td>" . ($row['course'] ? $row['course'] : 'N/A') . "</td>
-                <td>" . ($row['timetable_datetime'] ? $row['timetable_datetime'] : 'N/A') . "</td>
+                <td>" . $row['user_email'] . "</td>
+                <td>" . $row['user_role'] . "</td>
+                <td>" . $row['course_name'] . "</td>
+                <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>
                     <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
                     <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>

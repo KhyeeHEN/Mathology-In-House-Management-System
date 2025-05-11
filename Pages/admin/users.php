@@ -59,7 +59,7 @@
         </main>
     </div>
     <script type="module" src="../../scripts/common.js"></script>
-    <script src="../../scripts/users.js"></script>
+    <script src="../../scripts/users.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

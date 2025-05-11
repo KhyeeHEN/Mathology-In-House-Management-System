@@ -25,31 +25,45 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query
-$sql = "SELECT * FROM instructor";
+// Base query with JOIN for credentials and GROUP_CONCAT for timetable
+$sql = "
+    SELECT 
+        i.instructor_id, 
+        i.Last_Name, 
+        i.First_Name, 
+        i.Gender, 
+        i.DOB, 
+        i.Highest_Education, 
+        i.Remark, 
+        i.Training_Status,
+        u.email AS user_email, 
+        u.role AS user_role,
+        GROUP_CONCAT(DISTINCT c.course_name SEPARATOR ', ') AS courses,
+        GROUP_CONCAT(
+            DISTINCT CONCAT(it.day, ' (', it.start_time, ' - ', it.end_time, ')') SEPARATOR '<br>'
+        ) AS timetable
+    FROM 
+        instructor i
+    LEFT JOIN 
+        users u ON i.instructor_id = u.related_id AND u.role = 'instructor'
+    LEFT JOIN 
+        instructor_courses ic ON i.instructor_id = ic.instructor_id
+    LEFT JOIN 
+        courses c ON ic.course_id = c.course_id
+    LEFT JOIN 
+        instructor_timetable it ON ic.instructor_course_id = it.instructor_course_id
+";
 
 // If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
 if (!empty($search)) {
-    $sql = "
-        SELECT * FROM instructor
-        WHERE
-            instructor_id = '$search' OR
-            Last_Name = '$search' OR
-            First_Name = '$search'
-        UNION
-        SELECT * FROM instructor
-        WHERE 
-            instructor_id LIKE BINARY '%$search%' OR
-            Last_Name LIKE BINARY '%$search%' OR
-            First_Name LIKE BINARY '%$search%'
-        UNION
-        SELECT * FROM instructor
-        WHERE 
-            instructor_id LIKE '%$search%' OR
-            Last_Name LIKE '%$search%' OR
-            First_Name LIKE '%$search%'
-    ";
+    $sql .= " WHERE 
+        i.instructor_id = '$search' OR
+        i.Last_Name = '$search' OR
+        i.First_Name = '$search'";
 }
+
+// Group by instructor to avoid duplicate rows
+$sql .= " GROUP BY i.instructor_id";
 
 // Add pagination
 $sql .= " LIMIT $limit OFFSET $offset";
@@ -70,6 +84,10 @@ if ($result->num_rows > 0) {
                 <th>Highest Education</th>
                 <th>Remark</th>
                 <th>Training Status</th>
+                <th>User Email</th>
+                <th>User Role</th>
+                <th>Courses</th>
+                <th>Timetable</th>
                 <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
@@ -82,6 +100,10 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Highest_Education'] . "</td>
                 <td>" . $row['Remark'] . "</td>
                 <td>" . $row['Training_Status'] . "</td>
+                <td>" . $row['user_email'] . "</td>
+                <td>" . $row['user_role'] . "</td>
+                <td>" . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "</td>
+                <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>
                     <a href='../../sql/edit_instructor.php?instructor_id={$row['instructor_id']}'>Edit</a> 
                     <a href='../../sql/delete_instructor.php?instructor_id={$row['instructor_id']}' onclick=\"return confirm('Are you sure you want to delete this instructor?');\">Delete</a>

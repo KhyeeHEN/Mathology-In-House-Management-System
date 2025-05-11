@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3310
--- Generation Time: May 04, 2025 at 04:29 PM
+-- Generation Time: May 11, 2025 at 09:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -173,8 +173,8 @@ CREATE TABLE `instructor_timetable` (
 --
 
 INSERT INTO `instructor_timetable` (`id`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `instructor_course_id`, `course`) VALUES
-(1, 'Monday', '09:00:00', '11:00:00', '2023-10-15 06:30:00', 'active', NULL, ''),
-(2, 'Wednesday', '13:00:00', '15:00:00', '2023-10-16 02:15:00', 'active', NULL, ''),
+(1, 'Monday', '09:00:00', '11:00:00', '2023-10-15 06:30:00', 'active', 1, ''),
+(2, 'Wednesday', '13:00:00', '15:00:00', '2023-10-16 02:15:00', 'active', 1, ''),
 (3, 'Friday', '10:00:00', '12:00:00', '2023-10-17 03:20:00', 'active', NULL, ''),
 (4, 'Tuesday', '14:00:00', '16:00:00', '2023-10-18 01:45:00', 'active', NULL, ''),
 (5, 'Thursday', '11:00:00', '13:00:00', '2023-10-19 08:10:00', 'active', NULL, '');
@@ -202,16 +202,11 @@ CREATE TABLE `instructor_timetable_requests` (
 --
 
 INSERT INTO `instructor_timetable_requests` (`id`, `day`, `start_time`, `end_time`, `status`, `rejection_reason`, `requested_at`, `instructor_course_id`, `course`) VALUES
-(1, 'Monday', '09:00:00', '11:00:00', 'pending', NULL, '2025-05-01 13:52:45', 1, 'IGCSE Math Prep'),
-(2, 'Wednesday', '13:00:00', '15:00:00', 'pending', NULL, '2025-05-02 13:52:45', 1, 'IGCSE Math Prep'),
-(3, 'Tuesday', '10:00:00', '12:00:00', 'pending', NULL, '2025-04-30 13:52:45', 3, 'Elementary Math'),
-(4, 'Friday', '14:00:00', '16:00:00', 'approved', NULL, '2025-04-28 13:52:45', 3, 'Elementary Math'),
-(5, 'Thursday', '11:00:00', '13:00:00', 'rejected', 'Time conflict with existing class', '2025-04-29 13:52:45', 4, 'Physics Basics'),
-(6, 'Monday', '16:00:00', '18:00:00', 'pending', NULL, '2025-05-01 13:52:45', 4, 'Physics Basics'),
-(7, 'Wednesday', '09:00:00', '11:00:00', 'pending', NULL, '2025-05-02 13:52:45', 5, 'Advanced Physics'),
-(8, 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2025-05-03 13:52:45', 5, 'Advanced Physics'),
-(9, 'Tuesday', '14:00:00', '16:00:00', 'approved', NULL, '2025-04-30 13:52:45', 1, 'IGCSE Math Prep'),
-(10, 'Thursday', '10:00:00', '12:00:00', 'rejected', 'Instructor not available', '2025-04-27 13:52:45', 1, 'IGCSE Math Prep');
+(1, 'Monday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-01 01:15:00', NULL, NULL),
+(2, 'Wednesday', '10:00:00', '12:00:00', 'pending', NULL, '2023-11-02 02:30:00', NULL, NULL),
+(3, 'Friday', '13:00:00', '15:00:00', 'pending', NULL, '2023-11-03 03:45:00', NULL, NULL),
+(4, 'Tuesday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-04 06:20:00', NULL, NULL),
+(5, 'Thursday', '16:00:00', '18:00:00', 'pending', NULL, '2023-11-05 00:50:00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -306,6 +301,46 @@ INSERT INTO `primary_contact_number` (`Last_Name`, `First_Name`, `Relationship_w
 ('Phang', 'Wei Ming', 'Parent', '0123456789', 'weiming.phang@live.com', '11, Jalan Bukit Bintang, KLCC', 55100),
 ('Chia', 'Li Ying', 'Guardian', '0199012345', 'liying.chia@gmail.com', '22, Jalan PJS 11/7, Bandar Sunway', 46150),
 ('Tiew', 'Kok Seng', 'Parent', '0134567890', 'kokseng.tiew@outlook.com', '33, Lorong Seri, Taman Seri Bahtera', 51200),
+('Law', 'Mei Ling', 'Parent', '0161234567', 'meiling.law@yahoo.com', '44, Jalan SS22/19, Petaling Jaya', 47400),
+('Tan', 'Kok Wei', 'Parent', '0123456789', 'kokwei.tan@gmail.com', '12, Jalan Bukit, Taman Sentosa', 52000),
+('Lim', 'Siew Mei', 'Guardian', '0167891234', 'siewmei.lim@yahoo.com', '45, Lorong Bunga, Taman Indah', 47300),
+('Chong', 'Ahmad bin', 'Parent', '0198765432', 'ahmad.chong@hotmail.com', '78, Jalan Merdeka, Bandar Baru', 58200),
+('Ng', 'Lay Har', 'Parent', '0134567890', 'layhar.ng@gmail.com', '23, Jalan SS2/24, Petaling Jaya', 47301),
+('Lee', 'Chee Meng', 'Guardian', '0171234567', 'cheemeng.lee@outlook.com', '56, Lorong Damai, Taman Desa', 58100),
+('Wong', 'Mei Fong', 'Parent', '0112345678', 'meifong.wong@gmail.com', '89, Jalan Puchong, Taman Kinrara', 47100),
+('Chew', 'Boon Seng', 'Parent', '0145678901', 'boonseng.chew@yahoo.com', '34, Jalan Ipoh, Sentul', 51000),
+('Yap', 'Hui Ling', 'Guardian', '0189012345', 'huiling.yap@gmail.com', '67, Lorong Gasing, Taman Megah', 47400),
+('Khoo', 'Teck Guan', 'Parent', '0129876543', 'teckguan.khoo@live.com', '90, Jalan Klang, Taman Sri', 52100),
+('Chan', 'Sook Yee', 'Parent', '0191234567', 'sookyee.chan@gmail.com', '15, Jalan Ampang, Kuala Lumpur', 50450),
+('Goh', 'Wei Liang', 'Parent', '0137894561', 'weiliang.goh@gmail.com', '22, Jalan Setia, Taman Setiawangsa', 54200),
+('Lau', 'Poh Ling', 'Guardian', '0162345678', 'pohling.lau@yahoo.com', '33, Lorong Kenari, Taman Melawati', 53100),
+('Teo', 'Chin Hock', 'Parent', '0178901234', 'chinhock.teo@outlook.com', '44, Jalan Perak, Taman Tun', 60000),
+('Ho', 'Mei Yin', 'Parent', '0113456789', 'meiyin.ho@gmail.com', '55, Jalan SS3/12, Kelana Jaya', 47300),
+('Ong', 'Kok Leong', 'Guardian', '0149012345', 'kokleong.ong@live.com', '66, Lorong Cempaka, Taman Cheras', 56100),
+('Low', 'Siew Lan', 'Parent', '0124567890', 'siewlan.low@gmail.com', '77, Jalan Bukit Bintang, KLCC', 55100),
+('Soh', 'Teck Ming', 'Parent', '0195678901', 'teckming.soh@yahoo.com', '88, Jalan Kuchai Lama, Taman Kuchai', 58200),
+('Chua', 'Li Ping', 'Guardian', '0131234567', 'liping.chua@gmail.com', '99, Lorong Seri, Taman Seri Bahtera', 51200),
+('Pang', 'Wei Keong', 'Parent', '0167894561', 'weikeong.pang@outlook.com', '11, Jalan Damansara, Damansara Heights', 50490),
+('Yeoh', 'Siew Ching', 'Parent', '0172345678', 'siewching.yeoh@gmail.com', '22, Jalan Bangsar, Bangsar Baru', 59100),
+('Sim', 'Kok Fatt', 'Parent', '0118901234', 'kokfatt.sim@live.com', '33, Lorong Utama, Taman Utama', 47150),
+('Kong', 'Mei Ling', 'Guardian', '0143456789', 'meiling.kong@yahoo.com', '44, Jalan SS15/4, Subang Jaya', 47500),
+('Foo', 'Chin Wei', 'Parent', '0129012345', 'chinwei.foo@gmail.com', '55, Jalan PJS 11/9, Bandar Sunway', 46150),
+('Liew', 'Sook Fun', 'Parent', '0194567890', 'sookfun.liew@outlook.com', '66, Lorong Indah, Taman Indah Permai', 52200),
+('Tay', 'Kok Seng', 'Guardian', '0135678901', 'kokseng.tay@gmail.com', '77, Jalan Klang Lama, Taman Overseas', 58200),
+('Koh', 'Mei Yee', 'Parent', '0161234567', 'meiyee.koh@yahoo.com', '88, Jalan USJ 2/3, USJ 2', 47600),
+('Chin', 'Wei Hong', 'Parent', '0177894561', 'weihong.chin@live.com', '99, Lorong Damai 2, Taman Damai', 56000),
+('Toh', 'Siew Ling', 'Guardian', '0112345678', 'siewling.toh@gmail.com', '11, Jalan SS22/41, Petaling Jaya', 47400),
+('Heng', 'Kok Wai', 'Parent', '0148901234', 'kokwai.heng@outlook.com', '22, Jalan Bukit, Taman Bukit Mewah', 52100),
+('Poon', 'Li Mei', 'Parent', '0123456789', 'limei.poon@yahoo.com', '33, Lorong Seri Kembangan, Seri Kembangan', 43300),
+('Kwan', 'Teck Soon', 'Parent', '0199012345', 'tecksoon.kwan@gmail.com', '44, Jalan Puchong, Taman Puchong Utama', 47100),
+('Liang', 'Siew Har', 'Guardian', '0134567890', 'siewhar.liang@live.com', '55, Jalan SS3/29, Kelana Jaya', 47300),
+('Yeap', 'Chin Fatt', 'Parent', '0161234567', 'chinfatt.yeap@gmail.com', '66, Lorong Gasing 2, Taman Megah', 47400),
+('Ooi', 'Mei Chen', 'Parent', '0177894561', 'meichen.ooi@outlook.com', '77, Jalan Ampang Hilir, Desa Pandan', 55100),
+('Tham', 'Kok Leong', 'Guardian', '0112345678', 'kokleong.tham@yahoo.com', '88, Jalan SS15/5, Subang Jaya', 47500),
+('See', 'Siew Yee', 'Parent', '0148901234', 'siewyee.see@gmail.com', '99, Lorong Indah 3, Taman Indah Permai', 52200),
+('Phang', 'Wei Ming', 'Parent', '0123456789', 'weiming.phang@live.com', '11, Jalan Bukit Bintang, KLCC', 55100),
+('Chia', 'Li Ying', 'Guardian', '0199012345', 'liying.chia@gmail.com', '22, Jalan PJS 11/7, Bandar Sunway', 46150),
+('Tiew', 'Kok Seng', 'Parent', '0134567890', 'kokseng.tiew@outlook.com', '33, Lorong Seri, Taman Seri Bahtera', 51200),
 ('Law', 'Mei Ling', 'Parent', '0161234567', 'meiling.law@yahoo.com', '44, Jalan SS22/19, Petaling Jaya', 47400);
 
 -- --------------------------------------------------------
@@ -326,6 +361,46 @@ CREATE TABLE `secondary_contact_number` (
 --
 
 INSERT INTO `secondary_contact_number` (`Last_Name`, `First_Name`, `Relationship_with_Student`, `Phone`) VALUES
+('Tan', 'Wei Ling', 'Sibling', '0129876543'),
+('Lim', 'Kok Fatt', 'Parent', '0165432109'),
+('Chong', 'Mei Yee', 'Guardian', '0198761234'),
+('Ng', 'Teck Wei', 'Sibling', '0134561234'),
+('Lee', 'Siew Lan', 'Parent', '0177894561'),
+('Wong', 'Chin Hock', 'Guardian', '0112347890'),
+('Chew', 'Li Ping', 'Sibling', '0145671234'),
+('Yap', 'Kok Seng', 'Parent', '0189014567'),
+('Khoo', 'Mei Chen', 'Guardian', '0123459876'),
+('Chan', 'Wei Hong', 'Sibling', '0191237890'),
+('Goh', 'Siew Har', 'Parent', '0137891234'),
+('Lau', 'Teck Guan', 'Guardian', '0162347890'),
+('Teo', 'Li Ying', 'Sibling', '0178904561'),
+('Ho', 'Kok Wai', 'Parent', '0113451234'),
+('Ong', 'Mei Ling', 'Guardian', '0149017890'),
+('Low', 'Chin Wei', 'Sibling', '0124561234'),
+('Soh', 'Siew Yee', 'Parent', '0195674561'),
+('Chua', 'Wei Ming', 'Guardian', '0131237890'),
+('Pang', 'Li Mei', 'Sibling', '0167891234'),
+('Yeoh', 'Teck Soon', 'Parent', '0172344561'),
+('Sim', 'Siew Ching', 'Guardian', '0118907890'),
+('Kong', 'Kok Leong', 'Sibling', '0143451234'),
+('Foo', 'Mei Yin', 'Parent', '0129014567'),
+('Liew', 'Wei Keong', 'Guardian', '0194567890'),
+('Tay', 'Sook Fun', 'Sibling', '0135671234'),
+('Koh', 'Chin Fatt', 'Parent', '0161237890'),
+('Chin', 'Mei Yee', 'Guardian', '0177891234'),
+('Toh', 'Kok Seng', 'Sibling', '0112344561'),
+('Heng', 'Siew Ling', 'Parent', '0148907890'),
+('Poon', 'Wei Hong', 'Guardian', '0123451234'),
+('Kwan', 'Siew Har', 'Sibling', '0199014567'),
+('Liang', 'Teck Guan', 'Parent', '0134567890'),
+('Yeap', 'Li Ying', 'Guardian', '0161234567'),
+('Ooi', 'Kok Wai', 'Sibling', '0177897890'),
+('Tham', 'Mei Ling', 'Parent', '0112341234'),
+('See', 'Chin Wei', 'Guardian', '0148904561'),
+('Phang', 'Siew Yee', 'Sibling', '0123457890'),
+('Chia', 'Wei Ming', 'Parent', '0199011234'),
+('Tiew', 'Li Mei', 'Guardian', '0134564561'),
+('Law', 'Teck Soon', 'Sibling', '0161237890'),
 ('Tan', 'Wei Ling', 'Sibling', '0129876543'),
 ('Lim', 'Kok Fatt', 'Parent', '0165432109'),
 ('Chong', 'Mei Yee', 'Guardian', '0198761234'),
@@ -550,13 +625,12 @@ CREATE TABLE `student_timetable` (
 --
 
 INSERT INTO `student_timetable` (`id`, `course`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `student_course_id`) VALUES
-(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 22),
+(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 37),
 (2, 'IGCSE Math Prep', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00', 'active', 2),
-(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 4),
+(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 38),
 (4, 'IGCSE Math Prep', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00', 'active', 11),
 (5, 'IGCSE Math Prep', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00', 'active', 1),
-(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 15),
-(7, 'IGCSE Math Prep', 'Friday', '01:00:00', '04:00:00', '2025-05-04 14:17:08', 'active', 22);
+(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 31);
 
 --
 -- Triggers `student_timetable`
@@ -600,10 +674,7 @@ INSERT INTO `student_timetable_requests` (`id`, `day`, `start_time`, `end_time`,
 (2, 'Wednesday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-02 05:45:00', NULL, NULL),
 (3, 'Friday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-03 02:20:00', NULL, NULL),
 (4, 'Tuesday', '11:00:00', '13:00:00', 'pending', NULL, '2023-11-04 07:10:00', NULL, NULL),
-(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math'),
-(6, 'Monday', '19:00:00', '20:00:00', 'pending', NULL, '2025-05-04 13:39:11', 22, 'IGCSE Math Prep'),
-(7, 'Wednesday', '19:00:00', '21:00:00', 'pending', NULL, '2025-05-04 13:39:30', 22, 'IGCSE Math Prep'),
-(8, 'Friday', '01:00:00', '04:00:00', 'approved', NULL, '2025-05-04 14:16:38', 22, 'IGCSE Math Prep');
+(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math');
 
 -- --------------------------------------------------------
 
@@ -651,81 +722,20 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('admin','instructor','student') NOT NULL,
-  `related_id` int(11) DEFAULT NULL COMMENT 'Links to student_id or instructor_id',
-  `name` varchar(100) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `remember_token` varchar(64) DEFAULT NULL,
-  `token_expiry` datetime DEFAULT NULL
+  `student_id` int(11) DEFAULT NULL,
+  `instructor_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `email`, `password`, `role`, `related_id`, `name`, `created_at`, `updated_at`, `remember_token`, `token_expiry`) VALUES
-(1, 'meichen.chan@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 10, 'Mei Chen Chan', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(2, 'teckguan.chew@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 7, 'Teck Guan Chew', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(3, 'ahmadbin.chong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 3, 'Ahmad bin Chong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(4, 'meiyin.chua@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 18, 'Mei Yin Chua', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(5, 'kokseng.goh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 11, 'Kok Seng Goh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(6, 'limei.ho@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 14, 'Li Mei Ho', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(7, 'weiming.khoo@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 9, 'Wei Ming Khoo', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(8, 'siewhar.lau@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 12, 'Siew Har Lau', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(9, 'chinfatt.lee@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 5, 'Chin Fatt Lee', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(10, 'meilin.lim@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 2, 'Mei Lin Lim', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(11, 'siewling.low@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 16, 'Siew Ling Low', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(12, 'siewyee.ng@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 4, 'Siew Yee Ng', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(13, 'tecksoon.ong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 15, 'Teck Soon Ong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(14, 'kokwai.pang@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 19, 'Kok Wai Pang', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(15, 'weikeong.soh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 17, 'Wei Keong Soh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(16, 'kokwei.tan@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 1, 'Kok Wei Tan', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(17, 'chinwei.teo@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 13, 'Chin Wei Teo', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(18, 'liying.wong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 6, 'Li Ying Wong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(19, 'sookfun.yap@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 8, 'Sook Fun Yap', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(20, 'siewching.yeoh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'instructor', 20, 'Siew Ching Yeoh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(32, 'yiting.chan@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 10, 'Yi Ting Chan', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(33, 'boonkeat.chew@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 7, 'Boon Keat Chew', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(34, 'meixin.chia@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 38, 'Mei Xin Chia', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(35, 'weixiang.chin@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 27, 'Wei Xiang Chin', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(36, 'kaiwen.chong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 3, 'Kai Wen Chong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(37, 'meiqi.chua@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 18, 'Mei Qi Chua', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(38, 'junwei.foo@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 23, 'Jun Wei Foo', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(39, 'jiahao.goh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 11, 'Jia Hao Goh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(40, 'junkai.heng@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 29, 'Jun Kai Heng', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(41, 'peiling.ho@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 14, 'Pei Ling Ho', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(42, 'zhiwei.khoo@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 9, 'Zhi Wei Khoo', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(43, 'peiwen.koh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 26, 'Pei Wen Koh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(44, 'huimin.kong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 22, 'Hui Min Kong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(45, 'weilun.kwan@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 31, 'Wei Lun Kwan', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(46, 'xinyi.lau@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 12, 'Xin Yi Lau', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(47, 'jiawen.law@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 40, 'Jia Wen Law', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(48, 'junhao.lee@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 5, 'Jun Hao Lee', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(49, 'shuqi.liang@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 32, 'Shu Qi Liang', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(50, 'xinyi.liew@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 24, 'Xin Yi Liew', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(51, 'meiling.lim@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 2, 'Mei Ling Lim', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(52, 'shufen.low@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 16, 'Shu Fen Low', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(53, 'xiumei.ng@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 4, 'Xiu Mei Ng', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(54, 'weikang.ong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 15, 'Wei Kang Ong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(55, 'huishan.ooi@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 34, 'Hui Shan Ooi', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(56, 'weijun.pang@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 19, 'Wei Jun Pang', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(57, 'junwei.phang@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 37, 'Jun Wei Phang', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(58, 'xintong.poon@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 30, 'Xin Tong Poon', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(59, 'xinwei.see@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 36, 'Xin Wei See', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(60, 'kaijie.sim@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 21, 'Kai Jie Sim', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(61, 'jianwei.soh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 17, 'Jian Wei Soh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(62, 'weijie.tan@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 1, 'Wei Jie Tan', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(63, 'zhihao.tay@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 25, 'Zhi Hao Tay', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(64, 'mingzhe.teo@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 13, 'Ming Zhe Teo', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(65, 'weijie.tham@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 35, 'Wei Jie Tham', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(66, 'zhiyang.tiew@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 39, 'Zhi Yang Tiew', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(67, 'jiayi.toh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 28, 'Jia Yi Toh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(68, 'siewling.wong@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 6, 'Siew Ling Wong', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(69, 'huixin.yap@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 8, 'Hui Xin Yap', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(70, 'zhicong.yeap@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 33, 'Zhi Cong Yeap', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(71, 'xinru.yeoh@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', 20, 'Xin Ru Yeoh', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(95, 'admin1@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, 'System Admin', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL),
-(96, 'admin2@mathology.edu.my', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, 'Academic Admin', '2025-05-01 14:28:06', '2025-05-01 14:28:06', NULL, NULL);
+INSERT INTO `users` (`user_id`, `email`, `password`, `role`, `student_id`, `instructor_id`, `created_at`) VALUES
+(1, 'weijie@example.com', 'pass', 'student', 1, NULL, '2025-05-04 13:39:40'),
+(2, 'meiling@example.com', 'pass', 'student', 2, NULL, '2025-05-04 13:53:19'),
+(3, 'kokweitan@example.com', 'pass', 'instructor', NULL, 1, '2025-05-11 06:14:59'),
+(4, 'darrshan@example.com', 'pass', 'admin', NULL, NULL, '2025-05-11 06:19:46');
 
 --
 -- Indexes for dumped tables
@@ -824,8 +834,8 @@ ALTER TABLE `subjects`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD KEY `idx_role_related` (`role`,`related_id`),
-  ADD KEY `idx_remember_token` (`remember_token`);
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `instructor_id` (`instructor_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -865,7 +875,7 @@ ALTER TABLE `instructor_timetable`
 -- AUTO_INCREMENT for table `instructor_timetable_requests`
 --
 ALTER TABLE `instructor_timetable_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `payment`
@@ -889,13 +899,13 @@ ALTER TABLE `student_courses`
 -- AUTO_INCREMENT for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `student_timetable_requests`
 --
 ALTER TABLE `student_timetable_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `subjects`
@@ -907,7 +917,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -963,6 +973,13 @@ ALTER TABLE `student_timetable`
 --
 ALTER TABLE `student_timetable_requests`
   ADD CONSTRAINT `student_timetable_requests_ibfk_1` FOREIGN KEY (`student_course_id`) REFERENCES `student_courses` (`student_course_id`);
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`instructor_id`) REFERENCES `instructor` (`instructor_id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

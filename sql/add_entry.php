@@ -16,12 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
         $school = $conn->real_escape_string($_POST['School']);
         $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
+        $email = $conn->real_escape_string($_POST['Email']);
+        $password = password_hash($conn->real_escape_string($_POST['Password']), PASSWORD_BCRYPT);
 
-        $insertQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, Current_School_Grade, School, Mathology_Level)
-                        VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$current_grade', '$school', '$mathology_level')";
+        // Insert into students table
+        $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, Current_School_Grade, School, Mathology_Level)
+                               VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$current_grade', '$school', '$mathology_level')";
 
-        if ($conn->query($insertQuery)) {
-            header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+added+successfully");
+        if ($conn->query($insertStudentQuery)) {
+            $student_id = $conn->insert_id;
+
+            // Insert into users table
+            $insertUserQuery = "INSERT INTO users (email, password, role, related_id, name)
+                                VALUES ('$email', '$password', 'student', '$student_id', CONCAT('$first_name', ' ', '$last_name'))";
+
+            if ($conn->query($insertUserQuery)) {
+                header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+and+user+added+successfully");
+                exit;
+            } else {
+                $error = "Error adding user credentials: " . $conn->error;
+            }
         } else {
             $error = "Error adding student: " . $conn->error;
         }
@@ -34,12 +48,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $highest_education = $conn->real_escape_string($_POST['Highest_Education']);
         $remark = $conn->real_escape_string($_POST['Remark']);
         $training_status = $conn->real_escape_string($_POST['Training_Status']);
+        $email = $conn->real_escape_string($_POST['Email']);
+        $password = password_hash($conn->real_escape_string($_POST['Password']), PASSWORD_BCRYPT);
 
-        $insertQuery = "INSERT INTO instructor (Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status)
-                        VALUES ('$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status')";
+        // Insert into instructor table
+        $insertInstructorQuery = "INSERT INTO instructor (Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status)
+                                  VALUES ('$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status')";
 
-        if ($conn->query($insertQuery)) {
-            header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+added+successfully");
+        if ($conn->query($insertInstructorQuery)) {
+            $instructor_id = $conn->insert_id;
+
+            // Insert into users table
+            $insertUserQuery = "INSERT INTO users (email, password, role, related_id, name)
+                                VALUES ('$email', '$password', 'instructor', '$instructor_id', CONCAT('$first_name', ' ', '$last_name'))";
+
+            if ($conn->query($insertUserQuery)) {
+                header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+and+user+added+successfully");
+                exit;
+            } else {
+                $error = "Error adding user credentials: " . $conn->error;
+            }
         } else {
             $error = "Error adding instructor: " . $conn->error;
         }
@@ -86,7 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="School">School:</label>
             <input type="text" id="School" name="School"><br>
             <label for="Mathology_Level">Mathology Level:</label>
-            <input type="text" id="Mathology_Level" name="Mathology_Level"><br><br>
+            <input type="text" id="Mathology_Level" name="Mathology_Level"><br>
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" required><br>
+            <label for="Password">Password:</label>
+            <input type="password" id="Password" name="Password" required><br><br>
         </div>
 
         <div id="instructor-form" style="display: none;">
@@ -107,7 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="Remark">Remark:</label>
             <textarea id="Remark" name="Remark"></textarea><br>
             <label for="Training_Status">Training Status:</label>
-            <input type="text" id="Training_Status" name="Training_Status"><br><br>
+            <input type="text" id="Training_Status" name="Training_Status"><br>
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" required><br>
+            <label for="Password">Password:</label>
+            <input type="password" id="Password" name="Password" required><br><br>
         </div>
 
         <button type="submit">Add Entry</button>
