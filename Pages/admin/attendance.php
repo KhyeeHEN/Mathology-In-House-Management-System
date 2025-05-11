@@ -24,9 +24,6 @@
         <i class="fas fa-chart-line" style="margin-right: 8px;"></i> Daily Report
     </a>
 </div>
-
-   <?php include '../setting.php'; ?>
-
    <table class="attendence">
        <tr class="attendance_title">
            <th>Record ID</th>
