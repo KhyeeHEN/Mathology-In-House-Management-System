@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with JOIN for credentials and GROUP_CONCAT for timetable
+// Base query with GROUP_CONCAT for timetables
 $sql = "
     SELECT 
         s.student_id, 
@@ -38,14 +38,10 @@ $sql = "
         s.Current_School_Grade, 
         s.School, 
         s.Mathology_Level,
-        u.email AS user_email, 
-        u.role AS user_role,
         c.course_name,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
     FROM 
         students s
-    LEFT JOIN 
-        users u ON s.student_id = u.related_id AND u.role = 'student'
     LEFT JOIN 
         student_courses sc ON s.student_id = sc.student_id
     LEFT JOIN 
@@ -86,8 +82,6 @@ if ($result->num_rows > 0) {
                 <th>Current School Grade</th>
                 <th>School</th>
                 <th>Mathology Level</th>
-                <th>User Email</th>
-                <th>User Role</th>
                 <th>Course</th>
                 <th>Timetable</th>
                 <th>Actions</th>
@@ -104,8 +98,6 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Current_School_Grade'] . "</td>
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
-                <td>" . $row['user_email'] . "</td>
-                <td>" . $row['user_role'] . "</td>
                 <td>" . $row['course_name'] . "</td>
                 <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>

@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with JOIN for credentials and GROUP_CONCAT for timetable
+// Base query with GROUP_CONCAT for courses and timetable
 $sql = "
     SELECT 
         i.instructor_id, 
@@ -36,16 +36,12 @@ $sql = "
         i.Highest_Education, 
         i.Remark, 
         i.Training_Status,
-        u.email AS user_email, 
-        u.role AS user_role,
         GROUP_CONCAT(DISTINCT c.course_name SEPARATOR ', ') AS courses,
         GROUP_CONCAT(
             DISTINCT CONCAT(it.day, ' (', it.start_time, ' - ', it.end_time, ')') SEPARATOR '<br>'
         ) AS timetable
     FROM 
         instructor i
-    LEFT JOIN 
-        users u ON i.instructor_id = u.related_id AND u.role = 'instructor'
     LEFT JOIN 
         instructor_courses ic ON i.instructor_id = ic.instructor_id
     LEFT JOIN 
@@ -84,8 +80,6 @@ if ($result->num_rows > 0) {
                 <th>Highest Education</th>
                 <th>Remark</th>
                 <th>Training Status</th>
-                <th>User Email</th>
-                <th>User Role</th>
                 <th>Courses</th>
                 <th>Timetable</th>
                 <th>Actions</th>
@@ -100,8 +94,6 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Highest_Education'] . "</td>
                 <td>" . $row['Remark'] . "</td>
                 <td>" . $row['Training_Status'] . "</td>
-                <td>" . $row['user_email'] . "</td>
-                <td>" . $row['user_role'] . "</td>
                 <td>" . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "</td>
                 <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>
