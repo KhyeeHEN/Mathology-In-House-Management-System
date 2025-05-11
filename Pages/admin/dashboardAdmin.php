@@ -166,6 +166,327 @@ foreach ($classes as $class) {
                     <p><?php echo $totalCourses; ?></p>
                 </div>
             </div>
+
+            <!--Analysis-->
+            <div class="analysis-section">
+                <h2 class="section-title">Student & Instructor Analysis</h2>
+                
+                <div class="analysis-grid">
+                    <!-- Student Demographics Card -->
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Student Demographics</h3>
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <?php
+                            // Gender distribution
+                            $query = "SELECT Gender, COUNT(*) as count FROM students GROUP BY Gender";
+                            $result = $conn->query($query);
+                            $genderData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $genderData[] = $row;
+                            }
+                            
+                            // School syllabus distribution
+                            $query = "SELECT 
+                                        CASE 
+                                            WHEN School_Syllabus LIKE '%IGCSE%' THEN 'IGCSE'
+                                            WHEN School_Syllabus LIKE '%SPM%' THEN 'SPM'
+                                            WHEN School_Syllabus LIKE '%KSSR%' THEN 'KSSR'
+                                            ELSE 'Other'
+                                        END as syllabus,
+                                        COUNT(*) as count
+                                    FROM students
+                                    GROUP BY syllabus";
+                            $result = $conn->query($query);
+                            $syllabusData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $syllabusData[] = $row;
+                            }
+                            
+                            // Mathology level distribution
+                            $query = "SELECT Mathology_Level, COUNT(*) as count FROM students GROUP BY Mathology_Level";
+                            $result = $conn->query($query);
+                            $levelData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $levelData[] = $row;
+                            }
+                            ?>
+                            
+                            <div class="charts-container">
+                                <div class="chart-item">
+                                    <h4>Gender Distribution</h4>
+                                    <div class="demographic-chart" id="genderChart"></div>
+                                    <div class="chart-legend">
+                                        <div class="legend-item"><span class="color-box male"></span> Male: <?php echo $genderData[1]['count']; ?></div>
+                                        <div class="legend-item"><span class="color-box female"></span> Female: <?php echo $genderData[0]['count']; ?></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="chart-item">
+                                    <h4>Syllabus Distribution</h4>
+                                    <div class="demographic-bars" id="syllabusChart">
+                                        <?php foreach ($syllabusData as $item): ?>
+                                        <div class="bar-container">
+                                            <div class="bar-label"><?php echo $item['syllabus']; ?></div>
+                                            <div class="bar-outer">
+                                                <div class="bar-inner" style="width: <?php echo ($item['count'] / 40) * 100; ?>%"></div>
+                                            </div>
+                                            <div class="bar-value"><?php echo $item['count']; ?></div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-item wide">
+                                <h4>Mathology Level Distribution</h4>
+                                <div class="level-distribution">
+                                    <?php foreach ($levelData as $level): ?>
+                                    <div class="level-item <?php echo strtolower($level['Mathology_Level']); ?>">
+                                        <div class="level-count"><?php echo $level['count']; ?></div>
+                                        <div class="level-name"><?php echo $level['Mathology_Level']; ?></div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Instructor Analysis Card -->
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Instructor Analysis</h3>
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="card-content">
+                            <?php
+                            // Training status distribution
+                            $query = "SELECT Training_Status, COUNT(*) as count FROM instructor GROUP BY Training_Status";
+                            $result = $conn->query($query);
+                            $trainingData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $trainingData[] = $row;
+                            }
+                            
+                            // Education level distribution
+                            $query = "SELECT 
+                                        CASE 
+                                            WHEN Highest_Education LIKE '%PhD%' THEN 'PhD'
+                                            WHEN Highest_Education LIKE '%Master%' THEN 'Master'
+                                            ELSE 'Bachelor'
+                                        END as education,
+                                        COUNT(*) as count
+                                    FROM instructor
+                                    GROUP BY education";
+                            $result = $conn->query($query);
+                            $educationData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $educationData[] = $row;
+                            }
+                            
+                            // Calculate instructor experience levels based on DOB (rough estimate)
+                            $query = "SELECT 
+                                        CASE 
+                                            WHEN YEAR(CURDATE()) - YEAR(DOB) >= 40 THEN 'Senior (40+)'
+                                            WHEN YEAR(CURDATE()) - YEAR(DOB) >= 35 THEN 'Experienced (35-40)'
+                                            WHEN YEAR(CURDATE()) - YEAR(DOB) >= 30 THEN 'Mid-level (30-35)'
+                                            ELSE 'Junior (<30)'
+                                        END as age_group,
+                                        COUNT(*) as count
+                                    FROM instructor
+                                    GROUP BY age_group
+                                    ORDER BY MIN(YEAR(DOB))";
+                            $result = $conn->query($query);
+                            $experienceData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $experienceData[] = $row;
+                            }
+                            ?>
+                            
+                            <div class="charts-container">
+                                <div class="chart-item">
+                                    <h4>Training Status</h4>
+                                    <div class="training-status">
+                                        <?php foreach ($trainingData as $status): ?>
+                                        <div class="status-item <?php echo strtolower(str_replace(' ', '-', $status['Training_Status'])); ?>">
+                                            <div class="status-count"><?php echo $status['count']; ?></div>
+                                            <div class="status-label"><?php echo $status['Training_Status']; ?></div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="chart-item">
+                                    <h4>Education Qualification</h4>
+                                    <div class="qualification-chart" id="educationChart">
+                                        <?php foreach ($educationData as $edu): ?>
+                                        <div class="qualification-segment <?php echo strtolower($edu['education']); ?>" 
+                                            style="height: <?php echo ($edu['count'] / 20) * 100; ?>%"
+                                            title="<?php echo $edu['education']; ?>: <?php echo $edu['count']; ?>">
+                                            <span class="qualification-label"><?php echo $edu['education']; ?></span>
+                                            <span class="qualification-count"><?php echo $edu['count']; ?></span>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-item wide">
+                                <h4>Instructor Experience Levels</h4>
+                                <div class="experience-chart">
+                                    <?php foreach ($experienceData as $exp): ?>
+                                    <div class="experience-bar">
+                                        <div class="experience-label"><?php echo $exp['age_group']; ?></div>
+                                        <div class="experience-bar-outer">
+                                            <div class="experience-bar-inner" style="width: <?php echo ($exp['count'] / 20) * 100; ?>%"></div>
+                                        </div>
+                                        <div class="experience-count"><?php echo $exp['count']; ?></div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics Card -->
+                    <div class="analysis-card full-width">
+                        <div class="card-header">
+                            <h3>Education Performance Matrix</h3>
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="card-content">
+                            <?php
+                            // Calculate student distribution by syllabus and level
+                            $query = "SELECT 
+                                        CASE 
+                                            WHEN School_Syllabus LIKE '%IGCSE%' THEN 'IGCSE'
+                                            WHEN School_Syllabus LIKE '%SPM%' THEN 'SPM'
+                                            WHEN School_Syllabus LIKE '%KSSR%' THEN 'KSSR'
+                                            ELSE 'Other'
+                                        END as syllabus,
+                                        Mathology_Level,
+                                        COUNT(*) as count
+                                    FROM students
+                                    GROUP BY syllabus, Mathology_Level
+                                    ORDER BY syllabus, Mathology_Level";
+                            $result = $conn->query($query);
+                            $matrixData = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $matrixData[] = $row;
+                            }
+                            ?>
+                            
+                            <div class="matrix-container">
+                                <table class="performance-matrix">
+                                    <thead>
+                                        <tr>
+                                            <th>Syllabus / Level</th>
+                                            <th>Beginner</th>
+                                            <th>Intermediate</th>
+                                            <th>Advanced</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $syllabusTypes = ['IGCSE', 'SPM', 'KSSR'];
+                                        $totalsByLevel = ['Beginner' => 0, 'Intermediate' => 0, 'Advanced' => 0];
+                                        
+                                        foreach ($syllabusTypes as $syllabus) {
+                                            echo "<tr>";
+                                            echo "<td><strong>$syllabus</strong></td>";
+                                            
+                                            $syllabusTotal = 0;
+                                            foreach (['Beginner', 'Intermediate', 'Advanced'] as $level) {
+                                                $count = 0;
+                                                foreach ($matrixData as $item) {
+                                                    if ($item['syllabus'] == $syllabus && $item['Mathology_Level'] == $level) {
+                                                        $count = $item['count'];
+                                                        $totalsByLevel[$level] += $count;
+                                                        $syllabusTotal += $count;
+                                                        break;
+                                                    }
+                                                }
+                                                
+                                                $cellClass = '';
+                                                if ($count > 10) $cellClass = 'high-count';
+                                                else if ($count > 5) $cellClass = 'medium-count';
+                                                else $cellClass = 'low-count';
+                                                
+                                                echo "<td class='$cellClass'>$count</td>";
+                                            }
+                                            
+                                            echo "<td class='total-column'>$syllabusTotal</td>";
+                                            echo "</tr>";
+                                        }
+                                        
+                                        // Add totals row
+                                        $grandTotal = array_sum($totalsByLevel);
+                                        echo "<tr class='totals-row'>";
+                                        echo "<td><strong>Total</strong></td>";
+                                        foreach ($totalsByLevel as $level => $total) {
+                                            echo "<td>$total</td>";
+                                        }
+                                        echo "<td class='total-column'>$grandTotal</td>";
+                                        echo "</tr>";
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="key-insights">
+                                <h4><i class="fas fa-lightbulb"></i> Key Insights</h4>
+                                <ul>
+                                    <?php
+                                    // Generate some basic insights
+                                    $maxSyllabus = '';
+                                    $maxCount = 0;
+                                    foreach ($syllabusData as $item) {
+                                        if ($item['count'] > $maxCount) {
+                                            $maxCount = $item['count'];
+                                            $maxSyllabus = $item['syllabus'];
+                                        }
+                                    }
+                                    
+                                    $maxLevel = '';
+                                    $maxLevelCount = 0;
+                                    foreach ($levelData as $item) {
+                                        if ($item['count'] > $maxLevelCount) {
+                                            $maxLevelCount = $item['count'];
+                                            $maxLevel = $item['Mathology_Level'];
+                                        }
+                                    }
+                                    
+                                    // Find gender ratio
+                                    $maleCount = $genderData[1]['count'];
+                                    $femaleCount = $genderData[0]['count'];
+                                    $genderRatio = round($maleCount / $femaleCount, 2);
+                                    
+                                    // Find completed training percentage
+                                    $completedCount = 0;
+                                    $totalInstructors = 0;
+                                    foreach ($trainingData as $item) {
+                                        $totalInstructors += $item['count'];
+                                        if ($item['Training_Status'] == 'Completed') {
+                                            $completedCount = $item['count'];
+                                        }
+                                    }
+                                    $completedPercentage = round(($completedCount / $totalInstructors) * 100);
+                                    ?>
+                                    
+                                    <li><?php echo $maxSyllabus; ?> is the most common syllabus with <?php echo $maxCount; ?> students (<?php echo round(($maxCount / 40) * 100); ?>%).</li>
+                                    <li>Most students are at the <?php echo $maxLevel; ?> level (<?php echo $maxLevelCount; ?> students).</li>
+                                    <li>The male to female ratio among students is <?php echo $genderRatio; ?>:1.</li>
+                                    <li><?php echo $completedPercentage; ?>% of instructors have completed their training.</li>
+                                    <li>There's an opportunity to balance instructor qualifications with student needs across different syllabi.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     

@@ -4,32 +4,54 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Database connection
+require_once '../setting.php';
+
+// Initialize variables
+$userName = 'Guest';
+$profileImage = 'https://via.placeholder.com/150'; // Fallback image
+$userEmail = '';
+
 // Fetch logged-in user data if available
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     $userId = $_SESSION['user_id'];
+    $userRole = $_SESSION['role'];
+    $userEmail = $_SESSION['email'] ?? '';
 
-    // Database connection
-    require_once '../setting.php';
-
-    // Fetch student details using the user_id (you can modify this as per your actual schema)
-    $stmt = $conn->prepare("SELECT First_Name, Last_Name FROM students WHERE student_id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Check if the user exists in the students table
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        $userName = $user['First_Name'] . ' ' . $user['Last_Name'];
-        $profileImage = 'https://ui-avatars.com/api/?name=' . urlencode($userName); // Avatar based on real name
-    } else {
-        $userName = 'Guest';  // Fallback name if not found
-        $profileImage = 'https://via.placeholder.com/150'; // Fallback image
+    // Handle each role differently
+    switch ($userRole) {
+        case 'student':
+            $stmt = $conn->prepare("SELECT First_Name, Last_Name FROM students WHERE student_id = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                $userName = $user['First_Name'] . ' ' . $user['Last_Name'];
+                $profileImage = 'https://ui-avatars.com/api/?name=' . urlencode($userName);
+            }
+            break;
+            
+        case 'instructor':
+            $stmt = $conn->prepare("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                $userName = $user['First_Name'] . ' ' . $user['Last_Name'];
+                $profileImage = 'https://ui-avatars.com/api/?name=' . urlencode($userName);
+            }
+            break;
+            
+        case 'admin':
+            // For admin, just show the email
+            $userName = $userEmail;
+            $profileImage = 'https://ui-avatars.com/api/?name=Admin&background=random';
+            break;
     }
-} else {
-    // Fallback for non-logged in users
-    $userName = 'Guest';
-    $profileImage = 'https://via.placeholder.com/150'; // Fallback image
 }
 ?>
 
