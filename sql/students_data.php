@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with GROUP_CONCAT for timetables
+// Base query with joins
 $sql = "
     SELECT 
         s.student_id, 
@@ -39,7 +39,7 @@ $sql = "
         s.School, 
         s.Mathology_Level,
         c.course_name,
-        GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
+        CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') AS timetable
     FROM 
         students s
     LEFT JOIN 
@@ -57,9 +57,6 @@ if (!empty($search)) {
         s.Last_Name = '$search' OR
         s.First_Name = '$search'";
 }
-
-// Group by student to avoid duplicate rows
-$sql .= " GROUP BY s.student_id";
 
 // Add pagination
 $sql .= " LIMIT $limit OFFSET $offset";
@@ -99,7 +96,7 @@ if ($result->num_rows > 0) {
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
                 <td>" . $row['course_name'] . "</td>
-                <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
+                <td>" . $row['timetable'] . "</td>
                 <td>
                     <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
                     <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>

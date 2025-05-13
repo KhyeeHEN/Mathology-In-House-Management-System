@@ -18,7 +18,13 @@ function showTable(tableId) {
     // Update the hidden input field to reflect the current active tab
     const activeTabInput = document.getElementById('active_tab');
     if (activeTabInput) {
-        activeTabInput.value = tableId === 'students-table' ? 'students' : 'instructors';
+        if (tableId === 'students-table') {
+            activeTabInput.value = 'students';
+        } else if (tableId === 'instructors-table') {
+            activeTabInput.value = 'instructors';
+        } else if (tableId === 'admins-table') {
+            activeTabInput.value = 'admins';
+        }
     }
 }
 
@@ -26,9 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const activeTab = urlParams.get('active_tab') || 'students';
 
-    // Activate the appropriate tab and table
-    const tableId = activeTab === 'instructors' ? 'instructors-table' : 'students-table';
-    const buttonId = activeTab === 'instructors' ? 'instructors-btn' : 'students-btn';
+    // Determine the appropriate table and button IDs
+    let tableId, buttonId;
+    if (activeTab === 'instructors') {
+        tableId = 'instructors-table';
+        buttonId = 'instructors-btn';
+    } else if (activeTab === 'admins') {
+        tableId = 'admins-table';
+        buttonId = 'admins-btn';
+    } else {
+        tableId = 'students-table';
+        buttonId = 'students-btn';
+    }
 
     // Highlight the active button
     document.querySelectorAll('.filter-buttons button').forEach(button => {
@@ -51,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.value = ''; // Clear the search input
         document.getElementById('students_page').value = '1'; // Reset to page 1
         document.getElementById('instructors_page').value = '1'; // Reset to page 1
+        document.getElementById('admins_page').value = '1'; // Reset to page 1
         searchForm.submit(); // Submit the form immediately
     });
 
@@ -58,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchForm.addEventListener('submit', () => {
         document.getElementById('students_page').value = '1'; // Reset to page 1
         document.getElementById('instructors_page').value = '1'; // Reset to page 1
+        document.getElementById('admins_page').value = '1'; // Reset to page 1
     });
 });
 

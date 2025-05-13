@@ -26,6 +26,8 @@
                     class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
                 <button onclick="showTable('instructors-table')" id="instructors-btn"
                     class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
+                <button onclick="showTable('admins-table')" id="admins-btn"
+                    class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>">Admins</button>
             </div>
 
             <div class="add-entry-container">
@@ -55,6 +57,10 @@
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>"
                 id="instructors-table">
                 <?php include '../../sql/instructors_data.php'; ?>
+            </div>
+            <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>"
+                id="admins-table">
+                <?php include '../../sql/admins_data.php'; ?>
             </div>
         </main>
     </div>
