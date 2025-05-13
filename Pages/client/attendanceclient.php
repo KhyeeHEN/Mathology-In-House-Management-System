@@ -36,7 +36,7 @@
                     <i class="fas fa-check"></i>
                     <span>Apply Leave</span>
                 </a>
-                <a href="payment.php" class="nav-item">
+                <a href="paymentclient.php" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
@@ -88,7 +88,7 @@
                     <th>Class</th>
                     <th>Date</th>
                     <th>Check in</th>
-                    <th>Check out</th>  
+                    <th>Check out</th>
                 </tr>
                 <tr>
                     <td>-</td>
@@ -103,7 +103,7 @@
                     <td>-</td>
                 </tr>
             </table>
-            
+
         </main>
     </div>
     <script type="module" src="../../scripts/common.js"></script>
