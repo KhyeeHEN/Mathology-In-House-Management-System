@@ -1,3 +1,12 @@
+<?php
+// Include the database settings
+include 'settings.php';
+
+// Check for messages or errors in the URL
+$message = isset($_GET['message']) ? $_GET['message'] : null;
+$error = isset($_GET['error']) ? $_GET['error'] : null;
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
     <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../Styles/users.css">
+    <link rel="stylesheet" href="../../Styles/users.css?ver=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -33,6 +42,19 @@
             <div class="add-entry-container">
                 <a href="../../sql/add_entry.php" class="add-entry-button">Add Entry</a>
             </div>
+
+            <!-- Display messages or errors -->
+            <?php if ($message): ?>
+                <div style="color: green; font-weight: bold;">
+                    <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error): ?>
+                <div style="color: red; font-weight: bold;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
 
             <!-- Search Form -->
             <div class="search-bar">

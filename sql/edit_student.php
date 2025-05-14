@@ -2,9 +2,14 @@
 // Include the database settings
 include 'settings.php';
 
-// Fetch student data based on the student_id from the GET request
+// Fetch student and associated user data based on the student_id from the GET request
 $student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0;
-$query = "SELECT * FROM students WHERE student_id = $student_id";
+$query = "
+    SELECT s.*, u.email 
+    FROM students s 
+    LEFT JOIN users u ON s.student_id = u.student_id 
+    WHERE s.student_id = $student_id
+";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
@@ -23,21 +28,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
     $school = $conn->real_escape_string($_POST['School']);
     $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
+    $email = $conn->real_escape_string($_POST['Email']);
 
-    $updateQuery = "UPDATE students SET 
-        Last_Name = '$last_name', 
-        First_Name = '$first_name', 
-        Gender = '$gender', 
-        DOB = '$dob', 
-        School_Syllabus = '$school_syllabus', 
-        Current_School_Grade = '$current_grade', 
-        School = '$school', 
-        Mathology_Level = '$mathology_level'
-        WHERE student_id = $student_id";
+    // Update student table
+    $updateStudentQuery = "
+        UPDATE students SET 
+            Last_Name = '$last_name', 
+            First_Name = '$first_name', 
+            Gender = '$gender', 
+            DOB = '$dob', 
+            School_Syllabus = '$school_syllabus', 
+            Current_School_Grade = '$current_grade', 
+            School = '$school', 
+            Mathology_Level = '$mathology_level' 
+        WHERE student_id = $student_id
+    ";
 
-    if ($conn->query($updateQuery)) {
+    // Update users table
+    $updateUserQuery = "
+        UPDATE users SET 
+            email = '$email' 
+        WHERE student_id = $student_id
+    ";
+
+    // Execute both queries and redirect
+    if ($conn->query($updateStudentQuery) && $conn->query($updateUserQuery)) {
         echo "Student updated successfully!";
         header("Location: ../Pages/admin/users.php?active_tab=students");
+        exit();
     } else {
         echo "Error updating student: " . $conn->error;
     }
@@ -80,6 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label for="Mathology_Level">Mathology Level:</label>
         <input type="text" id="Mathology_Level" name="Mathology_Level" value="<?php echo $student['Mathology_Level']; ?>" required><br>
+
+        <label for="Email">Email:</label>
+        <input type="email" id="Email" name="Email" value="<?php echo $student['email']; ?>" required><br>
 
         <button type="submit">Update</button>
         <a href="../Pages/admin/users.php?active_tab=students">Cancel</a>

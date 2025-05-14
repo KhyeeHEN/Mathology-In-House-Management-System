@@ -9,9 +9,9 @@ $page = isset($_GET['instructors_page']) ? intval($_GET['instructors_page']) : 1
 $offset = ($page - 1) * $limit;
 
 // Get total rows for pagination
-$countQuery = "SELECT COUNT(*) AS total FROM instructor";
+$countQuery = "SELECT COUNT(*) AS total FROM instructor i LEFT JOIN users u ON i.instructor_id = u.instructor_id";
 if (!empty($search)) {
-    $countQuery .= " WHERE instructor_id LIKE '%$search%' OR Last_Name LIKE '%$search%' OR First_Name LIKE '%$search%'";
+    $countQuery .= " WHERE i.instructor_id LIKE '%$search%' OR i.Last_Name LIKE '%$search%' OR i.First_Name LIKE '%$search%' OR u.email LIKE '%$search%'";
 }
 $countResult = $conn->query($countQuery);
 $totalRows = $countResult->fetch_assoc()['total'];
@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with GROUP_CONCAT for courses and timetable
+// Base query with JOIN for user credentials, courses, and timetable
 $sql = "
     SELECT 
         i.instructor_id, 
@@ -36,12 +36,15 @@ $sql = "
         i.Highest_Education, 
         i.Remark, 
         i.Training_Status,
+        u.email, 
         GROUP_CONCAT(DISTINCT c.course_name SEPARATOR ', ') AS courses,
         GROUP_CONCAT(
             DISTINCT CONCAT(it.day, ' (', it.start_time, ' - ', it.end_time, ')') SEPARATOR '<br>'
         ) AS timetable
     FROM 
         instructor i
+    LEFT JOIN 
+        users u ON i.instructor_id = u.instructor_id
     LEFT JOIN 
         instructor_courses ic ON i.instructor_id = ic.instructor_id
     LEFT JOIN 
@@ -50,12 +53,13 @@ $sql = "
         instructor_timetable it ON ic.instructor_course_id = it.instructor_course_id
 ";
 
-// If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
+// If a search term is provided
 if (!empty($search)) {
     $sql .= " WHERE 
-        i.instructor_id = '$search' OR
-        i.Last_Name = '$search' OR
-        i.First_Name = '$search'";
+        i.instructor_id LIKE '%$search%' OR
+        i.Last_Name LIKE '%$search%' OR
+        i.First_Name LIKE '%$search%' OR
+        u.email LIKE '%$search%'";
 }
 
 // Group by instructor to avoid duplicate rows
@@ -80,6 +84,7 @@ if ($result->num_rows > 0) {
                 <th>Highest Education</th>
                 <th>Remark</th>
                 <th>Training Status</th>
+                <th>Email</th>
                 <th>Courses</th>
                 <th>Timetable</th>
                 <th>Actions</th>
@@ -94,6 +99,7 @@ if ($result->num_rows > 0) {
                 <td>" . $row['Highest_Education'] . "</td>
                 <td>" . $row['Remark'] . "</td>
                 <td>" . $row['Training_Status'] . "</td>
+                <td>" . $row['email'] . "</td>
                 <td>" . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "</td>
                 <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>

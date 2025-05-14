@@ -9,9 +9,9 @@ $page = isset($_GET['students_page']) ? intval($_GET['students_page']) : 1; // D
 $offset = ($page - 1) * $limit;
 
 // Get total rows for pagination
-$countQuery = "SELECT COUNT(*) AS total FROM students";
+$countQuery = "SELECT COUNT(*) AS total FROM students s LEFT JOIN users u ON s.student_id = u.student_id";
 if (!empty($search)) {
-    $countQuery .= " WHERE student_id LIKE '%$search%' OR Last_Name LIKE '%$search%' OR First_Name LIKE '%$search%'";
+    $countQuery .= " WHERE s.student_id LIKE '%$search%' OR s.Last_Name LIKE '%$search%' OR s.First_Name LIKE '%$search%' OR u.email LIKE '%$search%'";
 }
 $countResult = $conn->query($countQuery);
 $totalRows = $countResult->fetch_assoc()['total'];
@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with joins
+// Base query with JOIN for user credentials and student details
 $sql = "
     SELECT 
         s.student_id, 
@@ -38,10 +38,13 @@ $sql = "
         s.Current_School_Grade, 
         s.School, 
         s.Mathology_Level,
+        u.email, 
         c.course_name,
-        CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') AS timetable
+        GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
     FROM 
         students s
+    LEFT JOIN 
+        users u ON s.student_id = u.student_id
     LEFT JOIN 
         student_courses sc ON s.student_id = sc.student_id
     LEFT JOIN 
@@ -50,13 +53,17 @@ $sql = "
         student_timetable st ON sc.student_course_id = st.student_course_id
 ";
 
-// If a search term is provided, prioritize exact matches, case-insensitive matches, and partial matches
+// If a search term is provided
 if (!empty($search)) {
     $sql .= " WHERE 
-        s.student_id = '$search' OR
-        s.Last_Name = '$search' OR
-        s.First_Name = '$search'";
+        s.student_id LIKE '%$search%' OR
+        s.Last_Name LIKE '%$search%' OR
+        s.First_Name LIKE '%$search%' OR
+        u.email LIKE '%$search%'";
 }
+
+// Group by student to avoid duplicate rows
+$sql .= " GROUP BY s.student_id";
 
 // Add pagination
 $sql .= " LIMIT $limit OFFSET $offset";
@@ -79,7 +86,8 @@ if ($result->num_rows > 0) {
                 <th>Current School Grade</th>
                 <th>School</th>
                 <th>Mathology Level</th>
-                <th>Course</th>
+                <th>Course Taken</th>
+                <th>Email</th>
                 <th>Timetable</th>
                 <th>Actions</th>
             </tr>";
@@ -96,7 +104,8 @@ if ($result->num_rows > 0) {
                 <td>" . $row['School'] . "</td>
                 <td>" . $row['Mathology_Level'] . "</td>
                 <td>" . $row['course_name'] . "</td>
-                <td>" . $row['timetable'] . "</td>
+                <td>" . $row['email'] . "</td>
+                <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>
                     <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
                     <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
