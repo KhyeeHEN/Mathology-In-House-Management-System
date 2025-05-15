@@ -1,5 +1,5 @@
 <?php
-include '../setting.php'; // Include the database connection
+include '../setting.php';
 
 // Get the selected column and sorting direction from GET
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'payment_date'; // Default to payment_date
@@ -31,48 +31,12 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment</title>
     <link rel="stylesheet" href="../../styles/common.css">
-    <link rel="stylesheet" href="../../styles/payment.css">
+    <link rel="stylesheet" href="../../Styles/payment.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../../scripts/payment.js"></script>
+    <script src="../../Scripts/payment.js"></script>
+
     <style>
-        .payment-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
 
-        .payment-table th, .payment-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        .payment-table th {
-            background-color: #f4f4f4;
-            cursor: pointer;
-        }
-
-        .payment-table td {
-            vertical-align: middle;
-        }
-
-        th {
-            position: relative;
-            cursor: pointer;
-        }
-
-        th .sort-arrow {
-            margin-left: 5px;
-            font-size: 12px;
-        }
-
-        .asc::after {
-            content: '\2191'; /* Up Arrow */
-        }
-
-        .desc::after {
-            content: '\2193'; /* Down Arrow */
-        }
     </style>
 </head>
 
@@ -85,41 +49,28 @@ $result = $conn->query($sql);
             <!-- Top Navigation -->
            <?php require("../includes/Top_Nav_Bar.php"); ?>
         <h1>All Payments</h1>
+        <input type="text" id="searchInput" placeholder="Search payments..." onkeyup="searchTable()" style="margin-top: 20px; padding: 10px; width: 300px;">
+
             <table class="payment-table">
                 <thead>
                     <tr>
-                        <th class="<?php echo $sort_column == 'payment_id' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_id&direction=<?php echo $new_sort_direction; ?>'">
-                            Payment ID
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'student_name' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=student_name&direction=<?php echo $new_sort_direction; ?>'">
-                            Student Name
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'payment_method' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_method&direction=<?php echo $new_sort_direction; ?>'">
-                            Payment Method
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'payment_mode' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_mode&direction=<?php echo $new_sort_direction; ?>'">
-                            Payment Mode
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'payment_amount' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_amount&direction=<?php echo $new_sort_direction; ?>'">
-                            Amount (RM)
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'deposit_status' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=deposit_status&direction=<?php echo $new_sort_direction; ?>'">
-                            Deposit
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'payment_status' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_status&direction=<?php echo $new_sort_direction; ?>'">
-                            Status
-                            <span class="sort-arrow"></span>
-                        </th>
-                        <th class="<?php echo $sort_column == 'payment_date' ? strtolower($sort_direction) : ''; ?>" onclick="window.location='?sort=payment_date&direction=<?php echo $new_sort_direction; ?>'">
-                            Date
-                            <span class="sort-arrow"></span>
-                        </th>
+                        <?php
+                        $headers = [
+                            'payment_id' => 'Payment ID',
+                            'student_name' => 'Student',
+                            'payment_method' => 'Payment Method',
+                            'payment_mode' => 'Payment Mode',
+                            'payment_amount' => 'Payment Amount',
+                            'deposit_status' => 'Deposit',
+                            'payment_status' => 'Status',
+                            'payment_date' => 'Date',
+                        ];
+
+                        foreach ($headers as $column => $label) {
+                            $arrow_class = $sort_column == $column ? strtolower($sort_direction) : '';
+                            echo "<th class='$arrow_class' onclick=\"window.location='?sort=$column&direction=$new_sort_direction'\">$label<span class='sort-arrow'></span></th>";
+                        }
+                        ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,7 +99,7 @@ $result = $conn->query($sql);
 
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="../../Scripts/common.js"></script>
 
 </body>
 </html>

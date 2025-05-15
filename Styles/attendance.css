@@ -1,0 +1,36 @@
+.attendence {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.attendence th, .attendence td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.attendence th {
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.attendence th .sort-arrow {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.asc::after {
+    content: '\2191'; /* Up Arrow */
+}
+
+.desc::after {
+    content: '\2193'; /* Down Arrow */
+}
+
+#searchInput {
+    margin: 20px 0;
+    padding: 10px;
+    width: 300px;
+}
