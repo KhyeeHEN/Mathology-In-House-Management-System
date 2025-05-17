@@ -25,7 +25,7 @@ if ($page < 1) {
     $page = 1;
 }
 
-// Base query with JOIN for user credentials and student details
+// Base query for students
 $sql = "
     SELECT 
         s.student_id, 
@@ -37,7 +37,7 @@ $sql = "
         s.School_Intake, 
         s.Current_School_Grade, 
         s.School, 
-        s.Mathology_Level,
+        s.Mathology_Level, 
         u.email, 
         c.course_name,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
@@ -73,42 +73,42 @@ $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // Output the data as an HTML table
-    echo "<h1>Student Data</h1>";
+    echo "<h1>Student Overview</h1>";
     echo "<table border='1'>
             <tr>
                 <th>Student ID</th>
                 <th>Last Name</th>
                 <th>First Name</th>
                 <th>Gender</th>
-                <th>Date of Birth</th>
-                <th>School Syllabus</th>
-                <th>School Intake</th>
-                <th>Current School Grade</th>
-                <th>School</th>
-                <th>Mathology Level</th>
-                <th>Course Taken</th>
                 <th>Email</th>
-                <th>Timetable</th>
                 <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
+        $detailsId = "details_" . $row['student_id'];
         echo "<tr>
                 <td>" . $row['student_id'] . "</td>
                 <td>" . $row['Last_Name'] . "</td>
                 <td>" . $row['First_Name'] . "</td>
                 <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
-                <td>" . $row['DOB'] . "</td>
-                <td>" . $row['School_Syllabus'] . "</td>
-                <td>" . ($row['School_Intake'] ? 'Yes' : 'No') . "</td>
-                <td>" . $row['Current_School_Grade'] . "</td>
-                <td>" . $row['School'] . "</td>
-                <td>" . $row['Mathology_Level'] . "</td>
-                <td>" . $row['course_name'] . "</td>
                 <td>" . $row['email'] . "</td>
-                <td>" . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "</td>
                 <td>
+                    <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
                     <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
                     <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
+                </td>
+              </tr>";
+
+        // Hidden detailed information row
+        echo "<tr id='$detailsId' style='display: none;'>
+                <td colspan='6'>
+                    <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
+                    <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
+                    <strong>School Intake:</strong> " . ($row['School_Intake'] ? 'Yes' : 'No') . "<br>
+                    <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
+                    <strong>School:</strong> " . $row['School'] . "<br>
+                    <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
+                    <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
+                    <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
                 </td>
               </tr>";
     }
@@ -138,3 +138,15 @@ if ($result->num_rows > 0) {
 // Close the database connection
 $conn->close();
 ?>
+
+<script>
+// JavaScript to toggle detailed information
+function toggleDetails(detailsId) {
+    const detailsRow = document.getElementById(detailsId);
+    if (detailsRow.style.display === "none") {
+        detailsRow.style.display = "table-row";
+    } else {
+        detailsRow.style.display = "none";
+    }
+}
+</script>
