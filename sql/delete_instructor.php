@@ -16,22 +16,17 @@ if (isset($_GET['instructor_id'])) {
             throw new Exception("Failed to delete instructor courses: " . $conn->error);
         }
 
-        // Delete the instructor from the database
-        $deleteInstructorQuery = "DELETE FROM instructor WHERE instructor_id = $instructor_id";
-        if (!$conn->query($deleteInstructorQuery)) {
-            throw new Exception("Failed to delete instructor: " . $conn->error);
-        }
-
         // Delete the associated user from the users table
         $deleteUserQuery = "DELETE FROM users WHERE instructor_id = $instructor_id";
         if (!$conn->query($deleteUserQuery)) {
             throw new Exception("Failed to delete associated user: " . $conn->error);
         }
 
-        // Reset auto-increment to avoid gaps
-        $conn->query("OPTIMIZE TABLE instructor_courses");
-        $conn->query("OPTIMIZE TABLE instructor");
-        $conn->query("OPTIMIZE TABLE users");
+        // Delete the instructor from the database
+        $deleteInstructorQuery = "DELETE FROM instructor WHERE instructor_id = $instructor_id";
+        if (!$conn->query($deleteInstructorQuery)) {
+            throw new Exception("Failed to delete instructor: " . $conn->error);
+        }
 
         // Commit the transaction
         $conn->commit();
