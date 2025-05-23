@@ -1,5 +1,5 @@
 <?php
-require_once 'setting.php';
+require_once '../setting.php';
 session_start();
 
 // Initialize variables
@@ -80,8 +80,8 @@ if (isset($_GET['student_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reschedule Timetable - <?= htmlspecialchars($student['First_Name'] . ' ' . $student['Last_Name']) ?></title>
-    <link rel="stylesheet" href="../styles/common.css">
-    <link rel="stylesheet" href="../styles/timtable.css">
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .reschedule-container {
@@ -165,10 +165,10 @@ if (isset($_GET['student_id'])) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
-            <?php require("Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <?php if (isset($_SESSION['message'])): ?>
                 <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
