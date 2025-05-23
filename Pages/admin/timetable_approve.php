@@ -149,20 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Removal failed: " . $e->getMessage();
         }
         
-        // In the remove functionality:
-        $params = [
-            "tab=" . $current_tab
-        ];
-        if (isset($_GET['student_id'])) {
-            $params[] = "student_id=" . $_GET['student_id'];
-        } elseif (isset($_GET['instructor_id'])) {
-            $params[] = "instructor_id=" . $_GET['instructor_id'];
-        }
-        if (!empty($search_query)) {
-            $params[] = "search=" . urlencode($search_query);
-        }
-
-        header("Location: timetable_approve.php?" . implode('&', $params));
+        // Instead of redirecting, just refresh the current page
+        header("Refresh:0");
         exit();
     }
 }
@@ -562,8 +550,8 @@ if (!$viewing_id && !$show_search_results) {
 
                 <?php if ($viewing_id): ?>
                     <!-- Student/Instructor Details View -->
-                    <a href="timetable_approve.php?tab=<?= $current_tab ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="back-link">
-                        <i class="fas fa-arrow-left"></i> Back to <?= ucfirst($viewing_type) ?>s
+                    <a href="timetable_approve.php?tab=students" class="back-link">
+                        <i class="fas fa-arrow-left"></i> Back to Timetable Approval
                     </a>
 
                     <div class="student-info">
@@ -756,6 +744,10 @@ if (!$viewing_id && !$show_search_results) {
                         <a href="timetable_reschedule.php?<?= $viewing_type ?>_id=<?= $viewing_id ?>" class="btn btn-primary">
                             <i class="fas fa-calendar-alt"></i> Reschedule Timetable
                         </a>
+                        <a href="timetable_add.php?<?= $viewing_type ?>_id=<?= $viewing_id ?>" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Timetable
+                        </a>
+
                         <?php if ($viewing_type === 'student'): ?>
                             <a href="payment.php?student_id=<?= $viewing_id ?>" class="btn btn-warning">
                                 <i class="fas fa-money-bill-wave"></i> Payment Status
