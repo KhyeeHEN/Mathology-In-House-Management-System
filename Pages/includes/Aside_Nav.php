@@ -14,8 +14,8 @@
             <i class="fas fa-user-check"></i>
             <span>Attendance</span>
         </a>
-        <a href="../admin/timetable.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable.php' ? 'active' : ''; ?>">
+        <a href="../admin/timetable_approve.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable_approve.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Timetable</span>
         </a>
