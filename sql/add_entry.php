@@ -28,6 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
                 $email = $conn->real_escape_string($_POST['email']);
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
+                $course_id = intval($_POST['course_id']);
+                $enrollment_date = $conn->real_escape_string($_POST['Enrollment_Date']);
+                $day = $conn->real_escape_string($_POST['Day']);
+                $start_time = $conn->real_escape_string($_POST['Start_Time']);
+                $end_time = $conn->real_escape_string($_POST['End_Time']);
 
                 // Insert into students table
                 $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, Current_School_Grade, School, Mathology_Level)
@@ -44,6 +49,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     VALUES ('$email', '$password', 'student', '$student_id')";
                 if (!$conn->query($insertUserQuery)) {
                     throw new Exception("Error adding user: " . $conn->error);
+                }
+
+                // Insert into student_courses table
+                $insertStudentCourseQuery = "INSERT INTO student_courses (student_id, course_id, enrollment_date)
+                                             VALUES ('$student_id', '$course_id', '$enrollment_date')";
+                if (!$conn->query($insertStudentCourseQuery)) {
+                    throw new Exception("Error adding student course: " . $conn->error);
+                }
+                $student_course_id = $conn->insert_id;
+
+                // Insert into student_timetable table
+                $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status)
+                                         VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active')";
+                if (!$conn->query($insertTimetableQuery)) {
+                    throw new Exception("Error adding student timetable: " . $conn->error);
                 }
 
                 // Commit the transaction
@@ -106,14 +126,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Entry</title>
 </head>
+
 <body>
     <h1>Add New Entry</h1>
-    <?php if ($error) { echo "<p class='error'>$error</p>"; } ?>
+    <?php if ($error) {
+        echo "<p class='error'>$error</p>";
+    } ?>
 
     <form id="user-type-form" method="POST">
         <label for="user_type">User Type:</label>
@@ -151,6 +175,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="email" id="student_email" name="email" required><br>
         <label for="student_password">Password:</label>
         <input type="password" id="student_password" name="password" required><br><br>
+        <label for="student_course">Course:</label>
+        <select id="student_course" name="course_id" required>
+            <?php
+            // Fetch available courses from the database
+            $courses = $conn->query("SELECT course_id, course_name FROM courses");
+            while ($course = $courses->fetch_assoc()) {
+                echo "<option value='{$course['course_id']}'>{$course['course_name']}</option>";
+            }
+            ?>
+        </select><br>
+        <label for="enrollment_date">Enrollment Date:</label>
+        <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
+        <label for="student_day">Day:</label>
+        <select id="student_day" name="Day" required>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+        </select><br>
+        <label for="student_start_time">Start Time:</label>
+        <input type="time" id="student_start_time" name="Start_Time" required><br>
+        <label for="student_end_time">End Time:</label>
+        <input type="time" id="student_end_time" name="End_Time" required><br><br>
         <button type="submit">Add Student</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
@@ -213,4 +263,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </body>
+
 </html>
