@@ -1,111 +1,111 @@
+<?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+include '../setting.php';
+session_start();
+
+// Protect route
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+//     header("Location: ../login.php");
+//     exit();
+// }
+
+// $studentId = $_SESSION['user_id'];
+
+// Handle sorting
+$allowed_columns = ['timetable_datetime', 'attendance_datetime', 'hours_attended', 'hours_replacement', 'hours_remaining', 'status', 'course', 'updated_at'];
+$sort_column = in_array($_GET['sort'] ?? '', $allowed_columns) ? $_GET['sort'] : 'timetable_datetime';
+$sort_direction = ($_GET['direction'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+$new_sort_direction = $sort_direction === 'ASC' ? 'DESC' : 'ASC';
+
+// Query
+$sql = "
+    SELECT * FROM attendance_records
+    WHERE student_id = ?
+    ORDER BY $sort_column $sort_direction
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $studentId);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance</title>
-    <link rel="stylesheet" href="../../styles/common.css">
-    <link rel="stylesheet" href="../../styles/attendence.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Attendance</title>
+    <link rel="stylesheet" href="../../Styles/common.css" />
+    <link rel="stylesheet" href="../../Styles/attendance.css" />
+    <script>
+        function searchTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll(".attendence tbody tr");
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(filter) ? "" : "none";
+            });
+        }
+    </script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <h2>Mathology</h2>
-            </div>
-            <nav class="side-nav">
-                <a href="dashboardclient.php" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-                <a href="attendanceclient.php" class="nav-item active">
-                    <i class="fas fa-user-check"></i>
-                    <span>Attendance</span>
-                </a>
-                <a href="replacement.php" class="nav-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Schedule Replacement</span>
-                </a>
-                <a href="learninghours.php" class="nav-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Learning Hours</span>
-                </a>
-                <a href="leave.php" class="nav-item">
-                    <i class="fas fa-check"></i>
-                    <span>Apply Leave</span>
-                </a>
-                <a href="paymentclient.php" class="nav-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Payments</span>
-                </a>
-            </nav>
-        </aside>
+<div class="dashboard-container">
+    <?php include("../includes/Aside_Nav_Student.php"); ?>
+    <main class="main-content">
+        <?php include("../includes/Top_Nav_Bar_Student.php"); ?>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Navigation -->
-            <nav class="top-nav">
-                <div class="nav-left">
-                    <button id="menu-toggle" class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1>Attendance</h1>
-                </div>
-                <div class="nav-right">
-                    <div class="nav-links">
-                        <a href="dashboard.html" class="nav-link">Home</a>
-                        <a href="#" class="nav-link">Courses</a>
-                        <a href="#" class="nav-link">Resources</a>
-                        <a href="#" class="nav-link">Help</a>
-                    </div>
-                    <div class="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=Darshann" alt="Profile" class="profile-img">
-                        <div class="profile-dropdown">
-                            <span class="user-name">Darrshan</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown-menu">
-                            <a href="profile.html" class="dropdown-item">
-                                <i class="fas fa-user"></i>
-                                <span>View Profile</span>
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Logout</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+        <h2 style="padding: 1rem 2rem;">My Attendance</h2>
+        <div style="padding: 0 2rem;">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search attendance..." />
+        </div>
 
-            <!-- Do your content here -->
-
-            <table class="attendence">
+        <table class="attendence">
+            <thead>
                 <tr class="attendance_title">
-                    <th>Class</th>
-                    <th>Date</th>
-                    <th>Check in</th>
-                    <th>Check out</th>
+                    <?php
+                    $headers = [
+                        'timetable_datetime' => 'Scheduled',
+                        'attendance_datetime' => 'Attended',
+                        'hours_attended' => 'Attended (hrs)',
+                        'hours_replacement' => 'Replacement (hrs)',
+                        'hours_remaining' => 'Remaining (hrs)',
+                        'status' => 'Status',
+                        'course' => 'Course',
+                        'updated_at' => 'Updated At'
+                    ];
+                    foreach ($headers as $col => $label) {
+                        $arrow = ($sort_column === $col) ? strtolower($sort_direction) : '';
+                        echo "<th class='$arrow' onclick=\"window.location='?sort=$col&direction=$new_sort_direction'\">$label</th>";
+                    }
+                    ?>
                 </tr>
-                <tr>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-            </table>
+            </thead>
+            <tbody>
+            <?php if ($result && $result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars(date("Y-m-d H:i", strtotime($row['timetable_datetime']))) ?></td>
+                        <td><?= $row['attendance_datetime'] ? date("Y-m-d H:i", strtotime($row['attendance_datetime'])) : '-' ?></td>
+                        <td><?= $row['hours_attended'] > 0 ? $row['hours_attended'] . " hrs" : '-' ?></td>
+                        <td><?= $row['hours_replacement'] > 0 ? $row['hours_replacement'] . " hrs" : '-' ?></td>
+                        <td><?= $row['hours_remaining'] . " hrs" ?></td>
+                        <td><?= ucfirst($row['status']) ?></td>
+                        <td><?= htmlspecialchars($row['course']) ?></td>
+                        <td><?= date("Y-m-d H:i", strtotime($row['updated_at'])) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <tr><td colspan="8">No attendance records found.</td></tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </main>
+</div>
 
-        </main>
-    </div>
-    <script type="module" src="../../scripts/common.js"></script>
+<script type="module" src="../../Scripts/common.js"></script>
 </body>
 </html>
