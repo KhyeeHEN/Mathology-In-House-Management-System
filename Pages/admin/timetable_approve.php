@@ -1,6 +1,10 @@
 <?php
 require_once '../setting.php';
-session_start(); // Must be at the very top before any output
+session_start();
+$per_page = 10; // Number of items per page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max($page, 1); // Ensure page is at least 1
+$offset = ($page - 1) * $per_page;
 
 error_log("Script accessed: " . date('Y-m-d H:i:s'));
 error_log("POST data: " . print_r($_POST, true));
@@ -14,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle approval
     if (isset($_POST['approve'])) {
         $id = (int)$_POST['id'];
-        $type = $_POST['type']; // 'student' or 'instructor'
+        $type = 'student'; // Only student now
         
         $tables = [
             'student' => [
@@ -23,21 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'courses_table' => 'student_courses',
                 'request_course_id' => 'student_course_id',
                 'courses_pk' => 'student_course_id'
-            ],
-            'instructor' => [
-                'request_table' => 'instructor_timetable_requests',
-                'timetable_table' => 'instructor_timetable',
-                'courses_table' => 'instructor_courses',
-                'request_course_id' => 'instructor_course_id',
-                'courses_pk' => 'instructor_course_id'
             ]
         ];
-        
-        if (!isset($tables[$type])) {
-            $_SESSION['error'] = "Invalid request type";
-            header("Location: timetable_approve.php");
-            exit();
-        }
         
         $cfg = $tables[$type];
         $conn->begin_transaction();
@@ -108,12 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle rejection
     elseif (isset($_POST['reject'])) {
         $id = (int)$_POST['id'];
-        $type = $_POST['type'];
+        $type = 'student';
         $reason = $conn->real_escape_string($_POST['reason'] ?? '');
         
         try {
             $stmt = $conn->prepare("
-                UPDATE {$type}_timetable_requests 
+                UPDATE student_timetable_requests 
                 SET status = 'rejected', rejection_reason = ? 
                 WHERE id = ? AND status = 'pending'
             ");
@@ -132,11 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle removal
     elseif (isset($_POST['remove'])) {
         $id = (int)$_POST['id'];
-        $type = $_POST['type'];
+        $type = 'student';
         
         try {
-            $table = $type . '_timetable';
-            $stmt = $conn->prepare("DELETE FROM $table WHERE id = ?");
+            $stmt = $conn->prepare("DELETE FROM student_timetable WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             
@@ -155,28 +145,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Check if we're viewing a specific student/instructor
+// Check if we're viewing a specific student
 $student_id = $_GET['student_id'] ?? null;
-$instructor_id = $_GET['instructor_id'] ?? null;
-$viewing_id = $student_id ?? $instructor_id;
-$viewing_type = $student_id ? 'student' : 'instructor';
+$viewing_id = $student_id;
+$viewing_type = 'student';
 
 // Preserve search query from GET parameters
 $search_query = trim($_GET['search'] ?? '');
 $show_search_results = !empty($search_query);
 
-// Get current tab selection (now preserves tab when viewing specific student/instructor)
-$current_tab = $_GET['tab'] ?? ($student_id ? 'students' : ($instructor_id ? 'instructors' : 'students'));
+// Get current tab selection (now preserves tab when viewing specific student)
+$current_tab = 'students'; // Only students now
 
 if ($viewing_id) {
     // Get details with enrolled courses
-    $table = $viewing_type === 'student' ? 'Students' : 'instructor';
-    $id_field = $viewing_type . '_id';
+    $table = 'Students';
+    $id_field = 'student_id';
     
     $details = $conn->query("
         SELECT t.*, GROUP_CONCAT(c.course_name SEPARATOR ', ') as enrolled_courses
         FROM $table t
-        LEFT JOIN {$viewing_type}_courses sc ON t.{$id_field} = sc.{$id_field}
+        LEFT JOIN student_courses sc ON t.{$id_field} = sc.{$id_field}
         LEFT JOIN courses c ON sc.course_id = c.course_id
         WHERE t.{$id_field} = $viewing_id
         GROUP BY t.{$id_field}
@@ -185,25 +174,83 @@ if ($viewing_id) {
     // Get current timetable with course names
     $timetable = $conn->query("
         SELECT tt.*, c.course_name as course
-        FROM {$viewing_type}_timetable tt
-        JOIN {$viewing_type}_courses sc ON tt.{$viewing_type}_course_id = sc.{$viewing_type}_course_id
+        FROM student_timetable tt
+        JOIN student_courses sc ON tt.student_course_id = sc.student_course_id
         JOIN courses c ON sc.course_id = c.course_id
         JOIN $table t ON sc.{$id_field} = t.{$id_field}
         WHERE t.{$id_field} = $viewing_id
         ORDER BY FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), tt.start_time
+        LIMIT $per_page OFFSET $offset
     ");
+    
+    // Add total count query for pagination
+    $total_query = $conn->query("
+        SELECT COUNT(*) as total 
+        FROM student_timetable tt
+        JOIN student_courses sc ON tt.student_course_id = sc.student_course_id
+        JOIN $table t ON sc.{$id_field} = t.{$id_field}
+        WHERE t.{$id_field} = $viewing_id
+    ");
+    $total = $total_query->fetch_assoc()['total'];
+    $total_pages = ceil($total / $per_page);
 }
-
-// Get current tab selection (only if not viewing specific student/instructor)
-$current_tab = !$viewing_id ? ($_GET['tab'] ?? 'students') : null;
 
 // Handle search functionality
 $search_results = null;
 if ($show_search_results) {
     $search_term = "%" . $conn->real_escape_string($search_query) . "%";
     
-    if ($current_tab === 'students') {
-        $search_results = $conn->query("
+    $search_results = $conn->query("
+        (SELECT 
+            s.student_id as id, 
+            CONCAT(s.First_Name, ' ', s.Last_Name) as name,
+            'Pending Request' as type,
+            r.day,
+            r.start_time,
+            r.end_time,
+            c.course_name as course,
+            p.payment_status,
+            NULL as timetable_count
+        FROM student_timetable_requests r
+        JOIN student_courses sc ON r.student_course_id = sc.student_course_id
+        JOIN Students s ON sc.student_id = s.student_id
+        JOIN courses c ON sc.course_id = c.course_id
+        LEFT JOIN payment p ON s.student_id = p.student_id
+        WHERE r.status = 'pending' 
+        AND (s.student_id LIKE '$search_query' 
+            OR s.First_Name LIKE '$search_term' 
+            OR s.Last_Name LIKE '$search_term')
+        LIMIT $per_page OFFSET $offset)
+        
+        UNION
+        
+        (SELECT 
+            s.student_id as id, 
+            CONCAT(s.First_Name, ' ', s.Last_Name) as name,
+            'Current Timetable' as type,
+            t.day,
+            t.start_time,
+            t.end_time,
+            c.course_name as course,
+            p.payment_status,
+            COUNT(t.id) as timetable_count
+        FROM Students s
+        LEFT JOIN student_courses sc ON s.student_id = sc.student_id
+        LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
+        LEFT JOIN courses c ON sc.course_id = c.course_id
+        LEFT JOIN payment p ON s.student_id = p.student_id
+        WHERE (s.student_id LIKE '$search_query' 
+            OR s.First_Name LIKE '$search_term' 
+            OR s.Last_Name LIKE '$search_term')
+        GROUP BY s.student_id, t.day, t.start_time, t.end_time, c.course_name, p.payment_status
+        LIMIT $per_page OFFSET $offset)
+        
+        ORDER BY name, type
+    ");
+    
+    // Get total count for search results
+    $total_search = $conn->query("
+        SELECT COUNT(*) as total FROM (
             (SELECT 
                 s.student_id as id, 
                 CONCAT(s.First_Name, ' ', s.Last_Name) as name,
@@ -245,110 +292,36 @@ if ($show_search_results) {
                 OR s.First_Name LIKE '$search_term' 
                 OR s.Last_Name LIKE '$search_term')
             GROUP BY s.student_id, t.day, t.start_time, t.end_time, c.course_name, p.payment_status)
-            
-            ORDER BY name, type
-        ");
-    } else {
-        $search_results = $conn->query("
-            (SELECT 
-                i.instructor_id as id, 
-                CONCAT(i.First_Name, ' ', i.Last_Name) as name,
-                'Pending Request' as type,
-                r.day,
-                r.start_time,
-                r.end_time,
-                c.course_name as course,
-                NULL as payment_status,
-                NULL as timetable_count
-            FROM instructor_timetable_requests r
-            JOIN instructor_courses ic ON r.instructor_course_id = ic.instructor_course_id
-            JOIN instructor i ON ic.instructor_id = i.instructor_id
-            JOIN courses c ON ic.course_id = c.course_id
-            WHERE r.status = 'pending' 
-            AND (i.instructor_id LIKE '$search_query' 
-                OR i.First_Name LIKE '$search_term' 
-                OR i.Last_Name LIKE '$search_term'))
-            
-            UNION
-            
-            (SELECT 
-                i.instructor_id as id, 
-                CONCAT(i.First_Name, ' ', i.Last_Name) as name,
-                'Current Timetable' as type,
-                t.day,
-                t.start_time,
-                t.end_time,
-                c.course_name as course,
-                NULL as payment_status,
-                COUNT(t.id) as timetable_count
-            FROM instructor i
-            LEFT JOIN instructor_courses ic ON i.instructor_id = ic.instructor_id
-            LEFT JOIN instructor_timetable t ON t.instructor_course_id = ic.instructor_course_id
-            LEFT JOIN courses c ON ic.course_id = c.course_id
-            WHERE (i.instructor_id LIKE '$search_query' 
-                OR i.First_Name LIKE '$search_term' 
-                OR i.Last_Name LIKE '$search_term')
-            GROUP BY i.instructor_id, t.day, t.start_time, t.end_time, c.course_name)
-            
-            ORDER BY name, type
-        ");
-    }
+        ) as combined_results
+    ")->fetch_assoc()['total'];
+    $total_search_pages = ceil($total_search / $per_page);
 }
 
-// Fetch data based on selected tab if not viewing specific student/instructor and not searching
+// Fetch data if not viewing specific student and not searching
 if (!$viewing_id && !$show_search_results) {
-    if ($current_tab === 'students') {
-        // Pending requests
-        $pending = $conn->query("
-            SELECT r.*, s.student_id, s.Last_Name, s.First_Name, 
-                   s.Current_School_Grade, s.School, s.Mathology_Level,
-                   c.course_name as course
-            FROM student_timetable_requests r
-            JOIN student_courses sc ON r.student_course_id = sc.student_course_id
-            JOIN Students s ON sc.student_id = s.student_id
-            JOIN courses c ON sc.course_id = c.course_id
-            WHERE r.status = 'pending'
-        ");
-        
-        // Current student list
-        $current = $conn->query("
-            SELECT s.student_id, s.Last_Name, s.First_Name, 
-                   s.School, s.Current_School_Grade,
-                   COUNT(t.id) as timetable_count
-            FROM Students s
-            LEFT JOIN student_courses sc ON s.student_id = sc.student_id
-            LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
-            GROUP BY s.student_id, s.Last_Name, s.First_Name, s.School, s.Current_School_Grade
-        ");
-    } else {
-        // Instructor section
-        if ($current_tab === 'instructors') {
-            // Pending requests
-            $pending = $conn->query("
-                SELECT r.*, i.instructor_id, i.Last_Name, i.First_Name, 
-                    i.Highest_Education, i.Remark, i.Training_Status,
-                    c.course_name as course
-                FROM instructor_timetable_requests r
-                JOIN instructor_courses ic ON r.instructor_course_id = ic.instructor_course_id
-                JOIN instructor i ON ic.instructor_id = i.instructor_id
-                JOIN courses c ON ic.course_id = c.course_id
-                WHERE r.status = 'pending'
-            ");
-            
-            // Current instructor list
-            $current = $conn->query("
-                SELECT i.instructor_id, i.Last_Name, i.First_Name, 
-                    i.Highest_Education, i.Remark, i.Training_Status,
-                    COUNT(DISTINCT ic.course_id) as course_count,
-                    COUNT(t.id) as timetable_count
-                FROM instructor i
-                LEFT JOIN instructor_courses ic ON i.instructor_id = ic.instructor_id
-                LEFT JOIN instructor_timetable t ON t.instructor_course_id = ic.instructor_course_id
-                GROUP BY i.instructor_id, i.Last_Name, i.First_Name, 
-                        i.Highest_Education, i.Remark, i.Training_Status
-            ");
-        }
-    }
+    // Pending requests
+    $pending = $conn->query("
+        SELECT r.*, s.student_id, s.Last_Name, s.First_Name, 
+               s.Current_School_Grade, s.School, s.Mathology_Level,
+               c.course_name as course
+        FROM student_timetable_requests r
+        JOIN student_courses sc ON r.student_course_id = sc.student_course_id
+        JOIN Students s ON sc.student_id = s.student_id
+        JOIN courses c ON sc.course_id = c.course_id
+        WHERE r.status = 'pending'
+    ");
+    
+    // Current student list
+    $current = $conn->query("
+        SELECT s.student_id, s.Last_Name, s.First_Name, 
+            s.School, s.Current_School_Grade,
+            COUNT(t.id) as timetable_count
+        FROM Students s
+        LEFT JOIN student_courses sc ON s.student_id = sc.student_id
+        LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
+        GROUP BY s.student_id, s.Last_Name, s.First_Name, s.School, s.Current_School_Grade
+        LIMIT $per_page OFFSET $offset
+    ");
 }
 ?>
 <!DOCTYPE html>
@@ -521,6 +494,28 @@ if (!$viewing_id && !$show_search_results) {
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination a {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .pagination a:hover {
+            background-color: #3e8e41;
+        }
+        .pagination span {
+            padding: 8px 15px;
+        }
     </style>
 </head>
 <body>
@@ -549,32 +544,21 @@ if (!$viewing_id && !$show_search_results) {
                 <?php endif; ?>
 
                 <?php if ($viewing_id): ?>
-                    <!-- Student/Instructor Details View -->
-                    <a href="timetable_approve.php?tab=students" class="back-link">
+                    <!-- Student Details View -->
+                    <a href="timetable_approve.php" class="back-link">
                         <i class="fas fa-arrow-left"></i> Back to Timetable Approval
                     </a>
 
                     <div class="student-info">
                         <h2><?= htmlspecialchars($details['First_Name'] ?? '') ?> <?= htmlspecialchars($details['Last_Name'] ?? '') ?></h2>
-                        <?php if ($viewing_type === 'student'): ?>
-                            <div class="info-row">
-                                <div class="info-label">School:</div>
-                                <div><?= htmlspecialchars($details['School'] ?? 'Not specified') ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Grade:</div>
-                                <div><?= htmlspecialchars($details['Current_School_Grade'] ?? 'Not specified') ?></div>
-                            </div>
-                        <?php else: ?>
-                            <div class="info-row">
-                                <div class="info-label">Education:</div>
-                                <div><?= htmlspecialchars($details['Highest_Education'] ?? 'Not specified') ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Training Status:</div>
-                                <div><?= htmlspecialchars($details['Training_Status'] ?? 'Not specified') ?></div>
-                            </div>
-                        <?php endif; ?>
+                        <div class="info-row">
+                            <div class="info-label">School:</div>
+                            <div><?= htmlspecialchars($details['School'] ?? 'Not specified') ?></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Grade:</div>
+                            <div><?= htmlspecialchars($details['Current_School_Grade'] ?? 'Not specified') ?></div>
+                        </div>
                         <div class="info-row">
                             <div class="info-label">Enrolled Courses:</div>
                             <div><?= htmlspecialchars($details['enrolled_courses'] ?? 'None') ?></div>
@@ -612,7 +596,7 @@ if (!$viewing_id && !$show_search_results) {
                                     <div class="actions">
                                         <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure you want to remove this entry?');">
                                             <input type="hidden" name="id" value="<?= $entry['id'] ?>">
-                                            <input type="hidden" name="type" value="<?= $viewing_type ?>">
+                                            <input type="hidden" name="type" value="student">
                                             <?php if (!empty($search_query)): ?>
                                                 <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
                                             <?php endif; ?>
@@ -689,7 +673,7 @@ if (!$viewing_id && !$show_search_results) {
                                                                 <div class="actions" style="margin-top: 5px;">
                                                                     <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure you want to remove this entry?');" style="display: inline;">
                                                                         <input type="hidden" name="id" value="<?= $timetableData[$timeSlot][$day]['entry_id'] ?>">
-                                                                        <input type="hidden" name="type" value="<?= $viewing_type ?>">
+                                                                        <input type="hidden" name="type" value="student">
                                                                         <?php if (!empty($search_query)): ?>
                                                                             <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
                                                                         <?php endif; ?>
@@ -733,44 +717,51 @@ if (!$viewing_id && !$show_search_results) {
                                     });
                                 });
                             });
-                        </script>
+                        </script>   
+                            <?php if (isset($timetable) && $timetable->num_rows > 0 && isset($total_pages) && $total_pages > 1): ?>
+                                <div class="pagination">
+                                    <?php if ($page > 1): ?>
+                                        <a href="?student_id=<?= $viewing_id ?><?= isset($_GET['search']) ? '&search='.urlencode($_GET['search']) : '' ?>&page=<?= ($page - 1) ?>" class="btn btn-primary">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <span>
+                                        Page <?= $page ?> of <?= $total_pages ?>
+                                    </span>
+                                    
+                                    <?php if ($page < $total_pages): ?>
+                                        <a href="?student_id=<?= $viewing_id ?><?= isset($_GET['search']) ? '&search='.urlencode($_GET['search']) : '' ?>&page=<?= ($page + 1) ?>" class="btn btn-primary">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div style="margin-top: 20px;">
                     <?php else: ?>
                         <div class="no-entries">
                             <i class="fas fa-info-circle"></i>
-                            <p>No timetable entries found for this <?= $viewing_type ?></p>
+                            <p>No timetable entries found for this student</p>
                         </div>
                     <?php endif; ?>
                     <div style="margin-top: 20px;">
-                        <a href="timetable_reschedule.php?<?= $viewing_type ?>_id=<?= $viewing_id ?>" class="btn btn-primary">
+                        <a href="timetable_reschedule.php?student_id=<?= $viewing_id ?>" class="btn btn-primary">
                             <i class="fas fa-calendar-alt"></i> Reschedule Timetable
                         </a>
-                        <a href="timetable_add.php?<?= $viewing_type ?>_id=<?= $viewing_id ?>" class="btn btn-success">
+                        <a href="timetable_add.php?student_id=<?= $viewing_id ?>" class="btn btn-success">
                             <i class="fas fa-plus"></i> Add Timetable
                         </a>
-
-                        <?php if ($viewing_type === 'student'): ?>
-                            <a href="payment.php?student_id=<?= $viewing_id ?>" class="btn btn-warning">
-                                <i class="fas fa-money-bill-wave"></i> Payment Status
-                            </a>
-                        <?php endif; ?>
+                        <a href="payment.php?student_id=<?= $viewing_id ?>" class="btn btn-warning">
+                            <i class="fas fa-money-bill-wave"></i> Payment Status
+                        </a>
                     </div>
 
                 <?php else: ?>
                     <!-- Main Approval Interface -->
-                    <!-- Tab Navigation -->
-                    <div class="tab-container">
-                        <a href="?tab=students<?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="tab <?= $current_tab === 'students' ? 'active' : '' ?>">
-                            <i class="fas fa-user-graduate"></i> Students
-                        </a>
-                        <a href="?tab=instructors<?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="tab <?= $current_tab === 'instructors' ? 'active' : '' ?>">
-                            <i class="fas fa-chalkboard-teacher"></i> Instructors
-                        </a>
-                    </div>
-
                     <!-- Search Section -->
                     <div class="search-container">
                         <form method="GET" action="">
-                            <input type="hidden" name="tab" value="<?= $current_tab ?>">
                             <input type="text" name="search" placeholder="Search by ID or name..." 
                                 value="<?= htmlspecialchars($search_query) ?>">
                             <button type="submit"><i class="fas fa-search"></i> Search</button>
@@ -786,7 +777,7 @@ if (!$viewing_id && !$show_search_results) {
                                 <?php while ($result = $search_results->fetch_assoc()): ?>
                                     <div class="entry-card <?= $result['type'] === 'Pending Request' ? 'pending-entry' : 'current-entry' ?>">
                                         <div class="info-row">
-                                            <div class="info-label"><?= $current_tab === 'students' ? 'Student' : 'Instructor' ?>:</div>
+                                            <div class="info-label">Student:</div>
                                             <div>
                                                 <?= htmlspecialchars($result['name']) ?> 
                                                 (ID: <?= htmlspecialchars($result['id']) ?>)
@@ -812,7 +803,7 @@ if (!$viewing_id && !$show_search_results) {
                                             </div>
                                         <?php endif; ?>
 
-                                        <?php if ($current_tab === 'students' && isset($result['payment_status'])): ?>
+                                        <?php if (isset($result['payment_status'])): ?>
                                             <div class="info-row">
                                                 <div class="info-label">Payment Status:</div>
                                                 <div>
@@ -834,7 +825,7 @@ if (!$viewing_id && !$show_search_results) {
                                             <?php if ($result['type'] === 'Pending Request'): ?>
                                                 <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure?');">
                                                     <input type="hidden" name="id" value="<?= $result['id'] ?>">
-                                                    <input type="hidden" name="type" value="<?= $current_tab === 'students' ? 'student' : 'instructor' ?>">
+                                                    <input type="hidden" name="type" value="student">
                                                     <?php if (!empty($search_query)): ?>
                                                         <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
                                                     <?php endif; ?>
@@ -845,7 +836,7 @@ if (!$viewing_id && !$show_search_results) {
 
                                                 <form method="POST" action="timetable_approve.php">
                                                     <input type="hidden" name="id" value="<?= $result['id'] ?>">
-                                                    <input type="hidden" name="type" value="<?= $current_tab === 'students' ? 'student' : 'instructor' ?>">
+                                                    <input type="hidden" name="type" value="student">
                                                     <?php if (!empty($search_query)): ?>
                                                         <input type="hidden" name="search" value="<?= htmlspecialchars($search_query) ?>">
                                                     <?php endif; ?>
@@ -855,11 +846,7 @@ if (!$viewing_id && !$show_search_results) {
                                                     </button>
                                                 </form>
                                             <?php else: ?>
-                                                <?php 
-                                                    // Determine the correct ID parameter based on current tab
-                                                    $id_param = ($current_tab === 'students') ? 'student_id' : 'instructor_id';
-                                                ?>
-                                                <a href="timetable_approve.php?<?= $id_param ?>=<?= htmlspecialchars($result['id']) ?>&search=<?= urlencode($search_query) ?>&tab=<?= $current_tab ?>" 
+                                                <a href="timetable_approve.php?student_id=<?= htmlspecialchars($result['id']) ?>&search=<?= urlencode($search_query) ?>" 
                                                 class="btn btn-primary">
                                                     <i class="fas fa-eye"></i> View Timetable
                                                 </a>
@@ -900,29 +887,18 @@ if (!$viewing_id && !$show_search_results) {
                                             <div class="info-label">Time:</div>
                                             <div><?= date('h:i A', strtotime($request['start_time'] ?? '')) ?> - <?= date('h:i A', strtotime($request['end_time'] ?? '')) ?></div>
                                         </div>
-                                        <?php if ($current_tab === 'students'): ?>
-                                            <div class="info-row">
-                                                <div class="info-label">School:</div>
-                                                <div><?= htmlspecialchars($request['School'] ?? 'Not specified') ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Grade:</div>
-                                                <div><?= htmlspecialchars($request['Current_School_Grade'] ?? 'Not specified') ?></div>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="info-row">
-                                                <div class="info-label">Education:</div>
-                                                <div><?= htmlspecialchars($request['Highest_Education'] ?? 'Not specified') ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Training Status:</div>
-                                                <div><?= htmlspecialchars($request['Training_Status'] ?? 'Not specified') ?></div>
-                                            </div>
-                                        <?php endif; ?>
+                                        <div class="info-row">
+                                            <div class="info-label">School:</div>
+                                            <div><?= htmlspecialchars($request['School'] ?? 'Not specified') ?></div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="info-label">Grade:</div>
+                                            <div><?= htmlspecialchars($request['Current_School_Grade'] ?? 'Not specified') ?></div>
+                                        </div>
                                         <div class="actions">
                                             <form method="POST" action="timetable_approve.php" onsubmit="return confirm('Are you sure?');">
                                                 <input type="hidden" name="id" value="<?= $request['id'] ?>">
-                                                <input type="hidden" name="type" value="<?= $current_tab === 'students' ? 'student' : 'instructor' ?>">
+                                                <input type="hidden" name="type" value="student">
                                                 <button type="submit" name="approve" class="btn btn-success">
                                                     <i class="fas fa-check"></i> Approve
                                                 </button>
@@ -930,7 +906,7 @@ if (!$viewing_id && !$show_search_results) {
 
                                             <form method="POST" action="timetable_approve.php">
                                                 <input type="hidden" name="id" value="<?= $request['id'] ?>">
-                                                <input type="hidden" name="type" value="<?= $current_tab === 'students' ? 'student' : 'instructor' ?>">
+                                                <input type="hidden" name="type" value="student">
                                                 <input type="text" name="reason" placeholder="Rejection reason">
                                                 <button type="submit" name="reject" class="btn btn-danger">
                                                     <i class="fas fa-times"></i> Reject
@@ -942,7 +918,7 @@ if (!$viewing_id && !$show_search_results) {
                             <?php else: ?>
                                 <div class="no-entries">
                                     <i class="fas fa-check-circle"></i>
-                                    <p>No pending requests for <?= htmlspecialchars($current_tab) ?></p>
+                                    <p>No pending requests for students</p>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -951,77 +927,85 @@ if (!$viewing_id && !$show_search_results) {
                         <div class="section">
                             <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Current Timetable</h2>
                             
-                            <?php if ($current_tab === 'students'): ?>
-                                <!-- Student List View -->
-                                <?php if ($current && $current->num_rows > 0): ?>
-                                    <?php while ($student = $current->fetch_assoc()): ?>
-                                        <div class="entry-card current-entry student-card" 
-                                            onclick="window.location='timetable_approve.php?student_id=<?= htmlspecialchars($student['student_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>'">
-                                            <div class="info-row">
-                                                <div class="info-label">Name:</div>
-                                                <div><?= htmlspecialchars($student['Last_Name']) ?>, <?= htmlspecialchars($student['First_Name']) ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">School:</div>
-                                                <div><?= htmlspecialchars($student['School'] ?? 'Not specified') ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Grade:</div>
-                                                <div><?= htmlspecialchars($student['Current_School_Grade'] ?? 'Not specified') ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Scheduled Sessions:</div>
-                                                <div><?= htmlspecialchars($student['timetable_count'] ?? 0) ?></div>
-                                            </div>
-                                            <div class="actions">
-                                                <a href="timetable_approve.php?student_id=<?= htmlspecialchars($student['student_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="btn btn-primary">
-                                                    <i class="fas fa-eye"></i> View Timetable
-                                                </a>
-                                            </div>
+                            <!-- Student List View -->
+                            <?php if ($current && $current->num_rows > 0): ?>
+                                <?php while ($student = $current->fetch_assoc()): ?>
+                                    <div class="entry-card current-entry student-card" 
+                                        onclick="window.location='timetable_approve.php?student_id=<?= htmlspecialchars($student['student_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>'">
+                                        <div class="info-row">
+                                            <div class="info-label">Name:</div>
+                                            <div><?= htmlspecialchars($student['Last_Name']) ?>, <?= htmlspecialchars($student['First_Name']) ?></div>
                                         </div>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
-                                    <div class="no-entries">
-                                        <i class="fas fa-info-circle"></i>
-                                        <p>No students found</p>
+                                        <div class="info-row">
+                                            <div class="info-label">School:</div>
+                                            <div><?= htmlspecialchars($student['School'] ?? 'Not specified') ?></div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="info-label">Grade:</div>
+                                            <div><?= htmlspecialchars($student['Current_School_Grade'] ?? 'Not specified') ?></div>
+                                        </div>
+                                        <div class="info-row">
+                                            <div class="info-label">Scheduled Sessions:</div>
+                                            <div><?= htmlspecialchars($student['timetable_count'] ?? 0) ?></div>
+                                        </div>
+                                        <div class="actions">
+                                            <a href="timetable_approve.php?student_id=<?= htmlspecialchars($student['student_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="btn btn-primary">
+                                                <i class="fas fa-eye"></i> View Timetable
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
+
+                                <?php if ($show_search_results && isset($total_search_pages) && $total_search_pages > 1): ?>
+                                    <div class="pagination">
+                                        <?php if ($page > 1): ?>
+                                            <a href="?search=<?= urlencode($search_query) ?>&page=<?= $page - 1 ?>" class="btn btn-primary">
+                                                <i class="fas fa-chevron-left"></i> Previous
+                                            </a>
+                                        <?php endif; ?>
+                                        
+                                        <span>
+                                            Page <?= $page ?> of <?= $total_search_pages ?>
+                                        </span>
+                                        
+                                        <?php if ($page < $total_search_pages): ?>
+                                            <a href="?search=<?= urlencode($search_query) ?>&page=<?= $page + 1 ?>" class="btn btn-primary">
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             <?php else: ?>
-                                <!-- Instructor Timetable View -->
-                                <?php if ($current && $current->num_rows > 0): ?>
-                                    <?php while ($instructor = $current->fetch_assoc()): ?>
-                                        <div class="entry-card current-entry" 
-                                            onclick="window.location='timetable_approve.php?instructor_id=<?= htmlspecialchars($instructor['instructor_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>'">
-                                            <div class="info-row">
-                                                <div class="info-label">Name:</div>
-                                                <div><?= htmlspecialchars($instructor['Last_Name']) ?>, <?= htmlspecialchars($instructor['First_Name']) ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Education:</div>
-                                                <div><?= htmlspecialchars($instructor['Highest_Education'] ?? 'Not specified') ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Courses Assigned:</div>
-                                                <div><?= htmlspecialchars($instructor['course_count'] ?? 0) ?></div>
-                                            </div>
-                                            <div class="info-row">
-                                                <div class="info-label">Scheduled Sessions:</div>
-                                                <div><?= htmlspecialchars($instructor['timetable_count'] ?? 0) ?></div>
-                                            </div>
-                                            <div class="actions">
-                                                <a href="timetable_approve.php?instructor_id=<?= htmlspecialchars($instructor['instructor_id']) ?><?= !empty($search_query) ? '&search='.urlencode($search_query) : '' ?>" class="btn btn-primary">
-                                                    <i class="fas fa-eye"></i> View Timetable
-                                                </a>
-                                            </div>
-                                        </div>
-                                    <?php endwhile; ?>
-                                <?php else: ?>
-                                    <div class="no-entries">
-                                        <i class="fas fa-info-circle"></i>
-                                        <p>No timetable entries found for <?= htmlspecialchars($current_tab) ?></p>
+                                <div class="no-entries">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>No students found</p>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php 
+                                // Get total count for main lists
+                                $total = $conn->query("SELECT COUNT(*) as total FROM Students")->fetch_assoc()['total'];
+                                $total_pages = ceil($total / $per_page);
+
+                                if ($total_pages > 1): ?>
+                                    <div class="pagination">
+                                        <?php if ($page > 1): ?>
+                                            <a href="?page=<?= $page - 1 ?>" class="btn btn-primary">
+                                                <i class="fas fa-chevron-left"></i> Previous
+                                            </a>
+                                        <?php endif; ?>
+                                        
+                                        <span>
+                                            Page <?= $page ?> of <?= $total_pages ?>
+                                        </span>
+                                        
+                                        <?php if ($page < $total_pages): ?>
+                                            <a href="?page=<?= $page + 1 ?>" class="btn btn-primary">
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
-                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php endif; ?>
