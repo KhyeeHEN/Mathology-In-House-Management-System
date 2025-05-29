@@ -60,60 +60,175 @@ class Calendar {
 
             if (dayEvents.length > 0) {
                 console.log(`Events found for ${dateString}:`, dayEvents); // Debug
+                
+                // Add event indicator
+                const eventIndicator = document.createElement('div');
+                eventIndicator.className = 'event-indicator';
+                eventIndicator.innerHTML = `
+                    <i class="fas fa-circle"></i>
+                    <span class="event-count">${dayEvents.length}</span>
+                `;
+                dayElement.appendChild(eventIndicator);
+                
+                // Add click listener to show student list
+                dayElement.addEventListener('click', (e) => this.showStudentList(e, dateString, dayEvents));
+                dayElement.style.cursor = 'pointer';
+                dayElement.classList.add('has-events');
             }
-
-            dayEvents.forEach(event => {
-                const eventElement = document.createElement('div');
-                eventElement.className = `calendar-event event-${event.type}`;
-                eventElement.textContent = `${event.time} - ${event.title}`;
-                eventElement.addEventListener('click', (e) => this.showEventPopover(e, event));
-                dayElement.appendChild(eventElement);
-            });
 
             calendarDays.appendChild(dayElement);
         }
     }
 
-    showEventPopover(e, event) {
+    showStudentList(e, date, events) {
         this.removeCurrentPopover();
 
         const popover = document.createElement('div');
-        popover.className = 'event-popover';
+        popover.className = 'student-list-popover';
         
+        // Format date for display
+        const displayDate = new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Group events by student/class
+        const studentClasses = this.groupEventsByStudent(events);
+        
+        // Determine how many to show initially
+        const maxInitialDisplay = 5;
+        const hasMore = studentClasses.length > maxInitialDisplay;
+        const initialStudents = studentClasses.slice(0, maxInitialDisplay);
+        const remainingStudents = studentClasses.slice(maxInitialDisplay);
+
         popover.innerHTML = `
-            <div class="event-popover-header">
-                <h3>${event.title}</h3>
+            <div class="student-popover-header">
+                <h3><i class="fas fa-calendar-day"></i> ${displayDate}</h3>
                 <button class="close-popover">×</button>
             </div>
-            <div class="event-popover-content">
-                <div class="event-detail">
-                    <i class="fas fa-clock"></i>
-                    <span>${event.time} (${event.duration})</span>
+            <div class="student-popover-content">
+                <div class="student-count-info">
+                    <i class="fas fa-users"></i>
+                    <span>${studentClasses.length} class${studentClasses.length !== 1 ? 'es' : ''} scheduled</span>
                 </div>
-                <div class="event-detail">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>${event.venue}</span>
+                <div class="student-list" id="studentList">
+                    ${this.renderStudentList(initialStudents)}
                 </div>
-                <div class="event-detail">
-                    <i class="fas fa-user"></i>
-                    <span>${event.lecturer}</span>
-                </div>
-                ${event.description ? `
-                <div class="event-detail">
-                    <i class="fas fa-info-circle"></i>
-                    <span>${event.description}</span>
-                </div>` : ''}
+                ${hasMore ? `
+                    <div class="view-more-section">
+                        <button class="view-more-btn" id="viewMoreBtn">
+                            <i class="fas fa-plus"></i> View ${remainingStudents.length} more
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `;
 
+        // Position the popover
         const rect = e.target.getBoundingClientRect();
         popover.style.position = 'absolute';
-        popover.style.left = `${rect.left}px`;
+        popover.style.left = `${Math.min(rect.left, window.innerWidth - 400)}px`;
         popover.style.top = `${rect.bottom + 5}px`;
+        popover.style.zIndex = '1000';
 
         document.body.appendChild(popover);
+        
+        // Add event listeners
         popover.querySelector('.close-popover').addEventListener('click', () => this.removeCurrentPopover());
+        
+        if (hasMore) {
+            const viewMoreBtn = popover.querySelector('#viewMoreBtn');
+            let isExpanded = false;
+            
+            viewMoreBtn.addEventListener('click', () => {
+                const studentList = popover.querySelector('#studentList');
+                
+                if (!isExpanded) {
+                    // Expand to show all students
+                    studentList.innerHTML = this.renderStudentList(studentClasses);
+                    viewMoreBtn.innerHTML = '<i class="fas fa-minus"></i> Show less';
+                    isExpanded = true;
+                } else {
+                    // Collapse to show only initial students
+                    studentList.innerHTML = this.renderStudentList(initialStudents);
+                    viewMoreBtn.innerHTML = `<i class="fas fa-plus"></i> View ${remainingStudents.length} more`;
+                    isExpanded = false;
+                }
+            });
+        }
+
+        // Add click outside to close
+        setTimeout(() => {
+            document.addEventListener('click', this.handleOutsideClick.bind(this), { once: true });
+        }, 0);
+
         this.currentPopover = popover;
+    }
+
+    groupEventsByStudent(events) {
+        // Group events by course/student combination
+        const grouped = {};
+        
+        events.forEach(event => {
+            // Parse students from the event (assuming format: "Student1, Student2, ...")
+            const students = event.students ? event.students.split(', ') : ['Unknown Student'];
+            
+            students.forEach(student => {
+                const key = `${student}_${event.title}`;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        student: student.trim(),
+                        course: event.title.split(' - ')[0], // Extract course name
+                        instructor: event.title.split(' - ')[1] || 'Unknown Instructor',
+                        time: event.time,
+                        duration: event.duration,
+                        description: event.description
+                    };
+                }
+            });
+        });
+        
+        return Object.values(grouped);
+    }
+
+    renderStudentList(studentClasses) {
+        return studentClasses.map(studentClass => `
+            <div class="student-item">
+                <div class="student-info">
+                    <div class="student-name">
+                        <i class="fas fa-user"></i>
+                        <strong>${studentClass.student}</strong>
+                    </div>
+                    <div class="class-details">
+                        <div class="course-info">
+                            <i class="fas fa-book"></i>
+                            <span>${studentClass.course}</span>
+                        </div>
+                        <div class="time-info">
+                            <i class="fas fa-clock"></i>
+                            <span>${studentClass.time} (${studentClass.duration})</span>
+                        </div>
+                        <div class="instructor-info">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>${studentClass.instructor}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="student-actions">
+                    <button class="view-student-btn" onclick="viewStudentDetails('${studentClass.student}')">
+                        <i class="fas fa-eye"></i> View Student
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    handleOutsideClick(event) {
+        if (this.currentPopover && !this.currentPopover.contains(event.target)) {
+            this.removeCurrentPopover();
+        }
     }
 
     removeCurrentPopover() {
@@ -153,6 +268,22 @@ class Calendar {
             this.initializeCalendar();
         });
     }
+}
+
+// Function to handle viewing student details (to be implemented based on your needs)
+function viewStudentDetails(studentName) {
+    // This function should be implemented based on your application's needs
+    // For example, redirect to student profile page or show student details modal
+    console.log('Viewing details for student:', studentName);
+    
+    // Example implementation - you can modify this based on your requirements
+    alert(`Feature to view details for ${studentName} will be implemented here.\n\nThis could:\n- Open a student profile modal\n- Navigate to student details page\n- Show additional student information`);
+    
+    // Example: Redirect to student profile page
+    // window.location.href = `studentProfile.php?student=${encodeURIComponent(studentName)}`;
+    
+    // Example: Show modal with student details
+    // showStudentDetailsModal(studentName);
 }
 
 // Initialize calendar when DOM is loaded
