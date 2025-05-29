@@ -1,2 +1,2 @@
 RewriteEngine On
-RewriteRule ^$ Pages/ [L]
+RewriteRule ^$ Pages/login.php [L]
