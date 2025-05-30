@@ -28,34 +28,20 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <!-- Top Bar Row (Filter Buttons + Search Bar + Add Entry Button) -->
-            <div class="top-bar-row" style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-                <div class="filter-buttons" style="display: flex; gap: 8px;">
-                    <button onclick="showTable('students-table')" id="students-btn"
-                        class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
-                    <button onclick="showTable('instructors-table')" id="instructors-btn"
-                        class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
-                    <button onclick="showTable('admins-table')" id="admins-btn"
-                        class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>">Admins</button>
-                </div>
+            <!-- Do your content here -->
 
-                <!-- Search Bar -->
-                <form method="GET" action="users.php" id="search-bar">
-                    <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
-                        value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                    <input type="hidden" name="active_tab" id="active_tab"
-                        value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
-                    <input type="hidden" name="students_page" id="students_page" value="1">
-                    <input type="hidden" name="instructors_page" id="instructors_page" value="1">
-                    <button type="submit">Search</button>
-                    <button type="button" id="reset-button">Reset</button>
-                </form>
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button onclick="showTable('students-table')" id="students-btn"
+                    class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">Students</button>
+                <button onclick="showTable('instructors-table')" id="instructors-btn"
+                    class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">Instructors</button>
+                <button onclick="showTable('admins-table')" id="admins-btn"
+                    class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>">Admins</button>
+            </div>
 
-                <!-- Add Entry Button -->
-                <button class="add-entry-button" style="margin-left: auto;"
-                    onclick="window.location.href='../../sql/add_entry.php'">
-                    Add Entry
-                </button>
+            <div class="add-entry-container">
+                <a href="../../sql/add_entry.php" class="add-entry-button">Add Entry</a>
             </div>
 
             <!-- Display messages or errors -->
@@ -70,6 +56,21 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
+
+            <!-- Search Form -->
+            <div class="search-bar">
+                <form method="GET" action="users.php" id="search-form">
+                    <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
+                        value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                    <input type="hidden" name="active_tab" id="active_tab"
+                        value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                    <input type="hidden" name="students_page" id="students_page" value="1"> <!-- Reset to page 1 -->
+                    <input type="hidden" name="instructors_page" id="instructors_page" value="1">
+                    <!-- Reset to page 1 -->
+                    <button type="submit">Search</button>
+                    <button type="button" id="reset-button">Reset</button>
+                </form>
+            </div>
 
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
