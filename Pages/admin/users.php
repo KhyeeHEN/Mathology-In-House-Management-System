@@ -28,8 +28,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <div class="users-controls-row"
-                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <div class="users-controls-row">
                 <!-- Search Bar (Left) -->
                 <div class="search-bar" style="flex: 1 1 240px; min-width: 200px; max-width: 340px;">
                     <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
