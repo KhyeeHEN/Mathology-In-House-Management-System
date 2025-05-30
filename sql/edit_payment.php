@@ -1,5 +1,5 @@
 <?php
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 if (!isset($_GET['id'])) {
     die("Payment ID is required.");

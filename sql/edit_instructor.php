@@ -1,6 +1,5 @@
 <?php
-// Include the database settings
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Fetch instructor and associated user data based on the instructor_id from the GET request
 $instructor_id = isset($_GET['instructor_id']) ? intval($_GET['instructor_id']) : 0;

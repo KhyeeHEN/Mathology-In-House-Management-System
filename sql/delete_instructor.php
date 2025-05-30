@@ -1,6 +1,5 @@
 <?php
-// Include the database settings
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Get the instructor ID from the query string
 if (isset($_GET['instructor_id'])) {

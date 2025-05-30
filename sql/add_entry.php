@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Initialize variables to avoid warnings
 $user_type = isset($_POST['user_type']) ? $_POST['user_type'] : null;

@@ -1,6 +1,5 @@
 <?php
-// Include the database settings
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Get the student ID from the query string
 if (isset($_GET['student_id'])) {

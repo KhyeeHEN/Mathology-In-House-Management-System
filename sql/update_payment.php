@@ -1,5 +1,5 @@
 <?php
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payment_id = $_POST['payment_id'];
