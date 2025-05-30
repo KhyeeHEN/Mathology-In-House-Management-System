@@ -81,31 +81,32 @@ if ($result->num_rows > 0) {
                 <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
-        $detailsId = "details_" . $row['instructor_id'];
+        // Make the ID unique by prefixing with "instructor"
+        $detailsId = "details_instructor_" . $row['instructor_id'];
         echo "<tr>
-                <td>" . $row['instructor_id'] . "</td>
-                <td>" . $row['Last_Name'] . "</td>
-                <td>" . $row['First_Name'] . "</td>
-                <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
-                <td>" . $row['email'] . "</td>
-                <td>
-                    <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
-                    <a href='../../sql/edit_instructor.php?instructor_id={$row['instructor_id']}'>Edit</a>
-                    <a href='../../sql/delete_instructor.php?instructor_id={$row['instructor_id']}' onclick=\"return confirm('Are you sure you want to delete this instructor?');\">Delete</a>
-                </td>
-              </tr>";
+            <td>" . $row['instructor_id'] . "</td>
+            <td>" . $row['Last_Name'] . "</td>
+            <td>" . $row['First_Name'] . "</td>
+            <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
+            <td>" . $row['email'] . "</td>
+            <td>
+                <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
+                <a href='../../sql/edit_instructor.php?instructor_id={$row['instructor_id']}'>Edit</a>
+                <a href='../../sql/delete_instructor.php?instructor_id={$row['instructor_id']}' onclick=\"return confirm('Are you sure you want to delete this instructor?');\">Delete</a>
+            </td>
+          </tr>";
 
         // Hidden detailed information row
         echo "<tr id='$detailsId' style='display: none;'>
-                <td colspan='6'>
-                    <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
-                    <strong>Highest Education:</strong> " . $row['Highest_Education'] . "<br>
-                    <strong>Remark:</strong> " . $row['Remark'] . "<br>
-                    <strong>Training Status:</strong> " . $row['Training_Status'] . "<br>
-                    <strong>Courses:</strong> " . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "<br>
-                    <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
-                </td>
-              </tr>";
+            <td colspan='6'>
+                <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
+                <strong>Highest Education:</strong> " . $row['Highest_Education'] . "<br>
+                <strong>Remark:</strong> " . $row['Remark'] . "<br>
+                <strong>Training Status:</strong> " . $row['Training_Status'] . "<br>
+                <strong>Courses:</strong> " . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "<br>
+                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
+            </td>
+          </tr>";
     }
     echo "</table>";
 
@@ -132,13 +133,13 @@ if ($result->num_rows > 0) {
 ?>
 
 <script>
-// JavaScript to toggle detailed information
-function toggleDetails(detailsId) {
-    const detailsRow = document.getElementById(detailsId);
-    if (detailsRow.style.display === "none") {
-        detailsRow.style.display = "table-row";
-    } else {
-        detailsRow.style.display = "none";
+    // JavaScript to toggle detailed information
+    function toggleDetails(detailsId) {
+        const detailsRow = document.getElementById(detailsId);
+        if (detailsRow.style.display === "none") {
+            detailsRow.style.display = "table-row";
+        } else {
+            detailsRow.style.display = "none";
+        }
     }
-}
 </script>
