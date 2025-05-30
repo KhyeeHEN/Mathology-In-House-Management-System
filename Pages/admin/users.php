@@ -27,10 +27,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <div class="add-entry-container">
-                <a href="../../sql/add_entry.php" class="add-entry-button">Add Entry</a>
-            </div>
-
             <!-- Display messages or errors -->
             <?php if ($message): ?>
                 <div style="color: green; font-weight: bold;">
@@ -112,12 +108,12 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     <!-- Buttons -->
                     <button type="submit">Search/Filter</button>
                     <button type="button" id="reset-button" onclick="window.location='users.php'">Reset</button>
-                    <button type="button" onclick="window.location='add_entry.php'">
+                    <button type="button" onclick="window.location='../sql/add_entry.php'">
                         <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Add User
                     </button>
                 </form>
             </div>
-            
+
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
                 id="students-table">
