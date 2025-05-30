@@ -1,5 +1,4 @@
 <?php
-// Include the database settings
 include '../setting.php';
 
 // Check for messages or errors in the URL
@@ -17,8 +16,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     <link rel="stylesheet" href="../../Styles/common.css">
     <link rel="stylesheet" href="../../Styles/users.css?ver=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script type="module" src="../../Scripts/common.js"></script>
-    <script src="../../Scripts/users.js?v=<?php echo time(); ?>"></script>
 </head>
 
 <body>
@@ -88,6 +85,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             </div>
         </main>
     </div>
+    <script type="module" src="../../scripts/common.js"></script>
+    <script src="../../scripts/users.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
