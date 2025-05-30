@@ -74,11 +74,11 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
                 id="students-table">
-                <?php include '/sql/students_data.php'; ?>
+                <?php include '../sql/students_data.php'; ?>
             </div>
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>"
                 id="instructors-table">
-                <?php include '/sql/instructors_data.php'; ?>
+                <?php include '../sql/instructors_data.php'; ?>
             </div>
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>"
                 id="admins-table">
