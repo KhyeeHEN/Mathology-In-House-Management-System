@@ -86,7 +86,4 @@ if ($result->num_rows > 0) {
 } else {
     echo "No admin users found.";
 }
-
-// Close the database connection
-$conn->close();
 ?>
