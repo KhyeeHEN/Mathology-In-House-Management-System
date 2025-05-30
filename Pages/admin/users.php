@@ -13,8 +13,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users</title>
-    <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../Styles/users.css?ver=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/Styles/common.css">
+    <link rel="stylesheet" href="/Styles/users.css?ver=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
