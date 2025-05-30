@@ -1,5 +1,5 @@
 <?php
-include 'settings.php';
+include '../setting.php';
 
 if (!isset($_GET['id'])) {
     die("Payment ID is required.");

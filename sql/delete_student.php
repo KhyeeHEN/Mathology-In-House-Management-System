@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include 'settings.php';
+include '../setting.php';
 
 // Get the student ID from the query string
 if (isset($_GET['student_id'])) {

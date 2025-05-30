@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include 'settings.php';
+include '../setting.php';
 
 // Get parameters from the GET request
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';

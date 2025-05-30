@@ -1,6 +1,6 @@
 <?php
 // Include DB settings
-include 'settings.php';
+include '../setting.php';
 
 // Get record_id from URL
 $record_id = isset($_GET['record_id']) ? intval($_GET['record_id']) : 0;

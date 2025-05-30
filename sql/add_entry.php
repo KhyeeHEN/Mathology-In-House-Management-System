@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include 'settings.php';
+include '../setting.php';
 
 // Initialize variables to avoid warnings
 $user_type = isset($_POST['user_type']) ? $_POST['user_type'] : null;
