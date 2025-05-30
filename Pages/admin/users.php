@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include '../setting.php';
+include '../settings.php';
 
 // Check for messages or errors in the URL
 $message = isset($_GET['message']) ? $_GET['message'] : null;
@@ -86,8 +86,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             </div>
         </main>
     </div>
-    <script type="module" src="../../Scripts/common.js"></script>
-    <script src="../../Scripts/users.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
+    <script src="../../scripts/users.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
