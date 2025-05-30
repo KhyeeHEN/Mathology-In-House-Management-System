@@ -26,7 +26,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
         <!-- Main Content Area -->
         <main class="main-content">
-        
+            <?php require("../includes/Top_Nav_Bar.php"); ?>
+
             <div class="users-controls-row"
                 style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
                 <!-- Filter Buttons -->
