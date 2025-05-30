@@ -26,25 +26,11 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
-
-            <div class="users-controls-row">
-                <!-- Search Bar (Left) -->
-                <div class="search-bar" style="flex: 1 1 240px; min-width: 200px; max-width: 340px;">
-                    <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
-                        <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
-                            value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                        <input type="hidden" name="active_tab" id="active_tab"
-                            value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
-                        <input type="hidden" name="students_page" id="students_page" value="1">
-                        <input type="hidden" name="instructors_page" id="instructors_page" value="1">
-                        <button type="submit">Search</button>
-                        <button type="button" id="reset-button">Reset</button>
-                    </form>
-                </div>
-
-                <!-- Filter Buttons (Center) -->
-                <div class="filter-buttons" style="display: flex; gap: 8px; justify-content: center; flex: 1 1 240px;">
+        
+            <div class="users-controls-row"
+                style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                <!-- Filter Buttons -->
+                <div class="filter-buttons" style="display: flex; gap: 8px;">
                     <button onclick="showTable('students-table')" id="students-btn"
                         class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">
                         Students
@@ -59,16 +45,27 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </button>
                 </div>
 
-                <!-- Add Entry Button (Right) -->
-                <div style="flex: 1 1 120px; display: flex; justify-content: flex-end;">
-                    <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                        <button type="submit" class="add-entry-button">
-                            Add Entry
-                        </button>
+                <!-- Add Entry Button -->
+                <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
+                    <button type="submit" class="add-entry-button" style="margin-left: 8px;">
+                        Add Entry
+                    </button>
+                </form>
+
+                <!-- Search Bar -->
+                <div class="search-bar" style="flex: 1; min-width: 220px;">
+                    <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
+                        <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
+                            value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                        <input type="hidden" name="active_tab" id="active_tab"
+                            value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                        <input type="hidden" name="students_page" id="students_page" value="1">
+                        <input type="hidden" name="instructors_page" id="instructors_page" value="1">
+                        <button type="submit">Search</button>
+                        <button type="button" id="reset-button">Reset</button>
                     </form>
                 </div>
             </div>
-
 
             <!-- Display messages or errors -->
             <?php if ($message): ?>
