@@ -2,25 +2,19 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 20px 0;
 }
 
 table, th, td {
+    padding: 12px;
     border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 8px;
     text-align: left;
 }
 
 th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
 }
 
 h1 {
@@ -55,37 +49,6 @@ h1 {
 }
 .table-container.active {
     display: block;
-}
-
-/* Fix top navigation bar */
-.top-nav {
-    position: fixed; /* Ensures the nav bar stays at the top */
-    top: 0;
-    left: 260px; /* Adjusts for the sidebar width */
-    right: 0;
-    height: 120px; /* Adjust height as needed */
-    display: flex;
-    padding: 1rem 2rem;
-    z-index: 1000; /* Keep it above other elements */
-}
-
-/* Add spacing to the main content */
-.main-content {
-    margin-top: 20px; /* Adds space below the top navigation bar */
-    margin-left: 260px; /* Matches the width of the sidebar to avoid overlap */
-    padding: 20px; /* Optional padding for better spacing */
-    box-sizing: border-box; /* Ensures padding doesn't affect width calculations */
-    position: relative; /* Ensures content flow remains intact */
-}
-
-/* Adjust for sidebar to ensure no overlap */
-.sidebar {
-    position: fixed;
-    height: 100%;
-    top: 0;
-    left: 0;
-    width: 260px;
-    z-index: 1000
 }
 
 /* Style for the search bar */
@@ -190,3 +153,33 @@ h1 {
     color: #FFFFFF;
 }
 
+/* Fix top navigation bar
+.top-nav {
+    position: fixed; /* Ensures the nav bar stays at the top 
+    top: 0;
+    left: 260px; /* Adjusts for the sidebar width 
+    right: 0;
+    height: 120px; /* Adjust height as needed 
+    display: flex;
+    padding: 1rem 2rem;
+    z-index: 1000; /* Keep it above other elements 
+}
+
+/* Add spacing to the main content 
+.main-content {
+    margin-top: 20px; /* Adds space below the top navigation bar 
+    margin-left: 260px; /* Matches the width of the sidebar to avoid overlap 
+    padding: 20px; /* Optional padding for better spacing 
+    box-sizing: border-box; /* Ensures padding doesn't affect width calculations 
+    position: relative; /* Ensures content flow remains intact 
+}*/
+
+/* Adjust for sidebar to ensure no overlap 
+.sidebar {
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    width: 260px;
+    z-index: 1000
+}*/
