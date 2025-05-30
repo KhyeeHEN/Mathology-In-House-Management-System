@@ -74,20 +74,20 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
                 id="students-table">
-                <?php include '../../sql/students_data.php'; ?>
+                <?php include '/sql/students_data.php'; ?>
             </div>
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>"
                 id="instructors-table">
-                <?php include '../../sql/instructors_data.php'; ?>
+                <?php include '/sql/instructors_data.php'; ?>
             </div>
             <div class="table-container <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>"
                 id="admins-table">
-                <?php include '../../sql/admins_data.php'; ?>
+                <?php include '/sql/admins_data.php'; ?>
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
-    <script src="../../scripts/users.js?v=<?php echo time(); ?>"></script>
+    <script type="module" src="/Scripts/common.js"></script>
+    <script src="/Scripts/users.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>

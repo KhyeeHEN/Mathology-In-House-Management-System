@@ -306,7 +306,7 @@ if (!$viewing_id && !$show_search_results) {
                c.course_name as course
         FROM student_timetable_requests r
         JOIN student_courses sc ON r.student_course_id = sc.student_course_id
-        JOIN Students s ON sc.student_id = s.student_id
+        JOIN students s ON sc.student_id = s.student_id
         JOIN courses c ON sc.course_id = c.course_id
         WHERE r.status = 'pending'
     ");
@@ -316,7 +316,7 @@ if (!$viewing_id && !$show_search_results) {
         SELECT s.student_id, s.Last_Name, s.First_Name, 
             s.School, s.Current_School_Grade,
             COUNT(t.id) as timetable_count
-        FROM Students s
+        FROM students s
         LEFT JOIN student_courses sc ON s.student_id = sc.student_id
         LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
         GROUP BY s.student_id, s.Last_Name, s.First_Name, s.School, s.Current_School_Grade
