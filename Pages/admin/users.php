@@ -1,6 +1,6 @@
 <?php
 // Include the database settings
-include 'settings.php';
+include 'setting.php';
 
 // Check for messages or errors in the URL
 $message = isset($_GET['message']) ? $_GET['message'] : null;
