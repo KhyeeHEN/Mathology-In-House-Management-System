@@ -85,8 +85,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
-    <script src="../../scripts/users.js?v=<?php echo time(); ?>"></script>
+    <script type="module" src="/Scripts/common.js"></script>
+    <script src="/Scripts/users.js?v=<?php echo time(); ?>"></script>
 </body>
 
 </html>
