@@ -23,13 +23,13 @@
 
 
 /* Style for the search bar */
-.search-bar {
+.search-form {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
 
-.search-bar input[type="text"] {
+.search-form input[type="text"] {
     width: 300px;
     padding: 10px;
     border: 1px solid #ccc;
@@ -38,13 +38,13 @@
     transition: box-shadow 0.3s ease-in-out;
 }
 
-.search-bar input[type="text"]:focus {
+.search-form input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 5px rgb(71, 82, 95);
     border-color: rgb(71, 82, 95);
 }
 
-.search-bar button {
+.search-form button {
     padding: 10px 15px;
     margin-left: 10px;
     border: none;
@@ -56,17 +56,17 @@
     transition: background-color 0.3s ease-in-out;
 }
 
-.search-bar button:hover {
+.search-form button:hover {
     background-color: rgb(71, 82, 95);
 }
 
-.search-bar button:focus {
+.search-form button:focus {
     outline: none;
     box-shadow: 0 0 5px rgb(71, 82, 95);
 }
 
 /* Style for dropdown lists */
-.search-bar select {
+.search-form select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -78,14 +78,14 @@
     cursor: pointer;
 }
 
-.search-bar select:focus {
+.search-form select:focus {
     outline: none;
     box-shadow: 0 0 5px rgb(71, 82, 95);
     border-color: rgb(71, 82, 95);
 }
 
 /* Optional: Dropdown arrow style override (cross-browser consistency) */
-.search-bar select {
+.search-form select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
