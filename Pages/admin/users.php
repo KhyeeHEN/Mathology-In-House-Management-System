@@ -40,8 +40,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 </div>
 
                 <!-- Search Bar -->
-                <form method="GET" action="users.php" id="search-form"
-                    style="display: flex; align-items: center; gap: 8px; margin-bottom: 0;">
+                <form method="GET" action="users.php" id="search-bar">
                     <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
                         value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
                     <input type="hidden" name="active_tab" id="active_tab"
