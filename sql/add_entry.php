@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $gender = $conn->real_escape_string($_POST['Gender']);
                 $dob = $conn->real_escape_string($_POST['DOB']);
                 $school_syllabus = $conn->real_escape_string($_POST['School_Syllabus']);
+                $school_intake = $conn->real_escape_string($_POST['School_Intake']); 
                 $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
                 $school = $conn->real_escape_string($_POST['School']);
                 $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
@@ -35,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $end_time = $conn->real_escape_string($_POST['End_Time']);
 
                 // Insert into students table
-                $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, Current_School_Grade, School, Mathology_Level)
-                                       VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$current_grade', '$school', '$mathology_level')";
+                $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, School_Intake, Current_School_Grade, School, Mathology_Level)
+                                       VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$school_intake', '$current_grade', '$school', '$mathology_level')";
                 if (!$conn->query($insertStudentQuery)) {
                     throw new Exception("Error adding student: " . $conn->error);
                 }

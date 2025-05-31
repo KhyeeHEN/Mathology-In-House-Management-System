@@ -101,7 +101,7 @@ if ($result->num_rows > 0) {
             <td colspan='6'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
-                <strong>School Intake:</strong> " . ($row['School_Intake'] ? 'Yes' : 'No') . "<br>
+                <strong>School Intake:</strong> " . $row['School_Intake'] . "<br>
                 <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
                 <strong>School:</strong> " . $row['School'] . "<br>
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
