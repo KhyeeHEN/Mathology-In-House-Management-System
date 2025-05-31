@@ -29,38 +29,35 @@ h1 {
 }
 
 /* Button styling */
-.user-action-btn {
-    background: linear-gradient(135deg, #4285f4, #34a853);
+.users-controls-row button,
+.users-controls-row .add-entry-button {
+    background: #1f2937;
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 15px;
-    font-weight: 500;
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-size: 14px;
     cursor: pointer;
-    transition: background 0.18s, box-shadow 0.18s;
-    display: inline-block;
+    transition: background 0.2s, box-shadow 0.2s;
     margin: 0 3px;
+    font-weight: 500;
+}
+
+.users-controls-row button:hover,
+.users-controls-row .add-entry-button:hover {
+    background: #374151;
+    box-shadow: 0 2px 8px rgba(31, 41, 55, 0.12);
+}
+
+.users-controls-row button.active {
+    background: #4285f4;
+    color: #fff;
+}
+
+.users-controls-row button:focus,
+.users-controls-row .add-entry-button:focus {
     outline: none;
-}
-
-.user-action-btn:hover,
-.user-action-btn:focus {
-    background: linear-gradient(135deg, #357ae8, #2e7d32);
-    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.10);
-}
-
-.user-action-btn.active,
-.user-action-btn:active {
-    background: linear-gradient(135deg, #2e7d32, #4285f4);
-    box-shadow: 0 4px 14px rgba(66, 133, 244, 0.15);
-}
-
-@media (max-width: 600px) {
-    .user-action-btn {
-        padding: 8px 12px;
-        font-size: 14px;
-    }
+    box-shadow: 0 0 0 2px #4285f4;
 }
 
 /* Hide tables initially */

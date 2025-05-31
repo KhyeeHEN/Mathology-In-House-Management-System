@@ -31,7 +31,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
             <div class="users-controls-row"
                 style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
                 <!-- Filter Buttons -->
-                <div class="user-action-btn" style="display: flex; gap: 8px;">
+                <div class="filter-buttons" style="display: flex; gap: 8px;">
                     <button onclick="showTable('students-table')" id="students-btn"
                         class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">
                         Students
@@ -48,7 +48,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
                 <!-- Add Entry Button -->
                 <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                    <button type="submit" class="user-action-btn" style="margin-left: 8px;">
+                    <button type="submit" class="add-entry-button" style="margin-left: 8px;">
                         Add Entry
                     </button>
                 </form>
