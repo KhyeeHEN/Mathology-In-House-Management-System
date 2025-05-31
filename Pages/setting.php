@@ -1,9 +1,8 @@
 <?php
-// Database configuration - Update these with your actual credentials
-define('DB_HOST', 'localhost:3310');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'mathology');
+define('DB_HOST', '127.0.0.1:3306'); 
+define('DB_USER', 'u656820910_admin'); 
+define('DB_PASS', 'Thisislife23');    
+define('DB_NAME', 'u656820910_mathology');
 
 // Create connection
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);

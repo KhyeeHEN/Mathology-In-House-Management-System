@@ -1,7 +1,4 @@
 <?php
-// Include the database settings
-include 'settings.php';
-
 // Get parameters from the GET request
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $limit = 10; // Default limit per page
@@ -84,33 +81,34 @@ if ($result->num_rows > 0) {
                 <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
-        $detailsId = "details_" . $row['student_id'];
+        // Make the ID unique by prefixing with "student"
+        $detailsId = "details_student_" . $row['student_id'];
         echo "<tr>
-                <td>" . $row['student_id'] . "</td>
-                <td>" . $row['Last_Name'] . "</td>
-                <td>" . $row['First_Name'] . "</td>
-                <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
-                <td>" . $row['email'] . "</td>
-                <td>
-                    <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
-                    <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
-                    <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
-                </td>
-              </tr>";
+            <td>" . $row['student_id'] . "</td>
+            <td>" . $row['Last_Name'] . "</td>
+            <td>" . $row['First_Name'] . "</td>
+            <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
+            <td>" . $row['email'] . "</td>
+            <td>
+                <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
+                <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
+                <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
+            </td>
+          </tr>";
 
         // Hidden detailed information row
         echo "<tr id='$detailsId' style='display: none;'>
-                <td colspan='6'>
-                    <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
-                    <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
-                    <strong>School Intake:</strong> " . ($row['School_Intake'] ? 'Yes' : 'No') . "<br>
-                    <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
-                    <strong>School:</strong> " . $row['School'] . "<br>
-                    <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
-                    <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
-                    <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
-                </td>
-              </tr>";
+            <td colspan='6'>
+                <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
+                <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
+                <strong>School Intake:</strong> " . ($row['School_Intake'] ? 'Yes' : 'No') . "<br>
+                <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
+                <strong>School:</strong> " . $row['School'] . "<br>
+                <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
+                <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
+                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
+            </td>
+          </tr>";
     }
     echo "</table>";
 
@@ -134,19 +132,16 @@ if ($result->num_rows > 0) {
 } else {
     echo "No data found in the table.";
 }
-
-// Close the database connection
-$conn->close();
 ?>
 
 <script>
-// JavaScript to toggle detailed information
-function toggleDetails(detailsId) {
-    const detailsRow = document.getElementById(detailsId);
-    if (detailsRow.style.display === "none") {
-        detailsRow.style.display = "table-row";
-    } else {
-        detailsRow.style.display = "none";
+    // JavaScript to toggle detailed information
+    function toggleDetails(detailsId) {
+        const detailsRow = document.getElementById(detailsId);
+        if (detailsRow.style.display === "none") {
+            detailsRow.style.display = "table-row";
+        } else {
+            detailsRow.style.display = "none";
+        }
     }
-}
 </script>

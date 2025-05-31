@@ -1,6 +1,5 @@
 <?php
-// Include DB settings
-include 'settings.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Get record_id from URL
 $record_id = isset($_GET['record_id']) ? intval($_GET['record_id']) : 0;

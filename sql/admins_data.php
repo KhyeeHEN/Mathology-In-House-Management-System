@@ -1,7 +1,4 @@
 <?php
-// Include the database settings
-include 'settings.php';
-
 // Get parameters from the GET request
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $limit = 10; // Default limit per page
@@ -89,7 +86,4 @@ if ($result->num_rows > 0) {
 } else {
     echo "No admin users found.";
 }
-
-// Close the database connection
-$conn->close();
 ?>
