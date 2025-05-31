@@ -35,7 +35,7 @@ $sql = "
         s.Current_School_Grade, 
         s.School, 
         s.Mathology_Level, 
-        s.How_Did_You_Heard_About_Us
+        s.How_Did_You_Heard_About_Us,
         u.email, 
         c.course_name,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
