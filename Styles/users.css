@@ -50,14 +50,14 @@ h1 {
 }
 
 .users-controls-row button.active {
-    background: #4285f4;
+    background: rgb(71, 82, 95);
     color: #fff;
 }
 
 .users-controls-row button:focus,
 .users-controls-row .add-entry-button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #4285f4;
+    box-shadow: 0 0 0 2px rgb(71, 82, 95);
 }
 
 /* Hide tables initially */
