@@ -112,7 +112,41 @@ $student_info = $student_stmt->get_result()->fetch_assoc();
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("../includes/Aside_Nav.php"); ?>
+        <aside class="sidebar">
+            <div class="logo-container">
+                <h2>Mathology</h2>
+            </div>
+            <nav class="side-nav">
+                <a href="dashboardclient.php" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="attendanceclient.php" class="nav-item">
+                    <i class="fas fa-user-check"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="student_reschedule.php" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Student replacement</span>
+                </a>
+                <a href="student_timetable.php" class="nav-item active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>My Timetable</span>
+                </a>
+                <a href="learninghours.php" class="nav-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Learning Hours</span>
+                </a>
+                <a href="leave.php" class="nav-item">
+                    <i class="fas fa-check"></i>
+                    <span>Apply Leave</span>
+                </a>
+                <a href="payment.php" class="nav-item">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
         <main class="main-content">

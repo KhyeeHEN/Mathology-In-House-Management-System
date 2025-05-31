@@ -202,6 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
                     <i class="fas fa-calendar-alt"></i>
                     <span>Student replacement</span>
                 </a>
+                <a href="student_timetable.php" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>My Timetable</span>
+                </a>
                 <a href="learninghours.php" class="nav-item">
                     <i class="fas fa-clock"></i>
                     <span>Learning Hours</span>
