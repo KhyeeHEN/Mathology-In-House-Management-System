@@ -33,7 +33,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-.filter-buttons button {
+.filter-buttons button, .add-entry-button {
     padding: 10px 20px;
     margin-right: 10px;
     background-color: #1f2937;
@@ -44,7 +44,7 @@ h1 {
 .filter-buttons button.active {
     background-color: rgb(71, 82, 95);
 }
-.filter-buttons button:hover {
+.filter-buttons button:hover, .add-entry-button {
     background-color: rgb(71, 82, 95);
 }
 
