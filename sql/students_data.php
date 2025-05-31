@@ -107,7 +107,7 @@ if ($result->num_rows > 0) {
                 <strong>School:</strong> " . $row['School'] . "<br>
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
-                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
+                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
                 <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
             </td>
           </tr>";
