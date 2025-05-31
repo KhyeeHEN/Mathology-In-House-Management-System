@@ -166,6 +166,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="date" id="student_dob" name="DOB" required><br>
         <label for="student_school_syllabus">School Syllabus:</label>
         <input type="text" id="student_school_syllabus" name="School_Syllabus"><br>
+        <label for="student_school_intake">School Intake (Month):</label>
+        <select id="student_school_intake" name="School_Intake" required>
+            <option value="">Select Month</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+        </select><br>
         <label for="student_current_grade">Current School Grade:</label>
         <input type="text" id="student_current_grade" name="Current_School_Grade"><br>
         <label for="student_school">School:</label>
