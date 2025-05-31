@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $gender = $conn->real_escape_string($_POST['Gender']);
                 $dob = $conn->real_escape_string($_POST['DOB']);
                 $school_syllabus = $conn->real_escape_string($_POST['School_Syllabus']);
-                $school_intake = $conn->real_escape_string($_POST['School_Intake']); 
+                $school_intake = $conn->real_escape_string($_POST['School_Intake']);
                 $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
                 $school = $conn->real_escape_string($_POST['School']);
                 $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
@@ -34,10 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $day = $conn->real_escape_string($_POST['Day']);
                 $start_time = $conn->real_escape_string($_POST['Start_Time']);
                 $end_time = $conn->real_escape_string($_POST['End_Time']);
+                $how_did_you_heard_about_us = $conn->real_escape_string($_POST['How_Did_You_Heard_About_Us']);
 
                 // Insert into students table
-                $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, School_Intake, Current_School_Grade, School, Mathology_Level)
-                                       VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$school_intake', '$current_grade', '$school', '$mathology_level')";
+                $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, School_Intake, Current_School_Grade, School, Mathology_Level, How_Did_You_Heard_About_Us)
+                                       VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$school_intake', '$current_grade', '$school', '$mathology_level', '$how_did_you_heard_about_us')";
                 if (!$conn->query($insertStudentQuery)) {
                     throw new Exception("Error adding student: " . $conn->error);
                 }
@@ -218,6 +219,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="time" id="student_start_time" name="Start_Time" required><br>
         <label for="student_end_time">End Time:</label>
         <input type="time" id="student_end_time" name="End_Time" required><br><br>
+        <label for="student_how_heard">How did you hear about us?</label>
+        <input type="text" id="student_how_heard" name="How_Heard_About_Us" maxlength="100"><br>
         <button type="submit">Add Student</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
