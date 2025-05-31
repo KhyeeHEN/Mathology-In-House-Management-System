@@ -61,11 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Styles/common.css">
+    <link rel="stylesheet" href="/Styles/forms.css">
     <title>Edit Instructor</title>
 </head>
+
 <body>
     <h1>Edit Instructor</h1>
     <form method="POST">
@@ -73,25 +77,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="Last_Name" name="Last_Name" value="<?php echo $instructor['Last_Name']; ?>" required><br>
 
         <label for="First_Name">First Name:</label>
-        <input type="text" id="First_Name" name="First_Name" value="<?php echo $instructor['First_Name']; ?>" required><br>
+        <input type="text" id="First_Name" name="First_Name" value="<?php echo $instructor['First_Name']; ?>"
+            required><br>
 
         <label for="Gender">Gender:</label>
         <select id="Gender" name="Gender" required>
-            <option value="1" <?php if ($instructor['Gender']) echo 'selected'; ?>>Male</option>
-            <option value="0" <?php if (!$instructor['Gender']) echo 'selected'; ?>>Female</option>
+            <option value="1" <?php if ($instructor['Gender'])
+                echo 'selected'; ?>>Male</option>
+            <option value="0" <?php if (!$instructor['Gender'])
+                echo 'selected'; ?>>Female</option>
         </select><br>
 
         <label for="DOB">Date of Birth:</label>
         <input type="date" id="DOB" name="DOB" value="<?php echo $instructor['DOB']; ?>" required><br>
 
         <label for="Highest_Education">Highest Education:</label>
-        <input type="text" id="Highest_Education" name="Highest_Education" value="<?php echo $instructor['Highest_Education']; ?>" required><br>
+        <input type="text" id="Highest_Education" name="Highest_Education"
+            value="<?php echo $instructor['Highest_Education']; ?>" required><br>
 
         <label for="Remark">Remark:</label>
         <textarea id="Remark" name="Remark"><?php echo $instructor['Remark']; ?></textarea><br>
 
         <label for="Training_Status">Training Status:</label>
-        <input type="text" id="Training_Status" name="Training_Status" value="<?php echo $instructor['Training_Status']; ?>" required><br>
+        <input type="text" id="Training_Status" name="Training_Status"
+            value="<?php echo $instructor['Training_Status']; ?>" required><br>
 
         <label for="Email">Email:</label>
         <input type="email" id="Email" name="Email" value="<?php echo $instructor['email']; ?>" required><br>
@@ -100,4 +109,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../Pages/admin/users.php?active_tab=instructors">Cancel</a>
     </form>
 </body>
+
 </html>
