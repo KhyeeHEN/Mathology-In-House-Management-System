@@ -29,23 +29,38 @@ h1 {
 }
 
 /* Button styling */
-.filter-buttons {
-    margin-bottom: 20px;
+.user-action-btn {
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s;
+    display: inline-block;
+    margin: 0 3px;
+    outline: none;
 }
 
-.filter-buttons button, .add-entry-button {
-    padding: 10px 20px;
-    margin-right: 10px;
-    background-color: #1f2937;
-    color: white;
-    border: none;
-    cursor: pointer;
+.user-action-btn:hover,
+.user-action-btn:focus {
+    background: linear-gradient(135deg, #357ae8, #2e7d32);
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.10);
 }
-.filter-buttons button.active {
-    background-color: rgb(71, 82, 95);
+
+.user-action-btn.active,
+.user-action-btn:active {
+    background: linear-gradient(135deg, #2e7d32, #4285f4);
+    box-shadow: 0 4px 14px rgba(66, 133, 244, 0.15);
 }
-.filter-buttons button:hover, .add-entry-button {
-    background-color: rgb(71, 82, 95);
+
+@media (max-width: 600px) {
+    .user-action-btn {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
 }
 
 /* Hide tables initially */
