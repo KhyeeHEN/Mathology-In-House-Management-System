@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['related_id'] = $student['student_id'];
                     }
                 } elseif ($user['role'] === 'admin') {
-                    header("Location: /Pages/admin/dashboardAdmin.php");
+                    header("Location: /Pages/admin/dashboardAdmin2.php");
                     exit;
                 } elseif ($user['role'] === 'instructor') {
                     header("Location: /Pages/instructors/dashboardInstructors.php");
