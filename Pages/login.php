@@ -25,8 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['email'] = $user['email'];
 
                 if ($user['role'] === 'student') {
-                    header("Location: /Pages/client/dashboardclient.php");
-                    exit;
+                    // Get the student_id from users table or join with students table
+                    $stmt = $conn->prepare("SELECT student_id FROM students WHERE user_id = ?");
+                    $stmt->bind_param("i", $user['user_id']);
+                    $stmt->execute();
+                    $student_result = $stmt->get_result();
+                    
+                    if ($student_result->num_rows === 1) {
+                        $student = $student_result->fetch_assoc();
+                        $_SESSION['related_id'] = $student['student_id'];
+                    }
                 } elseif ($user['role'] === 'admin') {
                     header("Location: /Pages/admin/dashboardAdmin.php");
                     exit;
