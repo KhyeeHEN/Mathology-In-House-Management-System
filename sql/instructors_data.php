@@ -98,7 +98,7 @@ if ($result->num_rows > 0) {
 
         // Hidden detailed information row
         echo "<tr id='$detailsId' class='details-row' style='display: none;'>
-            <td colspan='6'>
+            <td colspan='6' class='details-box'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>Highest Education:</strong> " . $row['Highest_Education'] . "<br>
                 <strong>Remark:</strong> " . $row['Remark'] . "<br>
