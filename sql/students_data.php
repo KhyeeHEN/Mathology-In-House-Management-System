@@ -99,7 +99,8 @@ if ($result->num_rows > 0) {
 
         // Hidden detailed information row
         echo "<tr id='$detailsId' class='details-row' style='display: none;'>
-            <td colspan='6' class='details-box'>
+            <td colspan='6'>
+            <div class='details-box'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
                 <strong>School Intake:</strong> " . $row['School_Intake'] . "<br>
@@ -109,6 +110,7 @@ if ($result->num_rows > 0) {
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
                 <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
+            </div>
             </td>
           </tr>";
     }
