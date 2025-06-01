@@ -154,9 +154,8 @@ h1 {
     transition: background 0.2s;
     font-size: 0.95em;
 }
-.action-btn.view { background: #2ecc71; }
-.action-btn.edit { background: #f1c40f; color: #333; }
-.action-btn.delete { background: #e74c3c; }
+
+.action-btn.edit .action-btn.view .action-btn.delete { background: #1f2937; color: white; }
 .action-btn:hover { opacity: 0.85; }
 
 

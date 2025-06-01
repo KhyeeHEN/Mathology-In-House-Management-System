@@ -90,9 +90,15 @@ if ($result->num_rows > 0) {
             <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
             <td>" . $row['email'] . "</td>
             <td>
-                <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
-                <a href='../../sql/edit_instructor.php?instructor_id={$row['instructor_id']}'>Edit</a>
-                <a href='../../sql/delete_instructor.php?instructor_id={$row['instructor_id']}' onclick=\"return confirm('Are you sure you want to delete this instructor?');\">Delete</a>
+                <button class='action-btn view' onclick=\"toggleDetails('$detailsId')\">View Details</button>
+                <form method='get' action='../../sql/edit_student.php' style='display:inline; margin:0; padding:0;'>
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn edit'>Edit</button>
+                </form>
+                <form method='get' action='../../sql/delete_student.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn delete'>Delete</button>
+                </form>
             </td>
           </tr>";
 
