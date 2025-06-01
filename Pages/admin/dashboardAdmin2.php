@@ -504,7 +504,7 @@ foreach ($classes as $class) {
                 </div>
             `;
         }
-        
+
         class ScheduleCalendar {
             constructor() {
                 this.currentWeek = new Date();
@@ -802,6 +802,7 @@ foreach ($classes as $class) {
     
     <script type="module" src="/Scripts/dashboard.js"></script>
     <script type="module" src="/Scripts/common.js"></script>
+    <script type="module" src="/Scripts/dashboardAdmin2.js"></script>
     <script>
         // Override default event display for admin
         document.addEventListener('DOMContentLoaded', () => {
