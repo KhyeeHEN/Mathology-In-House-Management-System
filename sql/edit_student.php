@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = $conn->real_escape_string($_POST['Gender']);
     $dob = $conn->real_escape_string($_POST['DOB']);
     $school_syllabus = $conn->real_escape_string($_POST['School_Syllabus']);
+    $school_intake = $conn->real_escape_string($_POST['School_Intake']);
+    $how_heard = $conn->real_escape_string($_POST['How_Heard_About_Us']);
     $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
     $school = $conn->real_escape_string($_POST['School']);
     $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
@@ -38,9 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Gender = '$gender', 
             DOB = '$dob', 
             School_Syllabus = '$school_syllabus', 
+            School_Intake = '$school_intake', 
+            How_Heard_About_Us = '$how_heard',
             Current_School_Grade = '$current_grade', 
             School = '$school', 
-            Mathology_Level = '$mathology_level' 
+            Mathology_Level = '$mathology_level'
         WHERE student_id = $student_id
     ";
 
@@ -61,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,10 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Edit Student</h1>
     <form method="POST">
         <label for="Last_Name">Last Name:</label>
-        <input type="text" id="Last_Name" name="Last_Name" value="<?php echo $student['Last_Name']; ?>" required><br>
+        <input type="text" id="Last_Name" name="Last_Name" value="<?php echo htmlspecialchars($student['Last_Name']); ?>" required><br>
 
         <label for="First_Name">First Name:</label>
-        <input type="text" id="First_Name" name="First_Name" value="<?php echo $student['First_Name']; ?>" required><br>
+        <input type="text" id="First_Name" name="First_Name" value="<?php echo htmlspecialchars($student['First_Name']); ?>" required><br>
 
         <label for="Gender">Gender:</label>
         <select id="Gender" name="Gender" required>
@@ -87,22 +90,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
 
         <label for="DOB">Date of Birth:</label>
-        <input type="date" id="DOB" name="DOB" value="<?php echo $student['DOB']; ?>" required><br>
+        <input type="date" id="DOB" name="DOB" value="<?php echo htmlspecialchars($student['DOB']); ?>" required><br>
 
         <label for="School_Syllabus">School Syllabus:</label>
-        <input type="text" id="School_Syllabus" name="School_Syllabus" value="<?php echo $student['School_Syllabus']; ?>" required><br>
+        <input type="text" id="School_Syllabus" name="School_Syllabus" value="<?php echo htmlspecialchars($student['School_Syllabus']); ?>" required><br>
+
+        <!-- New: School Intake (Month) -->
+        <label for="School_Intake">School Intake (Month):</label>
+        <select id="School_Intake" name="School_Intake" required>
+            <option value="">Select Month</option>
+            <?php
+            $months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            foreach ($months as $month) {
+                $selected = ($student['School_Intake'] === $month) ? 'selected' : '';
+                echo "<option value=\"$month\" $selected>$month</option>";
+            }
+            ?>
+        </select><br>
+
 
         <label for="Current_School_Grade">Current School Grade:</label>
-        <input type="text" id="Current_School_Grade" name="Current_School_Grade" value="<?php echo $student['Current_School_Grade']; ?>" required><br>
+        <input type="text" id="Current_School_Grade" name="Current_School_Grade" value="<?php echo htmlspecialchars($student['Current_School_Grade']); ?>" required><br>
 
         <label for="School">School:</label>
-        <input type="text" id="School" name="School" value="<?php echo $student['School']; ?>" required><br>
+        <input type="text" id="School" name="School" value="<?php echo htmlspecialchars($student['School']); ?>" required><br>
 
         <label for="Mathology_Level">Mathology Level:</label>
-        <input type="text" id="Mathology_Level" name="Mathology_Level" value="<?php echo $student['Mathology_Level']; ?>" required><br>
+        <input type="text" id="Mathology_Level" name="Mathology_Level" value="<?php echo htmlspecialchars($student['Mathology_Level']); ?>" required><br>
 
         <label for="Email">Email:</label>
-        <input type="email" id="Email" name="Email" value="<?php echo $student['email']; ?>" required><br>
+        <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($student['email']); ?>" required><br>
 
         <button type="submit">Update</button>
         <a href="../Pages/admin/users.php?active_tab=students">Cancel</a>
