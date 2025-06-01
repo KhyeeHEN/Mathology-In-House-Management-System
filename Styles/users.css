@@ -30,7 +30,7 @@ h1 {
 
 /* Button styling */
 .users-controls-row button,
-.users-controls-row .add-entry-button {
+.users-controls-row .add-entry-button button {
     background: #1f2937;
     color: #fff;
     border: none;
@@ -44,12 +44,12 @@ h1 {
 }
 
 .users-controls-row button:hover,
-.users-controls-row .add-entry-button:hover {
+.users-controls-row .add-entry-button:hover button:hover {
     background: #374151;
     box-shadow: 0 2px 8px rgba(31, 41, 55, 0.12);
 }
 
-.users-controls-row button.active {
+.users-controls-row button.active{
     background: rgb(71, 82, 95);
     color: #fff;
 }
@@ -185,18 +185,3 @@ h1 {
     border-color: #1f2937;
     cursor: default;
 }
-
-/* Hover Effect for Add Entry Button */
-.add-entry-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    border-color: #0056b3; /* Match border color */
-    color: #FFFFFF; /* Keep text white */
-}
-
-/* Active State for Button */
-.add-entry-button:active {
-    background-color: #003f7f;
-    border-color: #003f7f;
-    color: #FFFFFF;
-}
-
