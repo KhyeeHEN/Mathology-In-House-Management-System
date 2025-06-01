@@ -105,7 +105,7 @@ foreach ($classes as $class) {
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <!-- Staff Duty Roster Section -->
+            <!-- Calendar Section -->
             <div class="staff-duty-roster">
                 <h2 class="section-title">Current Classes Roster</h2>
                 
