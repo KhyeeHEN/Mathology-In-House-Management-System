@@ -150,11 +150,19 @@ class ScheduleCalendar {
             `;
             dayColumn.appendChild(dayHeader);
 
+            // Create container for time slots
+            const timeGridContainer = document.createElement('div');
+            timeGridContainer.className = 'time-grid-container';
+
             // Time slots for this day
             this.timeSlots.forEach((time, timeIndex) => {
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'time-grid-slot';
                 timeSlot.setAttribute('data-time', time);
+                
+                // Create container for class blocks
+                const classBlockContainer = document.createElement('div');
+                classBlockContainer.className = 'class-block-container';
                 
                 // Find classes for this day and time
                 const dayClasses = this.getClassesForDayAndTime(day, time, currentDate);
@@ -162,15 +170,17 @@ class ScheduleCalendar {
                 if (dayClasses.length > 0) {
                     dayClasses.forEach(classInfo => {
                         const classBlock = this.createClassBlock(classInfo, currentDate);
-                        timeSlot.appendChild(classBlock);
+                        classBlockContainer.appendChild(classBlock);
                     });
                 } else if (timeIndex % 2 === 0) { // Show placeholder every hour
-                    timeSlot.innerHTML = '<div class="empty-slot"></div>';
+                    classBlockContainer.innerHTML = '<div class="empty-slot"></div>';
                 }
-
-                dayColumn.appendChild(timeSlot);
+                
+                timeSlot.appendChild(classBlockContainer);
+                timeGridContainer.appendChild(timeSlot);
             });
 
+            dayColumn.appendChild(timeGridContainer);
             grid.appendChild(dayColumn);
         });
     }
@@ -218,17 +228,26 @@ class ScheduleCalendar {
             durationMinutes = hours * 60 + minutes;
         }
         
-        const height = Math.max(50, (durationMinutes / 30) * 60 - 8);
-        block.style.height = `${height}px`;
+        // Calculate how many time slots this class spans
+        const slotCount = Math.ceil(durationMinutes / 30);
+        const height = `${(slotCount * 100)}%`;
+        const top = '0%';
+        
+        block.style.height = height;
+        block.style.top = top;
         
         // Extract course name and instructor
         const [courseName, instructor] = classInfo.title.split(' - ');
         
         block.innerHTML = `
-            <div class="class-title">${courseName}</div>
-            <div class="class-instructor">${instructor || 'Unknown Instructor'}</div>
-            <div class="class-time">${classInfo.time}</div>
-            <div class="class-students-count">${this.getStudentCount(classInfo.students)} students</div>
+            <div>
+                <div class="class-title">${courseName}</div>
+                <div class="class-instructor">${instructor || 'Unknown Instructor'}</div>
+            </div>
+            <div>
+                <div class="class-time">${classInfo.time}</div>
+                <div class="class-students-count">${this.getStudentCount(classInfo.students)} students</div>
+            </div>
         `;
 
         // Add click event for detailed view
