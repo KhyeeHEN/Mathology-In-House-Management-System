@@ -87,7 +87,7 @@ foreach ($classes as $class) {
     <title>Admin Dashboard</title> 
     <link rel="stylesheet" href="/Styles/dashboard.css">
     <link rel="stylesheet" href="/Styles/common.css">
-    <link rel="stylesheet" href="/Styles/dashboardAdmin.css">
+    <link rel="stylesheet" href="/Styles/dashboardAdmin2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .event-details {
@@ -105,7 +105,97 @@ foreach ($classes as $class) {
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            
+            <!-- Staff Duty Roster Section -->
+            <div class="staff-duty-roster">
+                <h2 class="section-title">Current Classes Roster</h2>
+                
+                <div class="roster-controls">
+                    <div class="current-time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentDateTime"><?php echo date('l, F j, Y - g:i A'); ?></span>
+                    </div>
+                    <div class="view-toggle">
+                        <button id="dayView" class="toggle-btn active">Day View</button>
+                        <button id="weekView" class="toggle-btn">Week View</button>
+                    </div>
+                </div>
+                
+                <div class="roster-container">
+                    <!-- Current Day Classes -->
+                    <div class="current-day-roster">
+                        <h3>Today's Classes (<?php echo date('l'); ?>)</h3>
+                        
+                        <?php
+                        $currentDay = date('l');
+                        $currentTime = date('H:i:s');
+                        $todayClasses = [];
+                        
+                        foreach ($classes as $class) {
+                            if ($class['day'] === $currentDay) {
+                                $startTime = $class['start_time'];
+                                $endTime = $class['end_time'];
+                                
+                                // Check if current time is within class time
+                                $isCurrent = ($currentTime >= $startTime && $currentTime <= $endTime);
+                                
+                                $todayClasses[] = [
+                                    'class' => $class,
+                                    'is_current' => $isCurrent
+                                ];
+                            }
+                        }
+                        
+                        if (empty($todayClasses)) {
+                            echo '<div class="no-classes">No classes scheduled for today.</div>';
+                        } else {
+                            echo '<div class="class-cards-container">';
+                            foreach ($todayClasses as $item) {
+                                $class = $item['class'];
+                                $isCurrent = $item['is_current'];
+                                $duration = calculateDuration($class['start_time'], $class['end_time']);
+                                
+                                echo '<div class="class-card ' . ($isCurrent ? 'current-class' : '') . '">';
+                                echo '<div class="class-header">';
+                                echo '<span class="class-time">' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . '</span>';
+                                echo '<span class="class-duration">' . $duration . '</span>';
+                                if ($isCurrent) {
+                                    echo '<span class="current-badge">Now</span>';
+                                }
+                                echo '</div>';
+                                echo '<h4 class="class-title">' . $class['course_name'] . '</h4>';
+                                echo '<div class="class-instructor"><i class="fas fa-chalkboard-teacher"></i> ' . $class['instructor'] . '</div>';
+                                echo '<div class="class-students"><i class="fas fa-users"></i> ' . (count(explode(',', $class['students'])) > 3 ? substr($class['students'], 0, 30) . '...' : $class['students']) . '</div>';
+                                
+                                // Expanded details (hidden by default)
+                                echo '<div class="class-details">';
+                                echo '<div class="detail-row"><strong>Course:</strong> ' . $class['course_name'] . '</div>';
+                                echo '<div class="detail-row"><strong>Instructor:</strong> ' . $class['instructor'] . '</div>';
+                                echo '<div class="detail-row"><strong>Time:</strong> ' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . ' (' . $duration . ')</div>';
+                                echo '<div class="detail-row"><strong>Students:</strong> ' . $class['students'] . '</div>';
+                                echo '</div>';
+                                
+                                echo '<button class="toggle-details-btn">Show Details <i class="fas fa-chevron-down"></i></button>';
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                        }
+                        ?>
+                    </div>
+                    
+                    <!-- Week View (hidden by default) -->
+                    <div class="week-view-roster" style="display: none;">
+                        <div class="schedule-grid" id="scheduleGrid"></div>
+                        <div class="week-navigation">
+                            <button id="prevWeek"><i class="fas fa-chevron-left"></i> Previous Week</button>
+                            <span id="currentWeek"></span>
+                            <button id="nextWeek">Next Week <i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tooltip for class details -->
+                <div id="classTooltip" class="class-tooltip"></div>
+            </div>
 
             <!-- Additional Admin Summary Section -->
             <div class="admin-summary">
