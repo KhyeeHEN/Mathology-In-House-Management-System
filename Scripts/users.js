@@ -59,15 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reset button functionality
     const resetButton = document.getElementById('reset-button');
-    const searchInput = document.getElementById('search-input');
-    const searchForm = document.getElementById('search-form');
-
+    // Remove previous reset listener if any, for clarity
     resetButton.addEventListener('click', () => {
-        searchInput.value = ''; // Clear the search input
-        document.getElementById('students_page').value = '1'; // Reset to page 1
-        document.getElementById('instructors_page').value = '1'; // Reset to page 1
-        document.getElementById('admins_page').value = '1'; // Reset to page 1
-        searchForm.submit(); // Submit the form immediately
+        // Instead of submitting the form with empty search, reload page without query params
+        window.location = 'users.php';
     });
 
     // Ensure pagination parameters reset to 1 on search

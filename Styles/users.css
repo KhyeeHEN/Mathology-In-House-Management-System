@@ -29,23 +29,35 @@ h1 {
 }
 
 /* Button styling */
-.filter-buttons {
-    margin-bottom: 20px;
+.users-controls-row button,
+.users-controls-row .add-entry-button {
+    background: #1f2937;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin: 0 3px;
+    font-weight: 500;
 }
 
-.filter-buttons button {
-    padding: 10px 20px;
-    margin-right: 10px;
-    background-color: #1f2937;
-    color: white;
-    border: none;
-    cursor: pointer;
+.users-controls-row button:hover,
+.users-controls-row .add-entry-button:hover {
+    background: #374151;
+    box-shadow: 0 2px 8px rgba(31, 41, 55, 0.12);
 }
-.filter-buttons button.active {
-    background-color: rgb(71, 82, 95);
+
+.users-controls-row button.active {
+    background: rgb(71, 82, 95);
+    color: #fff;
 }
-.filter-buttons button:hover {
-    background-color: rgb(71, 82, 95);
+
+.users-controls-row button:focus,
+.users-controls-row .add-entry-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(71, 82, 95);
 }
 
 /* Hide tables initially */

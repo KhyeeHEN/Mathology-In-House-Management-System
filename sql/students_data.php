@@ -35,6 +35,7 @@ $sql = "
         s.Current_School_Grade, 
         s.School, 
         s.Mathology_Level, 
+        s.How_Did_You_Heard_About_Us,
         u.email, 
         c.course_name,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
@@ -101,12 +102,13 @@ if ($result->num_rows > 0) {
             <td colspan='6'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
-                <strong>School Intake:</strong> " . ($row['School_Intake'] ? 'Yes' : 'No') . "<br>
+                <strong>School Intake:</strong> " . $row['School_Intake'] . "<br>
                 <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
                 <strong>School:</strong> " . $row['School'] . "<br>
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
-                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
+                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
+                <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
             </td>
           </tr>";
     }

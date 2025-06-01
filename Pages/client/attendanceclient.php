@@ -38,8 +38,8 @@ $result = $stmt->get_result();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>My Attendance</title>
-    <link rel="stylesheet" href="../../Styles/common.css" />
-    <link rel="stylesheet" href="../../Styles/attendance.css" />
+    <link rel="stylesheet" href="/Styles/common.css" />
+    <link rel="stylesheet" href="/Styles/attendance.css" />
     <script>
         function searchTable() {
             const input = document.getElementById("searchInput");
@@ -106,6 +106,6 @@ $result = $stmt->get_result();
     </main>
 </div>
 
-<script type="module" src="../../Scripts/common.js"></script>
+<script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>

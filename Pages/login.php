@@ -25,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['email'] = $user['email'];
 
                 if ($user['role'] === 'student') {
-                    header("Location: Pages/client/dashboardclient.php");
+                    header("Location: /Pages/client/dashboardclient.php");
                     exit;
                 } elseif ($user['role'] === 'admin') {
-                    header("Location: Pages/admin/dashboardAdmin.php");
+                    header("Location: /Pages/admin/dashboardAdmin.php");
                     exit;
                 } elseif ($user['role'] === 'instructor') {
-                    header("Location: Pages/instructors/dashboardInstructors.php");
+                    header("Location: /Pages/instructors/dashboardInstructors.php");
                     exit;
                 } else {
                     $error = 'Unauthorized role.';
