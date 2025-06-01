@@ -1,4 +1,4 @@
-// Enhanced Schedule Calendar for Dashboard with Full Features
+// Enhanced Schedule Calendar for Dashboard with Overlap Fix
 class ScheduleCalendar {
     constructor() {
         this.currentWeek = new Date();
@@ -195,6 +195,10 @@ class ScheduleCalendar {
             const timeGridContainer = document.createElement('div');
             timeGridContainer.className = 'time-grid-container';
 
+            // Get all classes for this day and organize them
+            const dayClasses = this.getClassesForDay(currentDate);
+            const organizedClasses = this.organizeOverlappingClasses(dayClasses);
+
             // Time slots for this day
             this.timeSlots.forEach((time, timeIndex) => {
                 const timeSlot = document.createElement('div');
@@ -205,13 +209,15 @@ class ScheduleCalendar {
                 const classBlockContainer = document.createElement('div');
                 classBlockContainer.className = 'class-block-container';
                 
-                // Find classes for this day and time
-                const dayClasses = this.getClassesForDayAndTime(day, time, currentDate);
+                // Find classes for this specific time slot
+                const slotClasses = this.getClassesForTimeSlot(organizedClasses, time);
                 
-                if (dayClasses.length > 0) {
-                    dayClasses.forEach(classInfo => {
-                        const classBlock = this.createClassBlock(classInfo, currentDate);
-                        classBlockContainer.appendChild(classBlock);
+                if (slotClasses.length > 0) {
+                    slotClasses.forEach((classGroup, groupIndex) => {
+                        classGroup.forEach((classInfo, classIndex) => {
+                            const classBlock = this.createClassBlock(classInfo, currentDate, classGroup.length, classIndex);
+                            classBlockContainer.appendChild(classBlock);
+                        });
                     });
                 } else if (timeIndex % 2 === 0) { // Show placeholder every hour
                     classBlockContainer.innerHTML = '<div class="empty-slot"></div>';
@@ -226,21 +232,19 @@ class ScheduleCalendar {
         });
     }
 
-    getClassesForDayAndTime(dayName, time, date) {
+    getClassesForDay(date) {
         return this.classes.filter(classInfo => {
-            // Convert the class date to check if it matches current week's date for this day
             const classDate = new Date(classInfo.date);
-            const isSameDate = classDate.toDateString() === date.toDateString();
-            
-            if (!isSameDate) return false;
-            
-            // Parse time from class info (assuming format "HH:MM AM/PM")
-            const classTime = this.parseTime12Hour(classInfo.time);
-            const slotTime = this.timeToMinutes(time);
-            
-            // Get duration in minutes
+            return classDate.toDateString() === date.toDateString();
+        });
+    }
+
+    organizeOverlappingClasses(dayClasses) {
+        // Sort classes by start time
+        const sortedClasses = dayClasses.map(classInfo => {
+            const startTime = this.parseTime12Hour(classInfo.time);
             const durationMatch = classInfo.duration.match(/(\d+)\s*hours?\s*(\d*)\s*minutes?/i);
-            let durationMinutes = 60; // Default 1 hour
+            let durationMinutes = 60;
             
             if (durationMatch) {
                 const hours = parseInt(durationMatch[1]) || 0;
@@ -248,46 +252,104 @@ class ScheduleCalendar {
                 durationMinutes = hours * 60 + minutes;
             }
             
-            const classEnd = classTime + durationMinutes;
+            return {
+                ...classInfo,
+                startTime,
+                endTime: startTime + durationMinutes,
+                duration: durationMinutes
+            };
+        }).sort((a, b) => a.startTime - b.startTime);
+
+        // Group overlapping classes
+        const groups = [];
+        
+        sortedClasses.forEach(classInfo => {
+            let placed = false;
             
-            return slotTime >= classTime && slotTime < classEnd;
+            // Try to place in existing group
+            for (let group of groups) {
+                let canPlace = true;
+                
+                // Check if this class overlaps with any class in the group
+                for (let existingClass of group) {
+                    if (this.doClassesOverlap(classInfo, existingClass)) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+                
+                if (canPlace) {
+                    group.push(classInfo);
+                    placed = true;
+                    break;
+                }
+            }
+            
+            // If not placed, create new group
+            if (!placed) {
+                groups.push([classInfo]);
+            }
         });
+
+        return groups;
     }
 
-    createClassBlock(classInfo, date) {
+    doClassesOverlap(class1, class2) {
+        return class1.startTime < class2.endTime && class2.startTime < class1.endTime;
+    }
+
+    getClassesForTimeSlot(organizedClasses, timeSlot) {
+        const slotTime = this.timeToMinutes(timeSlot);
+        const slotClasses = [];
+
+        organizedClasses.forEach(group => {
+            const groupClassesInSlot = group.filter(classInfo => {
+                return slotTime >= classInfo.startTime && slotTime < classInfo.endTime;
+            });
+            
+            if (groupClassesInSlot.length > 0) {
+                slotClasses.push(groupClassesInSlot);
+            }
+        });
+
+        return slotClasses;
+    }
+
+    createClassBlock(classInfo, date, totalInGroup, indexInGroup) {
         const block = document.createElement('div');
         const courseType = this.getCourseType(classInfo.title);
         block.className = `class-block ${courseType}`;
         
-        // Calculate height based on duration
-        const durationMatch = classInfo.duration.match(/(\d+)\s*hours?\s*(\d*)\s*minutes?/i);
-        let durationMinutes = 60; // Default 1 hour
+        // Calculate position and size based on group
+        const width = totalInGroup > 1 ? `${100 / totalInGroup}%` : '100%';
+        const left = totalInGroup > 1 ? `${(indexInGroup * 100) / totalInGroup}%` : '0%';
         
-        if (durationMatch) {
-            const hours = parseInt(durationMatch[1]) || 0;
-            const minutes = parseInt(durationMatch[2]) || 0;
-            durationMinutes = hours * 60 + minutes;
-        }
+        // Calculate height based on duration (limited to current time slot)
+        const slotHeight = 60; // Height of one time slot in pixels
+        const durationMinutes = classInfo.duration || 60;
+        const slotCount = Math.min(Math.ceil(durationMinutes / 30), 4); // Max 4 slots (2 hours)
+        const height = `${Math.min(slotCount * 100, 100)}%`; // Don't exceed 100% of slot
         
-        // Calculate how many time slots this class spans
-        const slotCount = Math.ceil(durationMinutes / 30);
-        const height = `${(slotCount * 100)}%`;
-        const top = '0%';
-        
+        block.style.width = width;
+        block.style.left = left;
         block.style.height = height;
-        block.style.top = top;
+        block.style.top = '0%';
+        block.style.position = 'absolute';
         
         // Extract course name and instructor
         const [courseName, instructor] = classInfo.title.split(' - ');
         
+        // Adjust content based on available space
+        const isNarrow = totalInGroup > 2;
+        
         block.innerHTML = `
             <div>
-                <div class="class-title">${courseName}</div>
-                <div class="class-instructor">${instructor || 'Unknown Instructor'}</div>
+                <div class="class-title" style="font-size: ${isNarrow ? '11px' : '13px'}">${courseName}</div>
+                ${!isNarrow ? `<div class="class-instructor">${instructor || 'Unknown Instructor'}</div>` : ''}
             </div>
             <div>
-                <div class="class-time">${classInfo.time}</div>
-                <div class="class-students-count">${this.getStudentCount(classInfo.students)} students</div>
+                <div class="class-time" style="font-size: ${isNarrow ? '9px' : '10px'}">${classInfo.time}</div>
+                ${!isNarrow ? `<div class="class-students-count">${this.getStudentCount(classInfo.students)} students</div>` : ''}
             </div>
         `;
 
@@ -694,16 +756,18 @@ class ScheduleCalendar {
         if (!time12) return 0;
         
         const [time, ampm] = time12.split(' ');
-        const [hours, minutes] = time.split(':').map(Number);
-        let hours24 = hours;
+        if (!time || !ampm) return 0;
         
-        if (ampm === 'PM' && hours !== 12) {
-            hours24 += 12;
-        } else if (ampm === 'AM' && hours === 12) {
-            hours24 = 0;
+        const [hours, minutes] = time.split(':').map(n => parseInt(n) || 0);
+        let hour24 = hours;
+        
+        if (ampm.toLowerCase() === 'pm' && hours !== 12) {
+            hour24 += 12;
+        } else if (ampm.toLowerCase() === 'am' && hours === 12) {
+            hour24 = 0;
         }
         
-        return hours24 * 60 + minutes;
+        return hour24 * 60 + minutes;
     }
 
     timeToMinutes(time) {
