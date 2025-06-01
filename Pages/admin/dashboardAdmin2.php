@@ -105,36 +105,7 @@ foreach ($classes as $class) {
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <!-- Calendar Section -->
-            <div class="schedule-container" style="width: calc(100% - 40px); margin: 20px;">
-                <div class="schedule-header">
-                    <div class="schedule-title">
-                        <h1><i class="fas fa-calendar-week"></i> Class Schedule</h1>
-                        <div class="schedule-subtitle">Weekly timetable view</div>
-                    </div>
-                    <div class="schedule-controls">
-                        <div class="week-nav">
-                            <button class="nav-btn" id="prevWeek">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div class="current-week" id="currentWeek">
-                                Dec 1 - Dec 7, 2024
-                            </div>
-                            <button class="nav-btn" id="nextWeek">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                        <div class="view-toggle">
-                            <button class="toggle-btn active" id="weekView">Week</button>
-                            <button class="toggle-btn" id="monthView">Month</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="schedule-grid" id="scheduleGrid">
-                    <!-- Grid will be populated by JavaScript -->
-                </div>
-            </div>
+            
 
             <!-- Additional Admin Summary Section -->
             <div class="admin-summary">
