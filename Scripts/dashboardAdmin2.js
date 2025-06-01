@@ -1,4 +1,4 @@
-// Enhanced Schedule Calendar for Dashboard
+// Enhanced Schedule Calendar for Dashboard with Full Features
 class ScheduleCalendar {
     constructor() {
         this.currentWeek = new Date();
@@ -6,6 +6,8 @@ class ScheduleCalendar {
         this.classes = calendarEvents || []; // Use the PHP data
         this.currentTooltip = null;
         this.viewMode = 'week'; // 'week' or 'month'
+        this.currentMonth = this.currentWeek.getMonth();
+        this.currentYear = this.currentWeek.getFullYear();
         
         console.log('Schedule Calendar initialized with classes:', this.classes);
         this.init();
@@ -13,10 +15,10 @@ class ScheduleCalendar {
 
     generateTimeSlots() {
         const slots = [];
-        // Generate time slots from 8 AM to 6 PM in 30-minute intervals
-        for (let hour = 8; hour <= 18; hour++) {
+        // Generate time slots from 8 AM to 8 PM in 30-minute intervals
+        for (let hour = 8; hour <= 20; hour++) {
             slots.push(`${hour.toString().padStart(2, '0')}:00`);
-            if (hour < 18) {
+            if (hour < 20) {
                 slots.push(`${hour.toString().padStart(2, '0')}:30`);
             }
         }
@@ -35,39 +37,70 @@ class ScheduleCalendar {
 
     setupEventListeners() {
         // Week navigation
-        document.getElementById('prevWeek').addEventListener('click', () => {
-            this.currentWeek.setDate(this.currentWeek.getDate() - 7);
+        document.getElementById('prevWeek')?.addEventListener('click', () => {
+            if (this.viewMode === 'week') {
+                this.currentWeek.setDate(this.currentWeek.getDate() - 7);
+            } else {
+                this.navigateMonth(-1);
+            }
             this.updateCurrentWeekDisplay();
             this.renderSchedule();
         });
 
-        document.getElementById('nextWeek').addEventListener('click', () => {
-            this.currentWeek.setDate(this.currentWeek.getDate() + 7);
+        document.getElementById('nextWeek')?.addEventListener('click', () => {
+            if (this.viewMode === 'week') {
+                this.currentWeek.setDate(this.currentWeek.getDate() + 7);
+            } else {
+                this.navigateMonth(1);
+            }
             this.updateCurrentWeekDisplay();
             this.renderSchedule();
         });
 
         // View toggle
-        document.getElementById('weekView').addEventListener('click', (e) => {
+        document.getElementById('weekView')?.addEventListener('click', (e) => {
             this.switchView('week', e.target);
         });
 
-        document.getElementById('monthView').addEventListener('click', (e) => {
+        document.getElementById('monthView')?.addEventListener('click', (e) => {
             this.switchView('month', e.target);
         });
 
         // Click outside to close tooltip
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.class-block') && !e.target.closest('.class-tooltip')) {
+            if (!e.target.closest('.class-block') && !e.target.closest('.class-tooltip') && !e.target.closest('.class-modal')) {
                 this.hideTooltip();
+                this.closeAllModals();
             }
         });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAllModals();
+            }
+        });
+    }
+
+    navigateMonth(months) {
+        this.currentMonth += months;
+        
+        // Handle year transition
+        if (this.currentMonth < 0) {
+            this.currentMonth = 11;
+            this.currentYear--;
+        } else if (this.currentMonth > 11) {
+            this.currentMonth = 0;
+            this.currentYear++;
+        }
+        
+        this.currentWeek = new Date(this.currentYear, this.currentMonth, 1);
     }
 
     switchView(mode, button) {
         this.viewMode = mode;
         document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+        button?.classList.add('active');
         
         if (mode === 'week') {
             this.renderSchedule();
@@ -77,22 +110,30 @@ class ScheduleCalendar {
     }
 
     updateCurrentWeekDisplay() {
-        const startOfWeek = new Date(this.currentWeek);
-        startOfWeek.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
-        
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        if (this.viewMode === 'week') {
+            const startOfWeek = new Date(this.currentWeek);
+            startOfWeek.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        const options = { month: 'short', day: 'numeric' };
-        const startStr = startOfWeek.toLocaleDateString('en-US', options);
-        const endStr = endOfWeek.toLocaleDateString('en-US', options);
-        const year = startOfWeek.getFullYear();
+            const options = { month: 'short', day: 'numeric' };
+            const startStr = startOfWeek.toLocaleDateString('en-US', options);
+            const endStr = endOfWeek.toLocaleDateString('en-US', options);
+            const year = startOfWeek.getFullYear();
 
-        document.getElementById('currentWeek').textContent = `${startStr} - ${endStr}, ${year}`;
+            document.getElementById('currentWeek').textContent = `${startStr} - ${endStr}, ${year}`;
+        } else {
+            const monthName = this.currentWeek.toLocaleDateString('en-US', { month: 'long' });
+            const year = this.currentWeek.getFullYear();
+            document.getElementById('currentWeek').textContent = `${monthName} ${year}`;
+        }
     }
 
     renderSchedule() {
         const grid = document.getElementById('scheduleGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '';
         grid.className = 'schedule-grid'; // Reset to weekly grid
 
@@ -264,6 +305,8 @@ class ScheduleCalendar {
     }
 
     getCourseType(title) {
+        if (!title) return 'general';
+        
         const course = title.toLowerCase();
         if (course.includes('math')) return 'math';
         if (course.includes('science') || course.includes('physics') || course.includes('chemistry') || course.includes('biology')) return 'science';
@@ -276,7 +319,7 @@ class ScheduleCalendar {
 
     getStudentCount(studentsString) {
         if (!studentsString) return 0;
-        return studentsString.split(',').length;
+        return studentsString.split(',').filter(s => s.trim() !== '').length;
     }
 
     showClassDetails(event, classInfo, date) {
@@ -290,7 +333,7 @@ class ScheduleCalendar {
         
         // Close modal on outside click
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            if (e.target === modal || e.target.closest('.close-modal')) {
                 this.closeModal(modal);
             }
         });
@@ -301,7 +344,7 @@ class ScheduleCalendar {
         modal.className = 'class-modal';
         
         const [courseName, instructor] = classInfo.title.split(' - ');
-        const students = classInfo.students ? classInfo.students.split(', ') : [];
+        const students = classInfo.students ? classInfo.students.split(',').map(s => s.trim()).filter(s => s !== '') : [];
         
         modal.innerHTML = `
             <div class="modal-content">
@@ -339,10 +382,20 @@ class ScheduleCalendar {
                                 <span>${students.length} enrolled</span>
                             </div>
                         </div>
+                        ${classInfo.location ? `
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <label>Location</label>
+                                <span>${classInfo.location}</span>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     
                     <div class="students-section">
                         <h3><i class="fas fa-user-graduate"></i> Enrolled Students</h3>
+                        ${students.length > 0 ? `
                         <div class="students-list">
                             ${students.map(student => `
                                 <div class="student-card">
@@ -350,21 +403,22 @@ class ScheduleCalendar {
                                         <i class="fas fa-user"></i>
                                     </div>
                                     <div class="student-info">
-                                        <span class="student-name">${student.trim()}</span>
+                                        <span class="student-name">${student}</span>
                                     </div>
                                     <div class="student-actions">
-                                        <button class="btn-sm" onclick="viewStudentDetails('${student.trim()}')">
+                                        <button class="btn-sm" onclick="viewStudentDetails('${student}')">
                                             <i class="fas fa-eye"></i> View
                                         </button>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
+                        ` : '<p class="no-students">No students enrolled in this class</p>'}
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-secondary" onclick="this.closest('.class-modal').remove()">Close</button>
-                    <button class="btn-primary" onclick="editClass('${classInfo.title}')">
+                    <button class="btn-primary" onclick="editClass('${encodeURIComponent(classInfo.title)}', '${classInfo.date}')">
                         <i class="fas fa-edit"></i> Edit Class
                     </button>
                 </div>
@@ -382,6 +436,12 @@ class ScheduleCalendar {
     closeModal(modal) {
         modal.classList.add('closing');
         setTimeout(() => modal.remove(), 300);
+    }
+
+    closeAllModals() {
+        document.querySelectorAll('.class-modal').forEach(modal => {
+            this.closeModal(modal);
+        });
     }
 
     showQuickTooltip(event, classInfo) {
@@ -441,8 +501,9 @@ class ScheduleCalendar {
     }
 
     renderMonthView() {
-        // Implementation for month view (similar to original calendar)
         const grid = document.getElementById('scheduleGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '';
         grid.className = 'calendar-month-grid';
         
@@ -468,23 +529,23 @@ class ScheduleCalendar {
         const daysContainer = document.createElement('div');
         daysContainer.className = 'calendar-days';
         
-        const currentMonth = this.currentWeek.getMonth();
-        const currentYear = this.currentWeek.getFullYear();
-        const firstDay = new Date(currentYear, currentMonth, 1);
-        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
         const startingDay = firstDay.getDay();
         const totalDays = lastDay.getDate();
 
         // Previous month's days
+        const prevMonthLastDay = new Date(this.currentYear, this.currentMonth, 0).getDate();
         for (let i = 0; i < startingDay; i++) {
             const dayElement = document.createElement('div');
             dayElement.className = 'calendar-day prev-month';
+            dayElement.textContent = prevMonthLastDay - startingDay + i + 1;
             daysContainer.appendChild(dayElement);
         }
 
         // Current month's days
         for (let day = 1; day <= totalDays; day++) {
-            const date = new Date(currentYear, currentMonth, day);
+            const date = new Date(this.currentYear, this.currentMonth, day);
             const dateString = date.toISOString().split('T')[0];
             const dayElement = document.createElement('div');
             dayElement.className = 'calendar-day';
@@ -496,7 +557,10 @@ class ScheduleCalendar {
             dayElement.innerHTML = `<div class="day-number">${day}</div>`;
             
             // Find events for this day
-            const dayEvents = this.classes.filter(event => event.date === dateString);
+            const dayEvents = this.classes.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.toISOString().split('T')[0] === dateString;
+            });
             
             if (dayEvents.length > 0) {
                 const eventIndicator = document.createElement('div');
@@ -516,12 +580,20 @@ class ScheduleCalendar {
             daysContainer.appendChild(dayElement);
         }
         
+        // Next month's days (to fill the grid)
+        const daysNeeded = 42 - (startingDay + totalDays); // 6 rows x 7 days
+        for (let i = 1; i <= daysNeeded; i++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day next-month';
+            dayElement.textContent = i;
+            daysContainer.appendChild(dayElement);
+        }
+        
         monthContainer.appendChild(daysContainer);
         grid.appendChild(monthContainer);
     }
 
     showDayEvents(event, date, events) {
-        // Similar to original showStudentList functionality but updated
         const modal = this.createDayEventsModal(date, events);
         document.body.appendChild(modal);
         setTimeout(() => modal.classList.add('show'), 10);
@@ -546,24 +618,36 @@ class ScheduleCalendar {
                 </div>
                 <div class="modal-body">
                     <div class="day-events-list">
-                        ${events.map(event => {
-                            const [courseName, instructor] = event.title.split(' - ');
-                            return `
-                                <div class="event-card">
-                                    <div class="event-time">${event.time}</div>
-                                    <div class="event-details">
-                                        <h4>${courseName}</h4>
-                                        <p><i class="fas fa-chalkboard-teacher"></i> ${instructor}</p>
-                                        <p><i class="fas fa-clock"></i> ${event.duration}</p>
-                                        <p><i class="fas fa-users"></i> ${this.getStudentCount(event.students)} students</p>
+                        ${events.length > 0 ? 
+                            events.map(event => {
+                                const [courseName, instructor] = event.title.split(' - ');
+                                return `
+                                    <div class="event-card">
+                                        <div class="event-time">${event.time}</div>
+                                        <div class="event-details">
+                                            <h4>${courseName}</h4>
+                                            <p><i class="fas fa-chalkboard-teacher"></i> ${instructor}</p>
+                                            <p><i class="fas fa-clock"></i> ${event.duration}</p>
+                                            <p><i class="fas fa-users"></i> ${this.getStudentCount(event.students)} students</p>
+                                            ${event.location ? `<p><i class="fas fa-map-marker-alt"></i> ${event.location}</p>` : ''}
+                                        </div>
+                                        <div class="event-actions">
+                                            <button class="btn-sm" onclick="editClass('${encodeURIComponent(event.title)}', '${event.date}')">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                        }).join('')}
+                                `;
+                            }).join('') 
+                            : '<p class="no-events">No classes scheduled for this day</p>'
+                        }
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-secondary" onclick="this.closest('.class-modal').remove()">Close</button>
+                    <button class="btn-primary" onclick="addNewClass('${date.toISOString().split('T')[0]}')">
+                        <i class="fas fa-plus"></i> Add New Class
+                    </button>
                 </div>
             </div>
         `;
@@ -588,7 +672,7 @@ class ScheduleCalendar {
         const currentMinutes = this.timeToMinutes(currentTime);
         
         // Only show if within schedule hours
-        if (currentMinutes >= this.timeToMinutes('08:00') && currentMinutes <= this.timeToMinutes('18:00')) {
+        if (currentMinutes >= this.timeToMinutes('08:00') && currentMinutes <= this.timeToMinutes('20:00')) {
             const firstTimeSlot = this.timeToMinutes(this.timeSlots[0]);
             const position = ((currentMinutes - firstTimeSlot) / 30) * 60 + 60; // +60 for header
             
@@ -607,6 +691,8 @@ class ScheduleCalendar {
 
     // Utility functions
     parseTime12Hour(time12) {
+        if (!time12) return 0;
+        
         const [time, ampm] = time12.split(' ');
         const [hours, minutes] = time.split(':').map(Number);
         let hours24 = hours;
@@ -621,11 +707,13 @@ class ScheduleCalendar {
     }
 
     timeToMinutes(time) {
+        if (!time) return 0;
         const [hours, minutes] = time.split(':').map(Number);
         return hours * 60 + minutes;
     }
 
     formatTime12Hour(time24) {
+        if (!time24) return '';
         const [hours, minutes] = time24.split(':').map(Number);
         const ampm = hours >= 12 ? 'PM' : 'AM';
         const hours12 = hours % 12 || 12;
@@ -654,10 +742,16 @@ function viewStudentDetails(studentName) {
     // Example: window.location.href = `student-profile.php?name=${encodeURIComponent(studentName)}`;
 }
 
-function editClass(classTitle) {
-    console.log('Editing class:', classTitle);
+function editClass(classTitle, classDate) {
+    console.log('Editing class:', classTitle, 'on date:', classDate);
     // Implement class editing functionality
-    // Example: window.location.href = `edit-class.php?class=${encodeURIComponent(classTitle)}`;
+    // Example: window.location.href = `edit-class.php?class=${encodeURIComponent(classTitle)}&date=${classDate}`;
+}
+
+function addNewClass(date) {
+    console.log('Adding new class on date:', date);
+    // Implement class creation functionality
+    // Example: window.location.href = `add-class.php?date=${date}`;
 }
 
 // Initialize calendar when DOM is loaded
