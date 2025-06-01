@@ -17,7 +17,7 @@
         <a href="../client/learninghours.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
-            <span>Timetable</span>
+            <span>Learning hours</span>
         </a>
         <a href="../client/student_timetable.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
