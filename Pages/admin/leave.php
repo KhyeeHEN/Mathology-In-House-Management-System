@@ -45,14 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['approve']) || isset(
 }
 
 // Fetch leave requests with search and sort
-$search_query = $search ? "AND (COALESCE(s.First_Name, i.First_Name, u.email) LIKE '%$search%' OR lr.reason LIKE '%$search%' OR lr.status LIKE '%$search%')" : "";
+$search_query = $search ? "AND (COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name), CONCAT(i.First_Name, ' ', i.Last_Name), u.email) LIKE '%$search%' OR lr.reason LIKE '%$search%' OR lr.status LIKE '%$search%')" : "";
 $sql = "
     SELECT lr.*, 
-           COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name), CONCAT(i.First_Name, ' ', i.Last_Name), u.email) AS name
+           COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name), CONCAT(i.First_Name, ' ', i.Last_Name), u.email) AS name,
+           lr.user_type
     FROM leave_requests lr
     JOIN users u ON lr.user_id = u.user_id
     LEFT JOIN students s ON u.student_id = s.student_id AND lr.user_type = 'student'
-    LEFT JOIN instructors i ON u.user_id = i.user_id AND lr.user_type = 'instructor'
+    LEFT JOIN instructor i ON u.instructor_id = i.instructor_id AND lr.user_type = 'instructor'
     WHERE 1=1 $search_query
     ORDER BY $sort_column $sort_direction
 ";
@@ -190,6 +191,7 @@ if ($result && $result->num_rows > 0) {
                                     <th class="<?php echo $sort_column === 'name' ? strtolower($sort_direction) : ''; ?>">
                                         <a href="?sort=name&direction=<?= $sort_column === 'name' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>">User</a>
                                     </th>
+                                    <th>User Type</th>
                                     <th class="<?php echo $sort_column === 'start_date' ? strtolower($sort_direction) : ''; ?>">
                                         <a href="?sort=start_date&direction=<?= $sort_column === 'start_date' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>">Start Date</a>
                                     </th>
@@ -212,6 +214,7 @@ if ($result && $result->num_rows > 0) {
                                 <?php foreach ($leave_requests as $request): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($request['name']) ?></td>
+                                        <td><?= htmlspecialchars($request['user_type']) ?></td>
                                         <td><?= htmlspecialchars(date('Y-m-d', strtotime($request['start_date']))) ?></td>
                                         <td><?= htmlspecialchars(date('Y-m-d', strtotime($request['end_date']))) ?></td>
                                         <td><?= htmlspecialchars($request['reason']) ?></td>
