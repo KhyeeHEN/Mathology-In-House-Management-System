@@ -228,7 +228,7 @@ class ScheduleCalendar {
         });
     }
 
-    // Enhanced renderWeekView method - FIXED VERSION
+    // Enhanced renderWeekView method - STUDENT COUNT VERSION
     renderWeekView() {
         const grid = document.getElementById('scheduleGrid');
         if (!grid) return;
@@ -280,9 +280,6 @@ class ScheduleCalendar {
             `;
             dayColumn.appendChild(dayHeader);
 
-            // Track classes that span multiple slots
-            const processedClasses = new Set();
-
             // Time slots for this day
             this.timeSlots.forEach((time, timeIndex) => {
                 const timeSlot = document.createElement('div');
@@ -291,34 +288,12 @@ class ScheduleCalendar {
                 
                 // Find classes for this day and time
                 const dayClasses = this.getClassesForDayAndTime(day, time);
-                const availableClasses = dayClasses.filter(cls => 
-                    !processedClasses.has(`${cls.course}-${cls.startTime}-${cls.endTime}`)
-                );
                 
-                // Add class count indicator for styling
-                if (availableClasses.length > 1) {
-                    if (availableClasses.length === 2) {
-                        timeSlot.classList.add('multiple-classes');
-                    } else if (availableClasses.length >= 3) {
-                        timeSlot.classList.add('triple-classes');
-                    }
-                }
-                
-                if (availableClasses.length > 0) {
-                    availableClasses.forEach(classInfo => {
-                        const classId = `${classInfo.course}-${classInfo.startTime}-${classInfo.endTime}`;
-                        
-                        if (!processedClasses.has(classId)) {
-                            const classBlock = this.createClassBlock(classInfo, availableClasses.length);
-                            timeSlot.appendChild(classBlock);
-                            
-                            // Mark long duration classes as processed
-                            const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
-                            if (duration > 30) {
-                                processedClasses.add(classId);
-                            }
-                        }
-                    });
+                if (dayClasses.length > 0) {
+                    // Calculate total students for this time slot
+                    const totalStudents = this.getTotalStudentsForTimeSlot(dayClasses);
+                    const studentCountBlock = this.createStudentCountBlock(dayClasses, totalStudents);
+                    timeSlot.appendChild(studentCountBlock);
                 }
 
                 dayColumn.appendChild(timeSlot);
@@ -567,3 +542,239 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 60000);
 });
+
+
+// New method to calculate total students for a time slot
+getTotalStudentsForTimeSlot(classes) ;{
+    let totalStudents = 0;
+    const uniqueStudents = new Set();
+    
+    classes.forEach(classInfo => {
+        const students = classInfo.students.split(',');
+        students.forEach(student => {
+            const trimmedStudent = student.trim();
+            if (trimmedStudent) {
+                uniqueStudents.add(trimmedStudent);
+            }
+        });
+    });
+    
+    return uniqueStudents.size;
+}
+
+// New method to create student count block instead of class block
+createStudentCountBlock(classes, totalStudents) ;{
+    const block = document.createElement('div');
+    block.className = 'student-count-block';
+    
+    // Add visual indicator based on number of students
+    if (totalStudents >= 20) {
+        block.classList.add('high-capacity');
+    } else if (totalStudents >= 10) {
+        block.classList.add('medium-capacity');
+    } else {
+        block.classList.add('low-capacity');
+    }
+    
+    block.innerHTML = `
+        <div class="student-count">${totalStudents}</div>
+        <div class="student-label">student${totalStudents !== 1 ? 's' : ''}</div>
+        <div class="class-count">${classes.length} class${classes.length !== 1 ? 'es' : ''}</div>
+    `;
+
+    // Add click functionality to show student list
+    block.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showStudentListModal(classes, totalStudents);
+    });
+    
+    // Add hover effect
+    block.addEventListener('mouseenter', (e) => {
+        this.showQuickPreview(e, classes, totalStudents);
+    });
+    
+    block.addEventListener('mouseleave', () => {
+        this.hideQuickPreview();
+    });
+
+    return block;
+}
+
+// New method to show student list modal
+showStudentListModal(classes, totalStudents) ;{
+    // Remove existing modal if any
+    const existingModal = document.getElementById('studentListModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'studentListModal';
+    modal.className = 'student-list-modal';
+    
+    // Get unique students and their classes
+    const studentClassMap = new Map();
+    
+    classes.forEach(classInfo => {
+        const students = classInfo.students.split(',');
+        students.forEach(student => {
+            const trimmedStudent = student.trim();
+            if (trimmedStudent) {
+                if (!studentClassMap.has(trimmedStudent)) {
+                    studentClassMap.set(trimmedStudent, []);
+                }
+                studentClassMap.get(trimmedStudent).push({
+                    course: classInfo.course,
+                    instructor: classInfo.instructor,
+                    time: `${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)}`
+                });
+            }
+        });
+    });
+    
+    let modalContent = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Students in Classes</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="summary-info">
+                    <div class="summary-item">
+                        <strong>${totalStudents}</strong> total students
+                    </div>
+                    <div class="summary-item">
+                        <strong>${classes.length}</strong> class${classes.length !== 1 ? 'es' : ''} running
+                    </div>
+                </div>
+                <div class="student-list">
+    `;
+    
+    // Sort students alphabetically
+    const sortedStudents = Array.from(studentClassMap.keys()).sort();
+    
+    sortedStudents.forEach(student => {
+        const studentClasses = studentClassMap.get(student);
+        modalContent += `
+            <div class="student-item">
+                <div class="student-name">
+                    <i class="fas fa-user"></i>
+                    ${student}
+                </div>
+                <div class="student-classes">
+        `;
+        
+        studentClasses.forEach(classDetail => {
+            modalContent += `
+                <div class="class-detail">
+                    <span class="course-name">${classDetail.course}</span>
+                    <span class="instructor-name">with ${classDetail.instructor}</span>
+                    <span class="class-time">${classDetail.time}</span>
+                </div>
+            `;
+        });
+        
+        modalContent += `
+                </div>
+            </div>
+        `;
+    });
+    
+    modalContent += `
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop"></div>
+    `;
+    
+    modal.innerHTML = modalContent;
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    modal.querySelector('.modal-backdrop').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    // Animate modal in
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+}
+
+// New method for quick preview on hover
+showQuickPreview(event, classes, totalStudents) ;{
+    const tooltip = document.getElementById('classTooltip');
+    if (!tooltip) return;
+    
+    let previewContent = `
+        <div class="tooltip-title">Time Slot Overview</div>
+        <div class="tooltip-info">
+            <i class="fas fa-users"></i> 
+            ${totalStudents} student${totalStudents !== 1 ? 's' : ''} in ${classes.length} class${classes.length !== 1 ? 'es' : ''}
+        </div>
+    `;
+    
+    // Show first few classes
+    const displayClasses = classes.slice(0, 3);
+    displayClasses.forEach(classInfo => {
+        const studentCount = classInfo.students.split(',').length;
+        previewContent += `
+            <div class="tooltip-info">
+                <i class="fas fa-book"></i> 
+                ${classInfo.course} (${studentCount} students)
+            </div>
+        `;
+    });
+    
+    if (classes.length > 3) {
+        previewContent += `
+            <div class="tooltip-info">
+                <i class="fas fa-ellipsis-h"></i> 
+                And ${classes.length - 3} more class${classes.length - 3 !== 1 ? 'es' : ''}
+            </div>
+        `;
+    }
+    
+    previewContent += `
+        <div class="tooltip-action">
+            <i class="fas fa-mouse-pointer"></i> 
+            Click to see all students
+        </div>
+    `;
+    
+    tooltip.innerHTML = previewContent;
+    
+    const rect = event.target.getBoundingClientRect();
+    
+    // Smart positioning
+    let left = rect.right + 10;
+    let top = rect.top;
+    
+    if (left + 320 > window.innerWidth) {
+        left = rect.left - 330;
+    }
+    
+    if (top + 200 > window.innerHeight) {
+        top = window.innerHeight - 210;
+    }
+    
+    if (top < 10) {
+        top = 10;
+    }
+    
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+    tooltip.classList.add('show');
+}
+
+hideQuickPreview() ;{
+    const tooltip = document.getElementById('classTooltip');
+    if (tooltip) {
+        tooltip.classList.remove('show');
+    }
+}
