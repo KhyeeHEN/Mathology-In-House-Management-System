@@ -15,7 +15,7 @@ $_SESSION['student_id'] = $student_id; // Store in session for consistency
 //$student_id = $_SESSION['student_id'];
 
 // Fetch student details
-$student = $conn->query("SELECT * FROM Students WHERE student_id = $student_id")->fetch_assoc();
+$student = $conn->query("SELECT * FROM students WHERE student_id = $student_id")->fetch_assoc();
 
 // Fetch student's current timetable
 $current_timetable = $conn->query("
