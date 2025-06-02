@@ -31,13 +31,13 @@ $query = "SELECT
             st.end_time,
             st.course AS course_name,
             c.course_name AS fallback_course_name,
-            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students
+            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students,
+            COUNT(s.student_id) AS student_count
           FROM student_timetable st
           JOIN student_courses sc ON st.student_course_id = sc.student_course_id
           JOIN students s ON sc.student_id = s.student_id
           JOIN courses c ON sc.course_id = c.course_id
-          JOIN instructor_courses ic ON ic.course_id = c.course_id
-          WHERE ic.instructor_id = ? AND st.status = 'active'
+          WHERE st.instructor_id = ? AND st.status = 'active'
           GROUP BY st.id, st.day, st.start_time, st.end_time, st.course, c.course_name";
 
 $stmt = $conn->prepare($query);
@@ -74,18 +74,21 @@ function getNextDateForDay($dayName) {
 $calendarEvents = [];
 foreach ($events as $event) {
     $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
+    $studentsList = $event['students'] ? $event['students'] : 'No students enrolled';
+    
     $calendarEvents[] = [
-        'title' => $courseName,
+        'title' => $courseName . ' (' . $event['student_count'] . ' students)',
         'date' => getNextDateForDay($event['day']),
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
         'venue' => 'TBD',
         'description' => '',
-        'students' => $event['students'] ? $event['students'] : 'No students enrolled'
+        'students' => $studentsList
     ];
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +101,7 @@ foreach ($events as $event) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("../includes/Aside_Nav_Instructor.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
