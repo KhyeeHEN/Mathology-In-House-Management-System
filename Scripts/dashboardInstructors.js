@@ -100,71 +100,74 @@ class InstructorCalendar {
         }
     }
 
-createDayElement(day, month, year) {
-    const dayElement = document.createElement('div');
-    dayElement.classList.add('calendar-day');
-    
-    // Create currentDate with zero-based month
-    const currentDate = new Date(year, month, day);
-    const today = new Date();
-    
-    // Debug: Log the constructed date
-    console.log(`Constructed date for day ${day}:`, currentDate.toISOString().split('T')[0]);
-    
-    if (this.isSameDay(currentDate, today)) {
-        dayElement.classList.add('today');
-    }
-
-    const dayNumber = document.createElement('div');
-    dayNumber.classList.add('day-number');
-    dayNumber.textContent = day;
-    dayElement.appendChild(dayNumber);
-
-    const dayEvents = this.getEventsForDate(currentDate);
-    console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents); // Debug log
-    
-    if (dayEvents.length > 0) {
-        dayElement.classList.add('has-events');
-        const eventsContainer = document.createElement('div');
-        eventsContainer.classList.add('day-events');
+    createDayElement(day, month, year) {
+        const dayElement = document.createElement('div');
+        dayElement.classList.add('calendar-day');
         
-        const maxVisibleEvents = 2;
-        const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+        // Create currentDate with zero-based month (correct)
+        const currentDate = new Date(year, month, day);
+        // Reset time components to avoid timezone issues
+        currentDate.setHours(12, 0, 0, 0);
         
-        visibleEvents.forEach(event => {
-            const eventElement = document.createElement('div');
-            eventElement.classList.add('event-item');
-            eventElement.textContent = `${event.time} - ${event.title}`;
-            eventElement.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.showEventDetails(event, currentDate);
-            });
-            eventsContainer.appendChild(eventElement);
-        });
-
-        if (dayEvents.length > maxVisibleEvents) {
-            const moreIndicator = document.createElement('div');
-            moreIndicator.classList.add('more-events');
-            moreIndicator.textContent = `+${dayEvents.length - maxVisibleEvents} more`;
-            moreIndicator.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.showDayEvents(dayEvents, currentDate);
-            });
-            eventsContainer.appendChild(moreIndicator);
+        const today = new Date();
+        today.setHours(12, 0, 0, 0); // Also reset time for today
+        
+        if (this.isSameDay(currentDate, today)) {
+            dayElement.classList.add('today');
         }
 
-        dayElement.appendChild(eventsContainer);
+        const dayNumber = document.createElement('div');
+        dayNumber.classList.add('day-number');
+        dayNumber.textContent = day;
+        dayElement.appendChild(dayNumber);
+
+        // Get events for this date
+        const dayEvents = this.getEventsForDate(currentDate);
+        console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents);
+        
+        if (dayEvents.length > 0) {
+            dayElement.classList.add('has-events');
+            const eventsContainer = document.createElement('div');
+            eventsContainer.classList.add('day-events');
+            
+            const maxVisibleEvents = 2;
+            const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+            
+            visibleEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.classList.add('event-item');
+                eventElement.textContent = `${event.time} - ${event.title}`;
+                eventElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showEventDetails(event, currentDate);
+                });
+                eventsContainer.appendChild(eventElement);
+            });
+
+            if (dayEvents.length > maxVisibleEvents) {
+                const moreIndicator = document.createElement('div');
+                moreIndicator.classList.add('more-events');
+                moreIndicator.textContent = `+${dayEvents.length - maxVisibleEvents} more`;
+                moreIndicator.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showDayEvents(dayEvents, currentDate);
+                });
+                eventsContainer.appendChild(moreIndicator);
+            }
+
+            dayElement.appendChild(eventsContainer);
+        }
+
+        dayElement.addEventListener('click', () => {
+            this.showDayEvents(dayEvents, currentDate);
+        });
+
+        return dayElement;
     }
 
-    dayElement.addEventListener('click', () => {
-        this.showDayEvents(dayEvents, currentDate);
-    });
-
-    return dayElement;
-}
-
     getEventsForDate(date) {
-        const dateString = this.formatDate(date);
+        // Format the date consistently with how PHP outputs it
+        const dateString = date.toISOString().split('T')[0];
         const filteredEvents = this.events.filter(event => event.date === dateString);
         console.log('Filtering for:', dateString, 'Events:', filteredEvents);
         return filteredEvents;
