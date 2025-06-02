@@ -61,7 +61,7 @@ class InstructorCalendar {
 
     renderCalendar() {
         const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
+        const month = this.currentDate.getMonth(); // Zero-based (e.g., 5 for June)
         
         // Update header
         const monthNames = [
@@ -77,8 +77,8 @@ class InstructorCalendar {
         }
 
         // Calculate first day and number of days
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
+        const firstDay = new Date(year, month, 1); // Correct: month is zero-based
+        const lastDay = new Date(year, month + 1, 0); // Correct: month + 1 for last day
         const startingDayOfWeek = firstDay.getDay();
         const daysInMonth = lastDay.getDate();
 
@@ -104,7 +104,7 @@ class InstructorCalendar {
         const dayElement = document.createElement('div');
         dayElement.classList.add('calendar-day');
         
-        const currentDate = new Date(year, month, day);
+        const currentDate = new Date(year, month, day); // month is zero-based
         const today = new Date();
         
         if (this.isSameDay(currentDate, today)) {
@@ -161,16 +161,8 @@ class InstructorCalendar {
 
     getEventsForDate(date) {
         const dateString = this.formatDate(date);
-        const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
-        
-        console.log('Filtering events for:', { dateString, dayOfWeek });
-        const filteredEvents = this.events.filter(event => {
-            const isMatch = event.date === dateString || 
-                (event.dayOfWeek && event.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase());
-            console.log('Event:', { eventDate: event.date, eventDayOfWeek: event.dayOfWeek, isMatch });
-            return isMatch;
-        });
-        console.log('Filtered Events:', filteredEvents);
+        const filteredEvents = this.events.filter(event => event.date === dateString);
+        console.log('Filtering for:', dateString, 'Events:', filteredEvents);
         return filteredEvents;
     }
 
