@@ -31,7 +31,7 @@ $query = "SELECT
             it.end_time,
             it.course AS course_name,
             c.course_name AS fallback_course_name,
-            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) AS students
+            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students
           FROM instructor_timetable it
           LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
           LEFT JOIN courses c ON (ic.course_id = c.course_id OR it.course = c.course_name)
