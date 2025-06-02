@@ -72,20 +72,40 @@ function getNextDateForDay($dayName) {
 
 // Format for calendar.js
 $calendarEvents = [];
+$currentMonth = date('n');
+$currentYear = date('Y');
+
 foreach ($events as $event) {
     $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
     $studentsList = $event['students'] ? $event['students'] : 'No students enrolled';
     
-    $calendarEvents[] = [
-        'title' => $courseName . ' (' . $event['student_count'] . ' students)',
-        'date' => getNextDateForDay($event['day']),
-        'type' => '1',
-        'time' => date('h:i A', strtotime($event['start_time'])),
-        'duration' => calculateDuration($event['start_time'], $event['end_time']),
-        'venue' => 'TBD',
-        'description' => '',
-        'students' => $studentsList
-    ];
+    // Get all dates for this day of week in current month
+    $dayOfWeek = $event['day'];
+    $daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    $targetDayIndex = array_search(ucfirst($dayOfWeek), $daysOfWeek);
+    
+    if ($targetDayIndex !== false) {
+        // Find all dates in current month that match this day of week
+        $date = new DateTime("first $dayOfWeek of $currentYear-$currentMonth");
+        $month = $date->format('n');
+        
+        while ($month == $currentMonth) {
+            $calendarEvents[] = [
+                'title' => $courseName . ' (' . $event['student_count'] . ' students)',
+                'date' => $date->format('Y-m-d'),
+                'type' => '1',
+                'time' => date('h:i A', strtotime($event['start_time'])),
+                'duration' => calculateDuration($event['start_time'], $event['end_time']),
+                'venue' => 'TBD',
+                'description' => '',
+                'students' => $studentsList,
+                'dayOfWeek' => $dayOfWeek // Add day of week for reference
+            ];
+            
+            $date->modify('next ' . $dayOfWeek);
+            $month = $date->format('n');
+        }
+    }
 }
 ?>
 
@@ -150,5 +170,8 @@ foreach ($events as $event) {
 
     <script src="../../Scripts/common.js"></script>
     <script src="../../Scripts/dashboardInstructors.js"></script>
+    <script>
+        console.log('Calendar Events:', <?php echo json_encode($calendarEvents); ?>);
+    </script>
 </body>
 </html>
