@@ -2,6 +2,11 @@
 include '../setting.php'; // Adjust path as needed
 session_start();
 
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Ensure student is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
@@ -28,6 +33,9 @@ if (!$user_info || !isset($user_info['student_id'])) {
 
 $student_id = $user_info['student_id'];
 
+// Debug: Output the student_id
+echo "<p>Debug: Student ID = $student_id</p>";
+
 // Fetch timetable data with student and course details
 $sql = "SELECT 
             st.id, 
@@ -50,6 +58,22 @@ $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Debug: Output number of rows
+echo "<p>Debug: Number of timetable rows = " . $result->num_rows . "</p>";
+
+// Store the results in an array to avoid pointer issues
+$timetable_data = [];
+while ($row = $result->fetch_assoc()) {
+    $timetable_data[] = $row;
+}
+
+// Debug: Output raw query results
+if (!empty($timetable_data)) {
+    echo "<p>Debug: Raw timetable data:</p><pre>";
+    print_r($timetable_data);
+    echo "</pre>";
+}
+
 // Get student info for header
 $student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?";
 $student_stmt = $conn->prepare($student_sql);
@@ -61,6 +85,9 @@ $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
 $student_result = $student_stmt->get_result();
 $student_info = $student_result ? $student_result->fetch_assoc() : null;
+
+// Debug: Output student info
+echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true) : "No student info found") . "</p>";
 ?>
 
 <!DOCTYPE html>
@@ -187,7 +214,8 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
 
             <div class="timetable-container">
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
+                    <?php echo "<p>Debug: Rendering table with " . count($timetable_data) . " rows</p>"; ?>
                     <table class="timetable">
                         <thead>
                             <tr>
@@ -199,7 +227,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php foreach ($timetable_data as $row): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($row['course'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['day'] ?? 'N/A') ?></td>
@@ -207,7 +235,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                                     <td><?= htmlspecialchars($row['end_time'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['approved_at'] ?? 'N/A') ?></td>
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 <?php else: ?>
@@ -225,7 +253,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                 <a href="timetable_add.php?student_id=<?= $student_id ?>" class="btn btn-secondary">
                     <i class="fas fa-plus"></i> Add New Session
                 </a>
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
                     <a href="print_timetable.php?student_id=<?= $student_id ?>" class="btn btn-danger" target="_blank">
                         <i class="fas fa-print"></i> Print Timetable
                     </a>
