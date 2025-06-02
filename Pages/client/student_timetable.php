@@ -21,7 +21,8 @@ $sql = "SELECT
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
         WHERE sc.student_id = ?
-        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
+        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time
+        ";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $student_id);
