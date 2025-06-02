@@ -61,6 +61,17 @@ $result = $stmt->get_result();
 // Debug: Output number of rows
 echo "<p>Debug: Number of timetable rows = " . $result->num_rows . "</p>";
 
+// Debug: Output raw query results
+if ($result->num_rows > 0) {
+    echo "<p>Debug: Raw timetable data:</p><pre>";
+    while ($row = $result->fetch_assoc()) {
+        print_r($row);
+    }
+    echo "</pre>";
+    // Reset result pointer to start for table rendering
+    $result->data_seek(0);
+}
+
 // Get student info for header
 $student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?";
 $student_stmt = $conn->prepare($student_sql);
@@ -95,6 +106,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            display: table; /* Ensure table is visible */
         }
         .timetable th, .timetable td {
             border: 1px solid #ddd;
@@ -214,11 +226,11 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
                         <tbody>
                             <?php while ($row = $result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($row['course']) ?></td>
-                                    <td><?= htmlspecialchars($row['day']) ?></td>
-                                    <td><?= htmlspecialchars($row['start_time']) ?></td>
-                                    <td><?= htmlspecialchars($row['end_time']) ?></td>
-                                    <td><?= htmlspecialchars($row['approved_at']) ?></td>
+                                    <td><?= htmlspecialchars($row['course'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['day'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['start_time'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['end_time'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['approved_at'] ?? 'N/A') ?></td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>
