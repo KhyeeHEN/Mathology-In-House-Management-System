@@ -791,3 +791,682 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
 }
+
+
+/*Anlysis section*/
+/* Add this CSS to your dashboard.css file */
+
+/* Analysis Section Styles */
+.analysis-section {
+    padding: 2.5rem;
+    margin-top: 1rem;
+    animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.section-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3.5rem;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.analysis-card {
+    background-color: var(--white);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08), 0 4px 20px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 1px solid rgba(var(--border-color-rgb), 0.5);
+}
+
+.analysis-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+}
+
+.analysis-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h3 {
+    font-size: 1.25rem;
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.card-header i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+/* Chart Containers */
+.charts-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-item h4 {
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-light);
+    font-weight: 500;
+    text-align: center;
+}
+
+.chart-item.wide {
+    margin-top: 1.5rem;
+}
+
+/* Gender Distribution Chart */
+.demographic-chart {
+    height: 180px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.color-box {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+}
+
+.color-box.male {
+    background-color: #4e73df;
+}
+
+.color-box.female {
+    background-color: #e74a3b;
+}
+
+/* Syllabus Distribution Bars */
+.demographic-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bar-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bar-label {
+    width: 60px;
+    font-size: 0.9rem;
+    text-align: right;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.bar-outer {
+    flex: 1;
+    height: 12px;
+    background-color: #f1f3f9;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.bar-inner {
+    height: 100%;
+    background-color: #36b9cc;
+    border-radius: 6px;
+    transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bar-value {
+    width: 30px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Mathology Level Distribution */
+.level-distribution {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem 0;
+}
+
+.level-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+.level-item:hover {
+    transform: translateY(-5px);
+}
+
+.level-item.beginner {
+    background-color: rgba(246, 194, 62, 0.1);
+    border: 1px solid rgba(246, 194, 62, 0.3);
+}
+
+.level-item.intermediate {
+    background-color: rgba(78, 115, 223, 0.1);
+    border: 1px solid rgba(78, 115, 223, 0.3);
+}
+
+.level-item.advanced {
+    background-color: rgba(28, 200, 138, 0.1);
+    border: 1px solid rgba(28, 200, 138, 0.3);
+}
+
+.level-count {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.level-item.beginner .level-count {
+    color: #f6c23e;
+}
+
+.level-item.intermediate .level-count {
+    color: #4e73df;
+}
+
+.level-item.advanced .level-count {
+    color: #1cc88a;
+}
+
+.level-name {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Training Status */
+.training-status {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.status-item {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    min-width: 100px;
+    transition: all 0.3s ease;
+}
+
+.status-item:hover {
+    transform: translateY(-5px);
+}
+
+.status-item.completed {
+    background-color: rgba(28, 200, 138, 0.1);
+    border: 1px solid rgba(28, 200, 138, 0.3);
+}
+
+.status-item.in-progress {
+    background-color: rgba(246, 194, 62, 0.1);
+    border: 1px solid rgba(246, 194, 62, 0.3);
+}
+
+.status-count {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.status-item.completed .status-count {
+    color: #1cc88a;
+}
+
+.status-item.in-progress .status-count {
+    color: #f6c23e;
+}
+
+.status-label {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Education Qualification Chart */
+.qualification-chart {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 0 1rem;
+}
+
+.qualification-segment {
+    width: 80px;
+    min-height: 25px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    text-align: center;
+    transition: height 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+}
+
+.qualification-segment:hover {
+    transform: scaleY(1.05);
+    transform-origin: bottom;
+}
+
+.qualification-segment.bachelor {
+    background-color: rgba(78, 115, 223, 0.2);
+    border: 1px solid rgba(78, 115, 223, 0.5);
+    border-bottom: 4px solid #4e73df;
+}
+
+.qualification-segment.master {
+    background-color: rgba(54, 185, 204, 0.2);
+    border: 1px solid rgba(54, 185, 204, 0.5);
+    border-bottom: 4px solid #36b9cc;
+}
+
+.qualification-segment.phd {
+    background-color: rgba(28, 200, 138, 0.2);
+    border: 1px solid rgba(28, 200, 138, 0.5);
+    border-bottom: 4px solid #1cc88a;
+}
+
+.qualification-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.qualification-count {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.qualification-segment.bachelor .qualification-count {
+    color: #4e73df;
+}
+
+.qualification-segment.master .qualification-count {
+    color: #36b9cc;
+}
+
+.qualification-segment.phd .qualification-count {
+    color: #1cc88a;
+}
+
+/* Experience Chart */
+.experience-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+.experience-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.experience-label {
+    width: 150px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.experience-bar-outer {
+    flex: 1;
+    height: 16px;
+    background-color: #f1f3f9;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.experience-bar-inner {
+    height: 100%;
+    background-color: #4e73df;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    border-radius: 8px;
+    transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.experience-count {
+    width: 30px;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-align: right;
+}
+
+/* Performance Matrix */
+.matrix-container {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.performance-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.performance-matrix th,
+.performance-matrix td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.performance-matrix th {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.performance-matrix td.high-count {
+    background-color: rgba(28, 200, 138, 0.1);
+    color: #1cc88a;
+    font-weight: 600;
+}
+
+.performance-matrix td.medium-count {
+    background-color: rgba(54, 185, 204, 0.1);
+    color: #36b9cc;
+    font-weight: 600;
+}
+
+.performance-matrix td.low-count {
+    background-color: rgba(246, 194, 62, 0.1);
+    color: #f6c23e;
+    font-weight: 600;
+}
+
+.performance-matrix .total-column {
+    background-color: rgba(78, 115, 223, 0.1);
+    color: #4e73df;
+    font-weight: 700;
+}
+
+.performance-matrix .totals-row {
+    background-color: var(--background-color);
+}
+
+/* Key Insights */
+.key-insights {
+    background-color: rgba(var(--background-color-rgb), 0.5);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.key-insights h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.key-insights h4 i {
+    color: #f6c23e;
+}
+
+.key-insights ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.key-insights li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.key-insights li:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1200px) {
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-container {
+        flex-direction: column;
+    }
+    
+    .level-distribution,
+    .training-status {
+        flex-wrap: wrap;
+    }
+}
+
+/* Admin Summary Section */
+.admin-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2.5rem;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Summary Cards */
+.summary-card {
+    background-color: var(--white);
+    border-radius: 0.75rem;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08), 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 1px solid rgba(var(--border-color-rgb), 0.5);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), rgba(var(--primary-color-rgb), 0.7));
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.summary-card:hover::before {
+    transform: translateX(0);
+}
+
+.summary-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px) scale(1.02);
+    background-color: rgba(var(--background-color-rgb), 0.3);
+}
+
+/* Card Title */
+.summary-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 0 0 0.75rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.summary-card h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 2rem;
+    height: 2px;
+    background-color: var(--border-color);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.summary-card:hover h3::after {
+    width: 3rem;
+    background-color: var(--primary-color);
+}
+
+/* Card Value */
+.summary-card p {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+}
+
+.summary-card:hover p {
+    color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* Specific card variations for visual distinction */
+.summary-card:nth-child(1) {
+    border-left: 4px solid #4e73df;
+}
+
+.summary-card:nth-child(1):hover {
+    background-color: rgba(78, 115, 223, 0.05);
+}
+
+.summary-card:nth-child(1) p {
+    color: #4e73df;
+}
+
+.summary-card:nth-child(2) {
+    border-left: 4px solid #1cc88a;
+}
+
+.summary-card:nth-child(2):hover {
+    background-color: rgba(28, 200, 138, 0.05);
+}
+
+.summary-card:nth-child(2) p {
+    color: #1cc88a;
+}
+
+.summary-card:nth-child(3) {
+    border-left: 4px solid #36b9cc;
+}
+
+.summary-card:nth-child(3):hover {
+    background-color: rgba(54, 185, 204, 0.05);
+}
+
+.summary-card:nth-child(3) p {
+    color: #36b9cc;
+}
+
+/* Add subtle animation on page load */
+.summary-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.summary-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.summary-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .admin-summary {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+    
+    .summary-card {
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .summary-card p {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .summary-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .summary-card p {
+        font-size: 1.75rem;
+    }
+}
