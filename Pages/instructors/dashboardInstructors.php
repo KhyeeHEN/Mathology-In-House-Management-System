@@ -173,7 +173,11 @@ echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEven
     <script src="../../Scripts/common.js"></script>
     <script src="../../Scripts/dashboardInstructors.js"></script>
     <script>
-        console.log('Calendar Events:', <?php echo json_encode($calendarEvents); ?>);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Window calendarEvents:', window.calendarEvents);
+            console.log('Type of calendarEvents:', typeof window.calendarEvents);
+            window.instructorCalendar = new InstructorCalendar();
+        });
     </script>
 </body>
 </html>

@@ -2,7 +2,14 @@
 class InstructorCalendar {
     constructor() {
         this.currentDate = new Date();
-        this.events = window.calendarEvents || [];
+        this.events = []; // Initialize empty array
+        
+        // Make sure we properly capture the window.calendarEvents
+        if (window.calendarEvents && Array.isArray(window.calendarEvents)) {
+            this.events = window.calendarEvents;
+            console.log('Loaded events:', this.events.length);
+        }
+        
         this.init();
     }
 
@@ -166,16 +173,14 @@ class InstructorCalendar {
     }
 
     getEventsForDate(date) {
-    // Create a date string in YYYY-MM-DD format, ignoring timezone
+        // Create a date string in YYYY-MM-DD format
         const dateString = date.getFullYear() + '-' + 
-                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(date.getDate()).padStart(2, '0');
+                         String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(date.getDate()).padStart(2, '0');
         
-        console.log('Filtering for:', dateString, 'All events:', this.events);
+        console.log('Filtering for:', dateString, 'Available events:', this.events);
         
-        // Filter events where the date matches exactly
-        const filteredEvents = this.events.filter(event => event.date === dateString);
-        return filteredEvents;
+        return this.events.filter(event => event.date === dateString);
     }
 
     showEventDetails(event, date) {
@@ -334,11 +339,6 @@ class InstructorCalendar {
 // Initialize calendar when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     window.instructorCalendar = new InstructorCalendar();
-});
-
-console.log("All calendar events with dates:");
-this.events.forEach(event => {
-    console.log(event.date, event.title);
 });
 // Export for global access
 window.InstructorCalendar = InstructorCalendar;
