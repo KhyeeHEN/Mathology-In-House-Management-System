@@ -92,8 +92,8 @@ foreach ($events as $event) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instructor Dashboard</title>
-    <link rel="stylesheet" href="../../Styles/dashboard.css">
     <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../Styles/dashboardInstructors.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -103,33 +103,38 @@ foreach ($events as $event) {
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <div class="calendar-navigation">
-                        <button class="nav-btn" id="prevMonth">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
-                        <button class="nav-btn" id="nextMonth">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+            <div class="calendar-wrapper">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-navigation">
+                            <button class="nav-btn" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
+                            <button class="nav-btn" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="date-picker-container">
+                            <input type="date" id="datePicker" class="date-picker">
+                        </div>
                     </div>
-                    <div class="date-picker-container">
-                        <input type="date" id="datePicker" class="date-picker">
-                    </div>
-                </div>
-                <div class="calendar-grid">
-                    <div class="calendar-weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
-                    </div>
-                    <div class="calendar-days" id="calendarDays">
-                        <!-- Days will be populated by JavaScript -->
+                    
+                    <div class="calendar-scroll-container">
+                        <div class="calendar-grid">
+                            <div class="calendar-weekdays">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays">
+                                <!-- Days will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,8 +144,8 @@ foreach ($events as $event) {
     <script>
         const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
     </script>
-    
-    <script src="../../Scripts/dashboard.js"></script>
+
     <script src="../../Scripts/common.js"></script>
+    <script src="../../Scripts/dashboardInstructors.js"></script>
 </body>
 </html>
