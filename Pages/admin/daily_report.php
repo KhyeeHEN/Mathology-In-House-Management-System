@@ -158,10 +158,8 @@ $result = $stmt->get_result();
                 <label for="report_date">Select Date:</label>
                 <input type="date" id="report_date" name="date" value="<?php echo isset($_GET['date']) ? $_GET['date'] : date('Y-m-d'); ?>">
                 <button type="submit">Generate Report</button>
-                <a href="export_excel.php?date=<?php echo $_GET['date'] ?? date('Y-m-d'); ?>&download_excel=1">
-                    <button type="button">Download Excel</button>
-                </a>
-                <a href="export_pdf.php?date=<?php echo $_GET['date'] ?? date('Y-m-d'); ?>&download_pdf=1">
+                <a href="../utils/export_excel.php?date=<?php echo $_GET['date'] ?? date('Y-m-d'); ?>&download_excel=1"><button type="button">Download Excel</button></a>
+                <a href="../utils/export_pdf.php?date=<?php echo $_GET['date'] ?? date('Y-m-d'); ?>&download_pdf=1">
                     <button type="button">Download PDF</button>
                 </a>
             </form>
