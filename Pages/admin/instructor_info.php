@@ -40,17 +40,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_instructor']))
         }
     }
 
-    // Redirect to avoid form resubmission
+    // Redirect to avoid form resubmission, preserving search term
     $query_params = [];
     if ($message) $query_params['message'] = urlencode($message);
     if ($error) $query_params['error'] = urlencode($error);
+    if (isset($_GET['search'])) $query_params['search'] = urlencode($_GET['search']);
     $query_string = http_build_query($query_params);
     header("Location: instructor_info.php?" . $query_string);
     exit();
 }
 
-// Fetch all instructors
-$sql = "SELECT * FROM instructor ORDER BY instructor_id";
+// Search functionality
+$search = isset($_GET['search']) ? $conn->real_escape_string(trim($_GET['search'])) : '';
+$search_query = $search ? "WHERE (Last_Name LIKE '%$search%' OR First_Name LIKE '%$search%' OR instructor_id LIKE '%$search%')" : "";
+
+// Fetch instructors with search filter
+$sql = "SELECT * FROM instructor $search_query ORDER BY instructor_id";
 $result = $conn->query($sql);
 if (!$result) {
     $error = "Failed to fetch instructors: " . $conn->error;
@@ -77,6 +82,23 @@ if ($result && $result->num_rows > 0) {
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
         }
         .instructor-table {
             background: white;
@@ -175,6 +197,13 @@ if ($result && $result->num_rows > 0) {
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
+
+                <div class="search-bar">
+                    <form method="GET" action="instructor_info.php">
+                        <input type="text" name="search" placeholder="Search by name or ID..." value="<?= htmlspecialchars($search) ?>">
+                        <button type="submit"><i class="fas fa-search"></i> Search</button>
+                    </form>
+                </div>
 
                 <div class="instructor-table">
                     <h2>Manage Instructor Information</h2>
