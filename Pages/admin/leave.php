@@ -16,7 +16,7 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'requested_at';
 $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
 // Validate sort column
-$allowed_columns = ['username', 'start_date', 'end_date', 'reason', 'status', 'requested_at'];
+$allowed_columns = ['name', 'start_date', 'end_date', 'reason', 'status', 'requested_at'];
 $sort_column = in_array($sort, $allowed_columns) ? $sort : 'requested_at';
 $sort_direction = $direction === 'ASC' ? 'ASC' : 'DESC';
 $new_direction = $sort_direction === 'ASC' ? 'DESC' : 'ASC';
@@ -45,12 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['approve']) || isset(
 }
 
 // Fetch leave requests with search and sort
-$search_query = $search ? "AND (u.username LIKE '%$search%' OR lr.reason LIKE '%$search%' OR lr.status LIKE '%$search%')" : "";
+$search_query = $search ? "AND (COALESCE(s.First_Name, i.First_Name, u.email) LIKE '%$search%' OR lr.reason LIKE '%$search%' OR lr.status LIKE '%$search%')" : "";
 $sql = "
-    SELECT lr.*, u.username 
-    FROM leave_requests lr 
-    JOIN users u ON lr.user_id = u.user_id 
-    WHERE 1=1 $search_query 
+    SELECT lr.*, 
+           COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name), CONCAT(i.First_Name, ' ', i.Last_Name), u.email) AS name
+    FROM leave_requests lr
+    JOIN users u ON lr.user_id = u.user_id
+    LEFT JOIN students s ON u.student_id = s.student_id AND lr.user_type = 'student'
+    LEFT JOIN instructors i ON u.user_id = i.user_id AND lr.user_type = 'instructor'
+    WHERE 1=1 $search_query
     ORDER BY $sort_column $sort_direction
 ";
 $result = $conn->query($sql);
@@ -173,7 +176,7 @@ if ($result && $result->num_rows > 0) {
 
                 <div class="search-bar">
                     <form method="GET" action="admin_leave.php">
-                        <input type="text" name="search" placeholder="Search by username, reason, or status..." value="<?= htmlspecialchars($search) ?>">
+                        <input type="text" name="search" placeholder="Search by name, reason, or status..." value="<?= htmlspecialchars($search) ?>">
                         <button type="submit" style="padding: 10px; border-radius: 4px; border: none; background-color: #4CAF50; color: white;">Search</button>
                     </form>
                 </div>
@@ -184,8 +187,8 @@ if ($result && $result->num_rows > 0) {
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="<?php echo $sort_column === 'username' ? strtolower($sort_direction) : ''; ?>">
-                                        <a href="?sort=username&direction=<?= $sort_column === 'username' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>">User</a>
+                                    <th class="<?php echo $sort_column === 'name' ? strtolower($sort_direction) : ''; ?>">
+                                        <a href="?sort=name&direction=<?= $sort_column === 'name' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>">User</a>
                                     </th>
                                     <th class="<?php echo $sort_column === 'start_date' ? strtolower($sort_direction) : ''; ?>">
                                         <a href="?sort=start_date&direction=<?= $sort_column === 'start_date' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>">Start Date</a>
@@ -208,7 +211,7 @@ if ($result && $result->num_rows > 0) {
                             <tbody>
                                 <?php foreach ($leave_requests as $request): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($request['username']) ?></td>
+                                        <td><?= htmlspecialchars($request['name']) ?></td>
                                         <td><?= htmlspecialchars(date('Y-m-d', strtotime($request['start_date']))) ?></td>
                                         <td><?= htmlspecialchars(date('Y-m-d', strtotime($request['end_date']))) ?></td>
                                         <td><?= htmlspecialchars($request['reason']) ?></td>
