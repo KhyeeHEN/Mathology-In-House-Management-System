@@ -15,9 +15,9 @@ class ScheduleCalendar {
 
     generateTimeSlots() {
         const slots = [];
-        for (let hour = 8; hour <= 17; hour++) {
+        for (let hour = 8; hour <= 23; hour++) { // Changed from 17 to 23 for 11pm
             slots.push(`${hour.toString().padStart(2, '0')}:00`);
-            if (hour < 17) {
+            if (hour < 23) { // Don't add :30 for 11pm
                 slots.push(`${hour.toString().padStart(2, '0')}:30`);
             }
         }
@@ -418,7 +418,7 @@ class ScheduleCalendar {
         // Only show if within schedule hours and in week view
         if (this.currentView === 'week' && 
             currentMinutes >= this.timeToMinutes('08:00') && 
-            currentMinutes <= this.timeToMinutes('17:00')) {
+            currentMinutes <= this.timeToMinutes('23:00')) { // Changed from 17:00 to 23:00
             
             const firstTimeSlot = this.timeToMinutes(this.timeSlots[0]);
             const position = ((currentMinutes - firstTimeSlot) / 30) * 60 + 60; // +60 for header

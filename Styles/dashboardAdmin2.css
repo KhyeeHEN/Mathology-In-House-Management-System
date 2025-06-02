@@ -222,10 +222,13 @@
 .time-column {
     background: #f8f9fa;
     border-right: 2px solid #e9ecef;
+    position: sticky;
+    left: 0;
+    z-index: 2;
 }
 
 .time-slot {
-    height: 70px;
+    height: 60px; /* Reduced from 70px to fit more time slots */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -234,6 +237,7 @@
     color: #666;
     font-weight: 500;
     border-bottom: 1px solid #e9ecef;
+    position: relative;
 }
 
 .time-slot.time-header {
@@ -241,22 +245,28 @@
     color: white;
     font-weight: 700;
     font-size: 0.9em;
+    position: sticky;
+    top: 0;
+    z-index: 3;
 }
 
 .day-column {
     background: white;
     position: relative;
+    min-width: 0; /* Prevent flex items from overflowing */
 }
 
 .day-header {
-    height: 70px;
+    height: 60px; /* Reduced from 70px to match time-slot */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-bottom: 2px solid #e9ecef;
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .day-header.today {
@@ -264,30 +274,16 @@
     color: white;
 }
 
-.day-header.today .day-name {
-    font-weight: 700;
-}
-
-.day-name {
-    font-weight: 600;
-    margin-bottom: 3px;
-    font-size: 0.9em;
-}
-
-.day-date {
-    font-size: 1.1em;
-    font-weight: 700;
-}
-
 .time-grid-slot {
-    height: 70px;
+    height: 60px; /* Reduced from 70px to fit more time slots */
     border-bottom: 1px solid #f0f0f0;
     position: relative;
     transition: background-color 0.2s ease;
-    display: flex; /* Add flexbox to arrange class blocks side by side */
-    flex-wrap: nowrap; /* Prevent wrapping to ensure horizontal layout */
-    overflow-x: auto; /* Allow horizontal scrolling if too many classes */
-    gap: 4px; /* Small gap between class blocks */
+    display: flex;
+    flex-direction: column; /* Changed from row to column */
+    overflow: hidden;
+    gap: 2px; /* Smaller gap between class blocks */
+    padding: 1px; /* Small padding to prevent overlap with borders */
 }
 
 .time-grid-slot:hover {
@@ -295,28 +291,52 @@
 }
 
 .class-block {
-    position: relative; /* Change from absolute to relative for flex layout */
-    flex: 1; /* Allow class blocks to share available space */
-    min-width: 100px; /* Minimum width to ensure readability */
+    position: relative;
+    flex: 1;
+    min-height: 20px; /* Minimum height for visibility */
     background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
     border-left: 4px solid #4a6cf7;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 0.8em;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 0.75em; /* Smaller font size */
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center content vertically */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2px;
 }
 
 .class-block:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: none; /* Removed scale effect */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     z-index: 10;
-    height: calc(100% - 8px); /* Full height minus padding */
+}
+
+.class-block .class-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #333;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.class-block .class-instructor {
+    font-size: 0.7em;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.class-block .class-students {
+    font-size: 0.65em;
+    color: #888;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Subject-specific colors */
