@@ -201,7 +201,7 @@ if ($show_search_results) {
     $search_term = "%" . $conn->real_escape_string($search_query) . "%";
     
     $search_results = $conn->query("
-        (SELECT 
+        (SELECT DISTINCT
             s.student_id as id, 
             CONCAT(s.First_Name, ' ', s.Last_Name) as name,
             'Pending Request' as type,
@@ -224,25 +224,26 @@ if ($show_search_results) {
         
         UNION
         
-        (SELECT 
+        (SELECT DISTINCT
             s.student_id as id, 
             CONCAT(s.First_Name, ' ', s.Last_Name) as name,
             'Current Timetable' as type,
-            t.day,
-            t.start_time,
-            t.end_time,
-            c.course_name as course,
+            NULL as day,
+            NULL as start_time,
+            NULL as end_time,
+            NULL as course,
             p.payment_status,
-            COUNT(t.id) as timetable_count
+            (
+                SELECT COUNT(*) 
+                FROM student_timetable st
+                JOIN student_courses sc ON st.student_course_id = sc.student_course_id
+                WHERE sc.student_id = s.student_id
+            ) as timetable_count
         FROM students s
-        LEFT JOIN student_courses sc ON s.student_id = sc.student_id
-        LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
-        LEFT JOIN courses c ON sc.course_id = c.course_id
         LEFT JOIN payment p ON s.student_id = p.student_id
         WHERE (s.student_id LIKE '$search_query' 
             OR s.First_Name LIKE '$search_term' 
             OR s.Last_Name LIKE '$search_term')
-        GROUP BY s.student_id, t.day, t.start_time, t.end_time, c.course_name, p.payment_status
         LIMIT $per_page OFFSET $offset)
         
         ORDER BY name, type
@@ -313,12 +314,19 @@ if (!$viewing_id && !$show_search_results) {
     
     // Current student list
     $current = $conn->query("
-        SELECT s.student_id, s.Last_Name, s.First_Name, 
-            s.School, s.Current_School_Grade,
-            COUNT(t.id) as timetable_count
+        SELECT 
+            s.student_id, 
+            s.Last_Name, 
+            s.First_Name, 
+            s.School, 
+            s.Current_School_Grade,
+            (
+                SELECT COUNT(*) 
+                FROM student_timetable st
+                JOIN student_courses sc ON st.student_course_id = sc.student_course_id
+                WHERE sc.student_id = s.student_id
+            ) as timetable_count
         FROM students s
-        LEFT JOIN student_courses sc ON s.student_id = sc.student_id
-        LEFT JOIN student_timetable t ON t.student_course_id = sc.student_course_id
         GROUP BY s.student_id, s.Last_Name, s.First_Name, s.School, s.Current_School_Grade
         LIMIT $per_page OFFSET $offset
     ");
