@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['approve']) || isset(
     }
 
     // Redirect to avoid form resubmission
-    header("Location: admin_leave.php" . ($message ? "?message=" . urlencode($message) : ($error ? "?error=" . urlencode($error) : "")));
+    header("Location: leave.php" . ($message ? "?message=" . urlencode($message) : ($error ? "?error=" . urlencode($error) : "")));
     exit();
 }
 
@@ -176,7 +176,7 @@ if ($result && $result->num_rows > 0) {
                 <?php endif; ?>
 
                 <div class="search-bar">
-                    <form method="GET" action="admin_leave.php">
+                    <form method="GET" action="leave.php">
                         <input type="text" name="search" placeholder="Search by name, reason, or status..." value="<?= htmlspecialchars($search) ?>">
                         <button type="submit" style="padding: 10px; border-radius: 4px; border: none; background-color: #4CAF50; color: white;">Search</button>
                     </form>
@@ -222,7 +222,7 @@ if ($result && $result->num_rows > 0) {
                                         <td><?= htmlspecialchars(date('Y-m-d H:i', strtotime($request['requested_at']))) ?></td>
                                         <td class="action-buttons">
                                             <?php if ($request['status'] === 'pending'): ?>
-                                                <form method="POST" action="admin_leave.php" class="leave-action-form" data-leave-id="<?= $request['leave_id'] ?>">
+                                                <form method="POST" action="leave.php" class="leave-action-form" data-leave-id="<?= $request['leave_id'] ?>">
                                                     <input type="hidden" name="leave_id" value="<?= $request['leave_id'] ?>">
                                                     <button type="button" class="btn-approve" onclick="confirmLeaveAction(<?= $request['leave_id'] ?>, 'approve')">Approve</button>
                                                     <button type="button" class="btn-reject" onclick="confirmLeaveAction(<?= $request['leave_id'] ?>, 'reject')">Reject</button>
