@@ -6,12 +6,12 @@ include '../setting.php';
 session_start();
 
 // Protect route
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
-//     header("Location: ../login.php");
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+    header("Location: ../login.php");
+    exit();
+}
 
-// $studentId = $_SESSION['user_id'];
+$studentId = $_SESSION['user_id'];
 
 // Handle sorting
 $allowed_columns = ['timetable_datetime', 'attendance_datetime', 'hours_attended', 'hours_replacement', 'hours_remaining', 'status', 'course', 'updated_at'];
