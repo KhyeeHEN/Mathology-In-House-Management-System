@@ -95,7 +95,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Timetable</title>
     <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../styles/timtable.css">
+    <link rel="stylesheet" href="../../Styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timetable-container {
