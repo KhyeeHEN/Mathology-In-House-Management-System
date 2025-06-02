@@ -49,7 +49,8 @@ $search_query = $search ? "AND (COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name),
 $sql = "
     SELECT lr.*, 
            COALESCE(CONCAT(s.First_Name, ' ', s.Last_Name), CONCAT(i.First_Name, ' ', i.Last_Name), u.email) AS name,
-           lr.user_type
+           lr.user_type,
+           CONVERT_TZ(lr.requested_at, '+00:00', '+08:00') AS requested_at
     FROM leave_requests lr
     JOIN users u ON lr.user_id = u.user_id
     LEFT JOIN students s ON u.student_id = s.student_id AND lr.user_type = 'student'
