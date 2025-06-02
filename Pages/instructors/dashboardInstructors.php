@@ -31,7 +31,7 @@ $query = "SELECT
             it.start_time, 
             it.end_time, 
             it.status,
-            GROUP_CONCAT(CONCAT(s.first_name, ' ', s.last_name) AS students
+            GROUP_CONCAT(CONCAT(s.first_name, ' ', s.last_name)) AS students
           FROM instructor_timetable it
           JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
           JOIN courses c ON ic.course_id = c.course_id
