@@ -26,19 +26,20 @@ $instructorId = $userData['instructor_id'];
 // Fetch instructor's timetable with student information
 $query = "SELECT 
             it.id, 
-            c.course_name, 
             it.day, 
             it.start_time, 
-            it.end_time, 
-            it.status,
-            GROUP_CONCAT(CONCAT(s.first_name, ' ', s.last_name)) AS students
+            it.end_time,
+            it.course AS course_name,
+            c.course_name AS fallback_course_name,
+            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) AS students
           FROM instructor_timetable it
-          JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
-          JOIN courses c ON ic.course_id = c.course_id
+          LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
+          LEFT JOIN courses c ON (ic.course_id = c.course_id OR it.course = c.course_name)
           LEFT JOIN student_courses sc ON sc.course_id = c.course_id
           LEFT JOIN students s ON sc.student_id = s.student_id
-          WHERE ic.instructor_id = ? AND it.status = 'active'
-          GROUP BY it.id";
+          WHERE (ic.instructor_id = ? OR it.instructor_course_id IS NULL) AND it.status = 'active'
+          GROUP BY it.id, it.day, it.start_time, it.end_time, it.course, c.course_name";
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $instructorId);
 
@@ -72,8 +73,9 @@ function getNextDateForDay($dayName) {
 // Format for calendar.js
 $calendarEvents = [];
 foreach ($events as $event) {
+    $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
     $calendarEvents[] = [
-        'title' => $event['course_name'],
+        'title' => $courseName,
         'date' => getNextDateForDay($event['day']),
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
