@@ -289,8 +289,9 @@ class ScheduleCalendar {
                 const dayClasses = this.getClassesForDayAndTime(day, time);
                 
                 if (dayClasses.length > 0) {
+                    // Pass the number of classes to adjust width
                     dayClasses.forEach(classInfo => {
-                        const classBlock = this.createClassBlock(classInfo);
+                        const classBlock = this.createClassBlock(classInfo, dayClasses.length);
                         timeSlot.appendChild(classBlock);
                     });
                 }
@@ -317,13 +318,18 @@ class ScheduleCalendar {
         });
     }
 
-    createClassBlock(classInfo) {
+    createClassBlock(classInfo, classCount = 1) {
         const block = document.createElement('div');
         block.className = `class-block ${this.getCourseType(classInfo.course)}`;
         
         const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
         const height = Math.max(40, (duration / 30) * 60 - 8); // Minimum 40px height
         block.style.height = `${height}px`;
+        
+        // Adjust width based on number of classes in the same time slot
+        if (classCount > 1) {
+            block.style.flex = `0 0 ${100 / classCount}%`; // Divide width equally
+        }
         
         block.innerHTML = `
             <div class="class-title">${this.truncateText(classInfo.course, 15)}</div>
