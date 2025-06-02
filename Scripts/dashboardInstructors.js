@@ -100,64 +100,68 @@ class InstructorCalendar {
         }
     }
 
-    createDayElement(day, month, year) {
-        const dayElement = document.createElement('div');
-        dayElement.classList.add('calendar-day');
-        
-        const currentDate = new Date(year, month, day); // month is zero-based
-        const today = new Date();
-        
-        if (this.isSameDay(currentDate, today)) {
-            dayElement.classList.add('today');
-        }
+createDayElement(day, month, year) {
+    const dayElement = document.createElement('div');
+    dayElement.classList.add('calendar-day');
+    
+    // Create currentDate with zero-based month
+    const currentDate = new Date(year, month, day);
+    const today = new Date();
+    
+    // Debug: Log the constructed date
+    console.log(`Constructed date for day ${day}:`, currentDate.toISOString().split('T')[0]);
+    
+    if (this.isSameDay(currentDate, today)) {
+        dayElement.classList.add('today');
+    }
 
-        const dayNumber = document.createElement('div');
-        dayNumber.classList.add('day-number');
-        dayNumber.textContent = day;
-        dayElement.appendChild(dayNumber);
+    const dayNumber = document.createElement('div');
+    dayNumber.classList.add('day-number');
+    dayNumber.textContent = day;
+    dayElement.appendChild(dayNumber);
 
-        const dayEvents = this.getEventsForDate(currentDate);
-        console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents); // Debug log
+    const dayEvents = this.getEventsForDate(currentDate);
+    console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents); // Debug log
+    
+    if (dayEvents.length > 0) {
+        dayElement.classList.add('has-events');
+        const eventsContainer = document.createElement('div');
+        eventsContainer.classList.add('day-events');
         
-        if (dayEvents.length > 0) {
-            dayElement.classList.add('has-events');
-            const eventsContainer = document.createElement('div');
-            eventsContainer.classList.add('day-events');
-            
-            const maxVisibleEvents = 2;
-            const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
-            
-            visibleEvents.forEach(event => {
-                const eventElement = document.createElement('div');
-                eventElement.classList.add('event-item');
-                eventElement.textContent = `${event.time} - ${event.title}`;
-                eventElement.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.showEventDetails(event, currentDate);
-                });
-                eventsContainer.appendChild(eventElement);
+        const maxVisibleEvents = 2;
+        const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+        
+        visibleEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.classList.add('event-item');
+            eventElement.textContent = `${event.time} - ${event.title}`;
+            eventElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.showEventDetails(event, currentDate);
             });
-
-            if (dayEvents.length > maxVisibleEvents) {
-                const moreIndicator = document.createElement('div');
-                moreIndicator.classList.add('more-events');
-                moreIndicator.textContent = `+${dayEvents.length - maxVisibleEvents} more`;
-                moreIndicator.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.showDayEvents(dayEvents, currentDate);
-                });
-                eventsContainer.appendChild(moreIndicator);
-            }
-
-            dayElement.appendChild(eventsContainer);
-        }
-
-        dayElement.addEventListener('click', () => {
-            this.showDayEvents(dayEvents, currentDate);
+            eventsContainer.appendChild(eventElement);
         });
 
-        return dayElement;
+        if (dayEvents.length > maxVisibleEvents) {
+            const moreIndicator = document.createElement('div');
+            moreIndicator.classList.add('more-events');
+            moreIndicator.textContent = `+${dayEvents.length - maxVisibleEvents} more`;
+            moreIndicator.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.showDayEvents(dayEvents, currentDate);
+            });
+            eventsContainer.appendChild(moreIndicator);
+        }
+
+        dayElement.appendChild(eventsContainer);
     }
+
+    dayElement.addEventListener('click', () => {
+        this.showDayEvents(dayEvents, currentDate);
+    });
+
+    return dayElement;
+}
 
     getEventsForDate(date) {
         const dateString = this.formatDate(date);
