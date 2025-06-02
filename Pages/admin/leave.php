@@ -222,10 +222,10 @@ if ($result && $result->num_rows > 0) {
                                         <td><?= htmlspecialchars(date('Y-m-d H:i', strtotime($request['requested_at']))) ?></td>
                                         <td class="action-buttons">
                                             <?php if ($request['status'] === 'pending'): ?>
-                                                <form method="POST" action="admin_leave.php">
+                                                <form method="POST" action="admin_leave.php" class="leave-action-form" data-leave-id="<?= $request['leave_id'] ?>">
                                                     <input type="hidden" name="leave_id" value="<?= $request['leave_id'] ?>">
-                                                    <button type="submit" name="approve" class="btn-approve">Approve</button>
-                                                    <button type="submit" name="reject" class="btn-reject">Reject</button>
+                                                    <button type="button" class="btn-approve" onclick="confirmLeaveAction(<?= $request['leave_id'] ?>, 'approve')">Approve</button>
+                                                    <button type="button" class="btn-reject" onclick="confirmLeaveAction(<?= $request['leave_id'] ?>, 'reject')">Reject</button>
                                                 </form>
                                             <?php else: ?>
                                                 <span>Action Taken</span>
@@ -244,5 +244,19 @@ if ($result && $result->num_rows > 0) {
     </div>
 
     <script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script>
+    <script>
+        function confirmLeaveAction(leaveId, action) {
+            const message = `Are you sure you want to ${action} this leave request?`;
+            if (confirm(message)) {
+                const form = document.querySelector(`.leave-action-form[data-leave-id="${leaveId}"]`);
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = action;
+                hiddenInput.value = action;
+                form.appendChild(hiddenInput);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>
