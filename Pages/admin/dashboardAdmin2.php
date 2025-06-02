@@ -15,8 +15,9 @@ $query = "
         st.day,
         st.start_time,
         st.end_time,
-        GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) SEPARATOR ', ') AS students,
-        CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor
+        GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) ORDER BY s.First_Name SEPARATOR ', ') AS students,
+        CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor,
+        sc.student_course_id
     FROM 
         student_timetable st
     JOIN 
@@ -25,9 +26,9 @@ $query = "
         courses c ON sc.course_id = c.course_id
     JOIN 
         students s ON sc.student_id = s.student_id
-    JOIN 
+    LEFT JOIN 
         instructor_courses ic ON ic.course_id = c.course_id
-    JOIN 
+    LEFT JOIN 
         instructor i ON ic.instructor_id = i.instructor_id
     WHERE 
         st.status = 'active'
@@ -69,15 +70,25 @@ function getNextDateForDay($dayName) {
 $calendarEvents = [];
 foreach ($classes as $class) {
     $calendarEvents[] = [
-        'title' => $class['course_name'] . ' - ' . $class['instructor'],
-        'date' => getNextDateForDay($class['day']),
-        'type' => '1',
-        'time' => date('h:i A', strtotime($class['start_time'])),
-        'duration' => calculateDuration($class['start_time'], $class['end_time']),
+        'course' => $class['course_name'],
+        'day' => $class['day'],
+        'startTime' => $class['start_time'],
+        'endTime' => $class['end_time'],
         'students' => $class['students'],
-        'description' => 'Students: ' . $class['students']
+        'instructor' => $class['instructor'],
+        'student_course_id' => $class['student_course_id']
     ];
 }
+
+// Fetch attendance summary for the summary cards
+$attendanceQuery = "SELECT 
+    COUNT(DISTINCT student_id) as total_students,
+    SUM(CASE WHEN status = 'attended' THEN hours_attended ELSE 0 END) as total_hours_attended,
+    SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as total_missed,
+    SUM(CASE WHEN status = 'replacement_booked' THEN hours_replacement ELSE 0 END) as total_replacement
+FROM attendance_records";
+$attendanceResult = $conn->query($attendanceQuery);
+$attendanceData = $attendanceResult->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -172,6 +183,29 @@ foreach ($classes as $class) {
                                 echo '<div class="detail-row"><strong>Instructor:</strong> ' . $class['instructor'] . '</div>';
                                 echo '<div class="detail-row"><strong>Time:</strong> ' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . ' (' . $duration . ')</div>';
                                 echo '<div class="detail-row"><strong>Students:</strong> ' . $class['students'] . '</div>';
+                                
+                                // Add attendance information if available
+                                $attendanceQuery = "SELECT 
+                                    COUNT(*) as total_sessions,
+                                    SUM(CASE WHEN status = 'attended' THEN 1 ELSE 0 END) as attended,
+                                    SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as missed,
+                                    SUM(CASE WHEN status = 'replacement_booked' THEN 1 ELSE 0 END) as replacement
+                                FROM attendance_records 
+                                WHERE course = ?";
+                                $attendanceStmt = $conn->prepare($attendanceQuery);
+                                $attendanceStmt->bind_param("s", $class['course_name']);
+                                $attendanceStmt->execute();
+                                $attendanceResult = $attendanceStmt->get_result();
+                                $attendanceData = $attendanceResult->fetch_assoc();
+                                
+                                if ($attendanceData) {
+                                    echo '<div class="detail-row"><strong>Attendance:</strong> ';
+                                    echo $attendanceData['attended'] . ' attended, ';
+                                    echo $attendanceData['missed'] . ' missed, ';
+                                    echo $attendanceData['replacement'] . ' replacements';
+                                    echo '</div>';
+                                }
+                                
                                 echo '</div>';
                                 
                                 echo '<button class="toggle-details-btn">Show Details <i class="fas fa-chevron-down"></i></button>';
@@ -225,6 +259,10 @@ foreach ($classes as $class) {
                     $totalCourses = $result->fetch_assoc()['total'];
                     ?>
                     <p><?php echo $totalCourses; ?></p>
+                </div>
+                <div class="summary-card">
+                    <h3>Hours Attended</h3>
+                    <p><?php echo $attendanceData['total_hours_attended'] ?? '0'; ?></p>
                 </div>
             </div>
 
@@ -292,7 +330,7 @@ foreach ($classes as $class) {
                                         <div class="bar-container">
                                             <div class="bar-label"><?php echo $item['syllabus']; ?></div>
                                             <div class="bar-outer">
-                                                <div class="bar-inner" style="width: <?php echo ($item['count'] / 40) * 100; ?>%"></div>
+                                                <div class="bar-inner" style="width: <?php echo ($item['count'] / $totalStudents) * 100; ?>%"></div>
                                             </div>
                                             <div class="bar-value"><?php echo $item['count']; ?></div>
                                         </div>
@@ -384,7 +422,7 @@ foreach ($classes as $class) {
                                     <div class="qualification-chart" id="educationChart">
                                         <?php foreach ($educationData as $edu): ?>
                                         <div class="qualification-segment <?php echo strtolower($edu['education']); ?>" 
-                                            style="height: <?php echo ($edu['count'] / 20) * 100; ?>%"
+                                            style="height: <?php echo ($edu['count'] / $totalInstructors) * 100; ?>%"
                                             title="<?php echo $edu['education']; ?>: <?php echo $edu['count']; ?>">
                                             <span class="qualification-label"><?php echo $edu['education']; ?></span>
                                             <span class="qualification-count"><?php echo $edu['count']; ?></span>
@@ -401,7 +439,7 @@ foreach ($classes as $class) {
                                     <div class="experience-bar">
                                         <div class="experience-label"><?php echo $exp['age_group']; ?></div>
                                         <div class="experience-bar-outer">
-                                            <div class="experience-bar-inner" style="width: <?php echo ($exp['count'] / 20) * 100; ?>%"></div>
+                                            <div class="experience-bar-inner" style="width: <?php echo ($exp['count'] / $totalInstructors) * 100; ?>%"></div>
                                         </div>
                                         <div class="experience-count"><?php echo $exp['count']; ?></div>
                                     </div>
@@ -537,7 +575,7 @@ foreach ($classes as $class) {
                                     $completedPercentage = round(($completedCount / $totalInstructors) * 100);
                                     ?>
                                     
-                                    <li><?php echo $maxSyllabus; ?> is the most common syllabus with <?php echo $maxCount; ?> students (<?php echo round(($maxCount / 40) * 100); ?>%).</li>
+                                    <li><?php echo $maxSyllabus; ?> is the most common syllabus with <?php echo $maxCount; ?> students (<?php echo round(($maxCount / $totalStudents) * 100); ?>%).</li>
                                     <li>Most students are at the <?php echo $maxLevel; ?> level (<?php echo $maxLevelCount; ?> students).</li>
                                     <li>The male to female ratio among students is <?php echo $genderRatio; ?>:1.</li>
                                     <li><?php echo $completedPercentage; ?>% of instructors have completed their training.</li>
@@ -555,6 +593,9 @@ foreach ($classes as $class) {
     <script type="module" src="/Scripts/common.js"></script>
     <script type="module" src="/Scripts/dashboardAdmin2.js"></script>
     <script>
+        // Pass the classes data to JavaScript
+        window.rosterClasses = <?php echo json_encode($calendarEvents); ?>;
+        
         // Override default event display for admin
         document.addEventListener('DOMContentLoaded', () => {
             // This assumes your dashboard.js has a way to customize event display
