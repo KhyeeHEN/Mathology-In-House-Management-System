@@ -22,7 +22,7 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'requested_at';
 $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
 // Validate sort column
-$allowed_columns = ['name', 'start_date', 'end_date', 'reason', 'status', 'requested_at'];
+$allowed_columns = ['leave_id', 'name', 'start_date', 'end_date', 'reason', 'status', 'requested_at'];
 $sort_column = in_array($sort, $allowed_columns) ? $sort : 'requested_at';
 $sort_direction = $direction === 'ASC' ? 'ASC' : 'DESC';
 $new_direction = $sort_direction === 'ASC' ? 'DESC' : 'ASC';
@@ -245,6 +245,9 @@ if ($result && $result->num_rows > 0) {
                         <table>
                             <thead>
                                 <tr>
+                                    <th class="<?php echo $sort_column === 'leave_id' ? strtolower($sort_direction) : ''; ?>">
+                                        <a href="?sort=leave_id&direction=<?= $sort_column === 'leave_id' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>&page=<?= $page ?>">Leave ID</a>
+                                    </th>
                                     <th class="<?php echo $sort_column === 'name' ? strtolower($sort_direction) : ''; ?>">
                                         <a href="?sort=name&direction=<?= $sort_column === 'name' ? $new_direction : 'ASC' ?>&search=<?= urlencode($search) ?>&page=<?= $page ?>">User</a>
                                     </th>
@@ -270,6 +273,7 @@ if ($result && $result->num_rows > 0) {
                             <tbody>
                                 <?php foreach ($leave_requests as $request): ?>
                                     <tr>
+                                        <td><?= htmlspecialchars($request['leave_id']) ?></td>
                                         <td><?= htmlspecialchars($request['name']) ?></td>
                                         <td><?= htmlspecialchars($request['user_type']) ?></td>
                                         <td><?= htmlspecialchars(date('Y-m-d', strtotime($request['start_date']))) ?></td>
