@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 include '../setting.php';
 session_start();
 
@@ -11,7 +8,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$studentId = $_SESSION['user_id'];
+// Fetch the actual student_id from the users table using the session's user_id
+$user_id = $_SESSION['user_id'];
+$user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
+$user_stmt = $conn->prepare($user_sql);
+if (!$user_stmt) {
+    echo "Error preparing user query: " . $conn->error;
+    exit();
+}
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+$user_info = $user_result->fetch_assoc();
+
+if (!$user_info || !isset($user_info['student_id'])) {
+    echo "<p>Error: Student ID not found for user ID $user_id.</p>";
+    exit();
+}
+
+$student_id = $user_info['student_id'];
 
 // Handle sorting
 $allowed_columns = ['timetable_datetime', 'attendance_datetime', 'hours_attended', 'hours_replacement', 'hours_remaining', 'status', 'course', 'updated_at'];
@@ -27,7 +42,11 @@ $sql = "
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $studentId);
+if (!$stmt) {
+    echo "Error preparing attendance query: " . $conn->error;
+    exit();
+}
+$stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
