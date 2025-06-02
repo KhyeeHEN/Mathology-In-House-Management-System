@@ -25,20 +25,20 @@ $instructorId = $userData['instructor_id'];
 
 // Fetch instructor's timetable with student information
 $query = "SELECT 
-            it.id, 
-            it.day, 
-            it.start_time, 
-            it.end_time,
-            it.course AS course_name,
+            st.id, 
+            st.day, 
+            st.start_time, 
+            st.end_time,
+            st.course AS course_name,
             c.course_name AS fallback_course_name,
             GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students
-          FROM instructor_timetable it
-          LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
-          LEFT JOIN courses c ON (ic.course_id = c.course_id OR it.course = c.course_name)
-          LEFT JOIN student_courses sc ON sc.course_id = c.course_id
-          LEFT JOIN students s ON sc.student_id = s.student_id
-          WHERE (ic.instructor_id = ? OR it.instructor_course_id IS NULL) AND it.status = 'active'
-          GROUP BY it.id, it.day, it.start_time, it.end_time, it.course, c.course_name";
+          FROM student_timetable st
+          JOIN student_courses sc ON st.student_course_id = sc.student_course_id
+          JOIN students s ON sc.student_id = s.student_id
+          JOIN courses c ON sc.course_id = c.course_id
+          JOIN instructor_courses ic ON ic.course_id = c.course_id
+          WHERE ic.instructor_id = ? AND st.status = 'active'
+          GROUP BY st.id, st.day, st.start_time, st.end_time, st.course, c.course_name";
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $instructorId);
