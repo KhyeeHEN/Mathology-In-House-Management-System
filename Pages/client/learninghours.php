@@ -1,10 +1,68 @@
+<?php
+include '../setting.php';
+session_start();
+
+// Protect route
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+    header("Location: ../login.php");
+    exit();
+}
+
+// Fetch the actual student_id from the users table using the session's user_id
+$user_id = $_SESSION['user_id'];
+$user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
+$user_stmt = $conn->prepare($user_sql);
+if (!$user_stmt) {
+    echo "<p>Error: Unable to retrieve student information. Please try again later.</p>";
+    exit();
+}
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+$user_info = $user_result->fetch_assoc();
+
+if (!$user_info || !isset($user_info['student_id'])) {
+    echo "<p>Error: Student ID not found for this user.</p>";
+    exit();
+}
+
+$student_id = $user_info['student_id'];
+
+// Fetch attendance data
+$sql = "
+    SELECT course, timetable_datetime, attendance_datetime, hours_attended, hours_remaining, status
+    FROM attendance_records
+    WHERE student_id = ?
+    ORDER BY timetable_datetime DESC
+";
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    echo "<p>Error: Unable to fetch attendance records. Please try again later.</p>";
+    exit();
+}
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Store results in an array
+$attendance_data = [];
+$total_hours = 0;
+$remaining_hours = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $attendance_data[] = $row;
+    $total_hours += $row['hours_attended'] > 0 ? floatval($row['hours_attended']) : 0;
+    // Use the last record's hours_remaining as the total remaining (assuming cumulative tracking)
+    $remaining_hours = floatval($row['hours_remaining']);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance</title>
+    <title>Learning Hours</title>
     <link rel="stylesheet" href="/Styles/common.css" />
     <link rel="stylesheet" href="/Styles/attendance.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -71,7 +129,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="dashboard-container">
         <?php include("../includes/Aside_Nav_Student.php"); ?>
@@ -82,12 +139,12 @@
             <div class="content-container">
                 <div class="summary-card">
                     <div class="summary-title">Total Hours Attended</div>
-                    <div class="summary-value" id="total-hours">0.0 hours</div>
+                    <div class="summary-value"><?= number_format($total_hours, 1) ?> hours</div>
                 </div>
 
                 <div class="summary-card">
                     <div class="summary-title">Hours Remaining</div>
-                    <div class="summary-value" id="remaining-hours">0.0 hours</div>
+                    <div class="summary-value"><?= number_format($remaining_hours, 1) ?> hours</div>
                 </div>
 
                 <h2>Attendance Records</h2>
@@ -102,107 +159,32 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="attendance-data">
-                        <!-- Data will be populated by JavaScript -->
+                    <tbody>
+                    <?php if (!empty($attendance_data)): ?>
+                        <?php foreach ($attendance_data as $row): ?>
+                            <tr>
+                                <td><?= htmlspecialchars(date("Y-m-d", strtotime($row['timetable_datetime']))) ?></td>
+                                <td><?= htmlspecialchars($row['course']) ?></td>
+                                <td><?= htmlspecialchars(date("H:i", strtotime($row['timetable_datetime']))) ?></td>
+                                <td><?= $row['attendance_datetime'] ? htmlspecialchars(date("H:i", strtotime($row['attendance_datetime']))) : 'N/A' ?></td>
+                                <td><?= $row['hours_attended'] > 0 ? htmlspecialchars(number_format($row['hours_attended'], 1)) . ' hours' : 'N/A' ?></td>
+                                <td class="<?php
+                                    echo $row['status'] === 'attended' ? 'status-attended' :
+                                         ($row['status'] === 'missed' ? 'status-missed' :
+                                         ($row['status'] === 'replacement_booked' ? 'status-replacement' : ''));
+                                ?>">
+                                    <?= ucfirst(htmlspecialchars($row['status'])) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="6">No attendance records found</td></tr>
+                    <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // In a real application, you would get the student ID from the session
-            // For this example, we'll use student_id = 1 (Wei Jie Tan)
-            const studentId = 1;
-
-            // Fetch attendance data from the server
-            fetchAttendanceData(studentId);
-        });
-
-        function fetchAttendanceData(studentId) {
-            // In a real application, you would make an AJAX call to your server
-            // For this example, we'll use mock data that matches the SQL dump
-
-            // This would be replaced with actual API call:
-            // fetch(`/api/attendance?student_id=${studentId}`)
-            //     .then(response => response.json())
-            //     .then(data => displayAttendanceData(data));
-
-            // Mock data based on the SQL dump for student_id = 1
-            const mockData = [
-                {
-                    record_id: 1,
-                    course: "IGCSE Math Prep",
-                    timetable_datetime: "2023-11-01 16:00:00",
-                    attendance_datetime: "2023-11-01 16:05:00",
-                    hours_attended: 2.0,
-                    hours_remaining: 18.0,
-                    status: "attended"
-                }
-                // Add more records if needed
-            ];
-
-            displayAttendanceData(mockData);
-        }
-
-        function displayAttendanceData(data) {
-            const tableBody = document.getElementById('attendance-data');
-            let totalHours = 0;
-            let remainingHours = 0;
-
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6">No attendance records found</td></tr>';
-                return;
-            }
-
-            tableBody.innerHTML = '';
-
-            data.forEach(record => {
-                const row = document.createElement('tr');
-
-                // Format date
-                const date = new Date(record.timetable_datetime);
-                const formattedDate = date.toLocaleDateString();
-                const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                // Format attendance time if exists
-                let attendanceTime = 'N/A';
-                if (record.attendance_datetime) {
-                    const attendDate = new Date(record.attendance_datetime);
-                    attendanceTime = attendDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-
-                // Determine status class
-                let statusClass = '';
-                if (record.status === 'attended') statusClass = 'status-attended';
-                else if (record.status === 'missed') statusClass = 'status-missed';
-                else if (record.status === 'replacement_booked') statusClass = 'status-replacement';
-
-                // Capitalize first letter of status
-                const formattedStatus = record.status.charAt(0).toUpperCase() + record.status.slice(1);
-
-                row.innerHTML = `
-                    <td>${formattedDate}</td>
-                    <td>${record.course}</td>
-                    <td>${formattedTime}</td>
-                    <td>${attendanceTime}</td>
-                    <td>${record.hours_attended} hours</td>
-                    <td class="${statusClass}">${formattedStatus}</td>
-                `;
-
-                tableBody.appendChild(row);
-
-                // Calculate totals
-                totalHours += parseFloat(record.hours_attended);
-                remainingHours = record.hours_remaining; // Will take last record's remaining hours
-            });
-
-            // Update summary cards
-            document.getElementById('total-hours').textContent = `${totalHours.toFixed(1)} hours`;
-            document.getElementById('remaining-hours').textContent = `${remainingHours.toFixed(1)} hours`;
-        }
-    </script>
+    <script type="module" src="/Scripts/common.js"></script>
 </body>
-
 </html>
