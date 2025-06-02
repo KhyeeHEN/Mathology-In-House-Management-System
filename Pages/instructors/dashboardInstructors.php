@@ -3,7 +3,7 @@ require_once '../setting.php';
 session_start();
 
 // Ensure instructor is logged in
-if (!isset($_SESSION['user_id']) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
