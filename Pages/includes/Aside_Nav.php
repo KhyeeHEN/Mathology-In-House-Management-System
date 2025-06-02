@@ -20,7 +20,7 @@
             <span>Student Timetable</span>
         </a>
         <a href="../admin/instructor_info.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'timetable_approve.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'instructor_info.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Instructor</span>
         </a>
