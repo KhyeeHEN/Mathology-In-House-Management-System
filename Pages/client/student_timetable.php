@@ -61,15 +61,17 @@ $result = $stmt->get_result();
 // Debug: Output number of rows
 echo "<p>Debug: Number of timetable rows = " . $result->num_rows . "</p>";
 
+// Store the results in an array to avoid pointer issues
+$timetable_data = [];
+while ($row = $result->fetch_assoc()) {
+    $timetable_data[] = $row;
+}
+
 // Debug: Output raw query results
-if ($result->num_rows > 0) {
+if (!empty($timetable_data)) {
     echo "<p>Debug: Raw timetable data:</p><pre>";
-    while ($row = $result->fetch_assoc()) {
-        print_r($row);
-    }
+    print_r($timetable_data);
     echo "</pre>";
-    // Reset result pointer to start for table rendering
-    $result->data_seek(0);
 }
 
 // Get student info for header
@@ -95,7 +97,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Timetable</title>
     <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../Styles/timtable.css">
+    <link rel="stylesheet" href="../../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timetable-container {
@@ -212,7 +214,8 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
             </div>
 
             <div class="timetable-container">
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
+                    <?php echo "<p>Debug: Rendering table with " . count($timetable_data) . " rows</p>"; ?>
                     <table class="timetable">
                         <thead>
                             <tr>
@@ -224,7 +227,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php foreach ($timetable_data as $row): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($row['course'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['day'] ?? 'N/A') ?></td>
@@ -232,7 +235,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
                                     <td><?= htmlspecialchars($row['end_time'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['approved_at'] ?? 'N/A') ?></td>
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 <?php else: ?>
@@ -250,7 +253,7 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
                 <a href="timetable_add.php?student_id=<?= $student_id ?>" class="btn btn-secondary">
                     <i class="fas fa-plus"></i> Add New Session
                 </a>
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
                     <a href="print_timetable.php?student_id=<?= $student_id ?>" class="btn btn-danger" target="_blank">
                         <i class="fas fa-print"></i> Print Timetable
                     </a>
@@ -258,6 +261,6 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
             </div>
         </main>
     </div>
-    <script type="module" src="../../Scripts/common.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
 </body>
 </html>
