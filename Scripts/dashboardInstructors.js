@@ -1,4 +1,4 @@
-// Calendar functionality for instructor dashboard
+// Calendar functionality for instructor dashboard - View Only
 class InstructorCalendar {
     constructor() {
         this.currentDate = new Date();
@@ -10,6 +10,18 @@ class InstructorCalendar {
         this.renderCalendar();
         this.bindEvents();
         this.createModal();
+        this.showViewOnlyMessage();
+    }
+
+    showViewOnlyMessage() {
+        const calendarContainer = document.querySelector('.calendar-container');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'view-only-message';
+        messageDiv.innerHTML = `
+            <i class="fas fa-info-circle"></i>
+            <p>This calendar displays your scheduled classes. View class details by clicking on any event.</p>
+        `;
+        calendarContainer.insertBefore(messageDiv, calendarContainer.firstChild);
     }
 
     bindEvents() {
@@ -116,7 +128,7 @@ class InstructorCalendar {
             const eventsContainer = document.createElement('div');
             eventsContainer.classList.add('day-events');
             
-            // Add up to 3 events, then show "more" indicator
+            // Add up to 2 events, then show "more" indicator
             const maxVisibleEvents = 2;
             const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
             
@@ -197,14 +209,6 @@ class InstructorCalendar {
                         </div>
                     ` : ''}
                 </div>
-                <div class="modal-actions">
-                    <button class="btn btn-primary" onclick="instructorCalendar.editEvent('${event.title}', '${date}')">
-                        <i class="fas fa-edit"></i> Edit Class
-                    </button>
-                    <button class="btn btn-secondary" onclick="instructorCalendar.viewStudents('${event.students}')">
-                        <i class="fas fa-users"></i> View Students
-                    </button>
-                </div>
             </div>
         `;
         
@@ -262,9 +266,9 @@ class InstructorCalendar {
                 <div class="no-events">
                     <i class="fas fa-calendar-times"></i>
                     <p>No classes scheduled for ${this.formatDateDisplay(date)}</p>
-                    <button class="btn btn-primary" onclick="instructorCalendar.scheduleClass('${date}')">
-                        <i class="fas fa-plus"></i> Schedule New Class
-                    </button>
+                    <p style="font-size: 14px; color: #888; margin-top: 20px;">
+                        Classes are scheduled by administrators. Contact your administrator for scheduling changes.
+                    </p>
                 </div>
             </div>
         `;
@@ -317,25 +321,6 @@ class InstructorCalendar {
         return date1.getDate() === date2.getDate() &&
                date1.getMonth() === date2.getMonth() &&
                date1.getFullYear() === date2.getFullYear();
-    }
-
-    // Action handlers
-    editEvent(title, date) {
-        console.log('Edit event:', title, date);
-        // Implement edit functionality
-        alert('Edit functionality would be implemented here');
-    }
-
-    viewStudents(students) {
-        console.log('View students:', students);
-        // Implement view students functionality
-        alert(`Students: ${students}`);
-    }
-
-    scheduleClass(date) {
-        console.log('Schedule class for:', date);
-        // Implement schedule functionality
-        alert('Schedule new class functionality would be implemented here');
     }
 }
 
