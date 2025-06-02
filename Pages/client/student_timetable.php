@@ -2,12 +2,13 @@
 include '../setting.php'; // adjust path as needed
 session_start();
 
-// Get current student ID from session or URL
-$student_id = $_SESSION['student_id'] ?? $_GET['student_id'] ?? null;
-
-if (!$student_id) {
-    die("Student ID not provided.");
+// Ensure student is logged in
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+    header("Location: ../login.php");
+    exit();
 }
+
+$studentId = $_SESSION['user_id']; 
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
@@ -21,7 +22,7 @@ $sql = "SELECT
             DATE_FORMAT(st.approved_at, '%M %d, %Y') as approved_at
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
-        JOIN Students s ON sc.student_id = s.student_id
+        JOIN students s ON sc.student_id = s.student_id
         JOIN courses c ON sc.course_id = c.course_id
         WHERE s.student_id = ?
         ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
@@ -32,7 +33,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 // Get student info for header
-$student_sql = "SELECT First_Name, Last_Name FROM Students WHERE student_id = ?";
+$student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?";
 $student_stmt = $conn->prepare($student_sql);
 $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
