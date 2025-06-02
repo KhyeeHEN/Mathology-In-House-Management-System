@@ -166,11 +166,7 @@ echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEven
         </main>
     </div>
     
-    <script>
-        const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-    </script>
-
-    <script src="../../Scripts/common.js"></script>
+    <!-- <script src="../../Scripts/common.js"></script> -->
     <script src="../../Scripts/dashboardInstructors.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

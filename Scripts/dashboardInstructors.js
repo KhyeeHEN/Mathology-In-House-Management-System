@@ -2,14 +2,15 @@
 class InstructorCalendar {
     constructor() {
         this.currentDate = new Date();
-        this.events = []; // Initialize empty array
-        
-        // Make sure we properly capture the window.calendarEvents
+        this.events = [];
+
         if (window.calendarEvents && Array.isArray(window.calendarEvents)) {
             this.events = window.calendarEvents;
             console.log('Loaded events:', this.events.length);
+        } else {
+            console.warn('Warning: window.calendarEvents is undefined or not an array. No events loaded.');
         }
-        
+
         this.init();
     }
 
