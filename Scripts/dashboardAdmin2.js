@@ -343,18 +343,17 @@ class ScheduleCalendar {
         });
     }
 
-    // Enhanced createClassBlock method - FIXED VERSION
     createClassBlock(classInfo, classCount = 1) {
         const block = document.createElement('div');
         block.className = `class-block ${this.getCourseType(classInfo.course)}`;
         
         const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
+        const studentCount = this.getStudentCount(classInfo.students);
         
-        // Calculate height based on duration (each 30-minute slot = 50px height)
+        // Calculate height based on duration
         const slotsSpanned = Math.ceil(duration / 30);
-        const height = Math.max(40, (slotsSpanned * 50) - 4); // Minimum 40px height
+        const height = Math.max(45, (slotsSpanned * 50) - 4);
         
-        // Handle long duration classes differently
         if (slotsSpanned > 1) {
             block.classList.add('long-duration');
             block.style.height = `${height}px`;
@@ -367,46 +366,85 @@ class ScheduleCalendar {
             block.style.height = `${height}px`;
         }
         
-        // Adjust for multiple classes in the same time slot
+        // Adjust for multiple classes
         if (classCount > 1 && slotsSpanned === 1) {
-            if (classCount === 2) {
-                block.style.width = 'calc(50% - 2px)';
-            } else if (classCount === 3) {
-                block.style.width = 'calc(33.33% - 2px)';
-            } else {
-                block.style.width = `calc(${100/classCount}% - 2px)`;
-            }
+            block.style.width = `calc(${100/classCount}% - 2px)`;
         }
         
-        // Create content with proper truncation
-        const courseTitle = this.truncateText(classInfo.course, classCount > 1 ? 12 : 18);
-        const instructorName = this.truncateText(classInfo.instructor, classCount > 1 ? 15 : 25);
-        const studentCount = this.getStudentCount(classInfo.students);
+        const courseTitle = this.truncateText(classInfo.course, 15);
+        const timeRange = `${this.formatTime12Hour(classInfo.startTime)}-${this.formatTime12Hour(classInfo.endTime)}`;
         
         block.innerHTML = `
             <div class="class-title" title="${classInfo.course}">${courseTitle}</div>
-            <div class="class-instructor" title="${classInfo.instructor}">
-                <i class="fas fa-user"></i>
-                ${instructorName}
-            </div>
-            <div class="class-students" title="${classInfo.students}">
+            <div class="class-time">${timeRange}</div>
+            <div class="student-count">
                 <i class="fas fa-users"></i>
                 ${studentCount} student${studentCount !== 1 ? 's' : ''}
             </div>
         `;
 
-        // Add tooltip functionality
-        block.addEventListener('mouseenter', (e) => this.showTooltip(e, classInfo));
-        block.addEventListener('mouseleave', () => this.hideTooltip());
-        
-        // Add click functionality for mobile
+        // Add click functionality to show student list
         block.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.showTooltip(e, classInfo);
-            setTimeout(() => this.hideTooltip(), 3000); // Auto-hide after 3 seconds
+            this.showStudentModal(classInfo);
         });
 
         return block;
+    }
+
+    showStudentModal(classInfo) {
+        const studentCount = this.getStudentCount(classInfo.students);
+        const studentList = classInfo.students.split(',').map(s => s.trim());
+        
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('studentModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'studentModal';
+            modal.className = 'student-modal';
+            document.body.appendChild(modal);
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">${classInfo.course}</div>
+                    <button class="close-modal">&times;</button>
+                </div>
+                
+                <div class="class-info">
+                    <div><strong>Instructor:</strong> ${classInfo.instructor}</div>
+                    <div><strong>Time:</strong> ${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)}</div>
+                    <div><strong>Day:</strong> ${classInfo.day}</div>
+                    <div><strong>Duration:</strong> ${this.getClassDuration(classInfo.startTime, classInfo.endTime)} minutes</div>
+                </div>
+                
+                <h4>Students (${studentCount}):</h4>
+                <ul class="student-list">
+                    ${studentList.map(student => `
+                        <li class="student-item">
+                            <span class="student-name">${student}</span>
+                            <button class="view-details-btn" onclick="viewStudentDetails('${student}', '${classInfo.course}')">
+                                View Details
+                            </button>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+        
+        modal.classList.add('show');
+        
+        // Close modal functionality
+        modal.querySelector('.close-modal').addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
     }
 
     getCourseType(courseName) {
@@ -567,3 +605,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 60000);
 });
+
+// Global function for view details button
+function viewStudentDetails(studentName, courseName) {
+    // This will redirect to another page - you can customize the URL
+    const url = `student-details.php?student=${encodeURIComponent(studentName)}&course=${encodeURIComponent(courseName)}`;
+    window.open(url, '_blank');
+}

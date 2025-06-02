@@ -95,8 +95,7 @@ $attendanceData = $attendanceResult->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title> 
-    <link rel="stylesheet" href="/Styles/dashboard.css">
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/Styles/common.css">
     <link rel="stylesheet" href="/Styles/dashboardAdmin2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -589,7 +588,7 @@ $attendanceData = $attendanceResult->fetch_assoc();
         </main>
     </div>
     
-    <script type="module" src="/Scripts/dashboard.js"></script>
+    <!-- <script type="module" src="/Scripts/dashboard.js"></script> -->
     <script type="module" src="/Scripts/common.js"></script>
     <script type="module" src="/Scripts/dashboardAdmin2.js"></script>
     <script>

@@ -992,7 +992,7 @@ if (!$viewing_id && !$show_search_results) {
 
                             <?php 
                                 // Get total count for main lists
-                                $total = $conn->query("SELECT COUNT(*) as total FROM Students")->fetch_assoc()['total'];
+                                $total = $conn->query("SELECT COUNT(*) as total FROM students")->fetch_assoc()['total'];
                                 $total_pages = ceil($total / $per_page);
 
                                 if ($total_pages > 1): ?>
