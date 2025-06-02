@@ -168,7 +168,13 @@ class InstructorCalendar {
 
     getEventsForDate(date) {
         const dateString = this.formatDate(date);
-        return this.events.filter(event => event.date === dateString);
+        const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+        
+        return this.events.filter(event => {
+            // Match either exact date or recurring day of week
+            return event.date === dateString || 
+                (event.dayOfWeek && event.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase());
+        });
     }
 
     showEventDetails(event, date) {

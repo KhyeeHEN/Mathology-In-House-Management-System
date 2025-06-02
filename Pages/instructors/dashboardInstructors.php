@@ -25,20 +25,20 @@ $instructorId = $userData['instructor_id'];
 
 // Fetch instructor's timetable with student information
 $query = "SELECT 
-            it.id, 
-            it.day, 
-            it.start_time, 
-            it.end_time,
-            it.course AS course_name,
+            st.id, 
+            st.day, 
+            st.start_time, 
+            st.end_time,
+            st.course AS course_name,
             c.course_name AS fallback_course_name,
-            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students
-          FROM instructor_timetable it
-          LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
-          LEFT JOIN courses c ON (ic.course_id = c.course_id OR it.course = c.course_name)
-          LEFT JOIN student_courses sc ON sc.course_id = c.course_id
-          LEFT JOIN students s ON sc.student_id = s.student_id
-          WHERE (ic.instructor_id = ? OR it.instructor_course_id IS NULL) AND it.status = 'active'
-          GROUP BY it.id, it.day, it.start_time, it.end_time, it.course, c.course_name";
+            GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name)) AS students,
+            COUNT(s.student_id) AS student_count
+          FROM student_timetable st
+          JOIN student_courses sc ON st.student_course_id = sc.student_course_id
+          JOIN students s ON sc.student_id = s.student_id
+          JOIN courses c ON sc.course_id = c.course_id
+          WHERE st.instructor_id = ? AND st.status = 'active'
+          GROUP BY st.id, st.day, st.start_time, st.end_time, st.course, c.course_name";
 
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $instructorId);
@@ -72,20 +72,43 @@ function getNextDateForDay($dayName) {
 
 // Format for calendar.js
 $calendarEvents = [];
+$currentMonth = date('n');
+$currentYear = date('Y');
+
 foreach ($events as $event) {
     $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
-    $calendarEvents[] = [
-        'title' => $courseName,
-        'date' => getNextDateForDay($event['day']),
-        'type' => '1',
-        'time' => date('h:i A', strtotime($event['start_time'])),
-        'duration' => calculateDuration($event['start_time'], $event['end_time']),
-        'venue' => 'TBD',
-        'description' => '',
-        'students' => $event['students'] ? $event['students'] : 'No students enrolled'
-    ];
+    $studentsList = $event['students'] ? $event['students'] : 'No students enrolled';
+    
+    // Get all dates for this day of week in current month
+    $dayOfWeek = $event['day'];
+    $daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    $targetDayIndex = array_search(ucfirst($dayOfWeek), $daysOfWeek);
+    
+    if ($targetDayIndex !== false) {
+        // Find all dates in current month that match this day of week
+        $date = new DateTime("first $dayOfWeek of $currentYear-$currentMonth");
+        $month = $date->format('n');
+        
+        while ($month == $currentMonth) {
+            $calendarEvents[] = [
+                'title' => $courseName . ' (' . $event['student_count'] . ' students)',
+                'date' => $date->format('Y-m-d'),
+                'type' => '1',
+                'time' => date('h:i A', strtotime($event['start_time'])),
+                'duration' => calculateDuration($event['start_time'], $event['end_time']),
+                'venue' => 'TBD',
+                'description' => '',
+                'students' => $studentsList,
+                'dayOfWeek' => $dayOfWeek // Add day of week for reference
+            ];
+            
+            $date->modify('next ' . $dayOfWeek);
+            $month = $date->format('n');
+        }
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +121,7 @@ foreach ($events as $event) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("../includes/Aside_Nav_Instructor.php"); ?>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
@@ -147,5 +170,8 @@ foreach ($events as $event) {
 
     <script src="../../Scripts/common.js"></script>
     <script src="../../Scripts/dashboardInstructors.js"></script>
+    <script>
+        console.log('Calendar Events:', <?php echo json_encode($calendarEvents); ?>);
+    </script>
 </body>
 </html>
