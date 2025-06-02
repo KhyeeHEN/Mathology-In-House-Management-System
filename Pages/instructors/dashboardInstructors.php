@@ -3,30 +3,44 @@ require_once '../setting.php';
 session_start();
 
 // Ensure instructor is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
 
-$instructorId = $_SESSION['user_id']; 
-
-// First get the instructor_id from users table
-$query = "SELECT instructor_id FROM users WHERE user_id = ?";
+// Check if user is an instructor
+$query = "SELECT role, instructor_id FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $instructorId);
+$stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();
 $userData = $result->fetch_assoc();
-$actualInstructorId = $userData['instructor_id'];
 
-// Fetch instructor's timetable
-$query = "SELECT it.id, c.course_name, it.day, it.start_time, it.end_time, it.status 
+if (!$userData || $userData['role'] !== 'instructor') {
+    header("Location: ../login.php");
+    exit();
+}
+
+$instructorId = $userData['instructor_id'];
+
+// Fetch instructor's timetable with student information
+$query = "SELECT 
+            it.id, 
+            c.course_name, 
+            it.day, 
+            it.start_time, 
+            it.end_time, 
+            it.status,
+            GROUP_CONCAT(CONCAT(s.first_name, ' ', s.last_name) AS students
           FROM instructor_timetable it
           JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
           JOIN courses c ON ic.course_id = c.course_id
-          WHERE ic.instructor_id = ? AND it.status = 'active'";
+          LEFT JOIN student_courses sc ON ic.instructor_course_id = sc.instructor_course_id
+          LEFT JOIN students s ON sc.student_id = s.student_id
+          WHERE ic.instructor_id = ? AND it.status = 'active'
+          GROUP BY it.id";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $actualInstructorId);
+$stmt->bind_param("i", $instructorId);
 
 if (!$stmt->execute()) {
     die("Query execution failed: " . $stmt->error);
@@ -64,8 +78,9 @@ foreach ($events as $event) {
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
-        'venue' => 'TBD', // Can be added to instructor_timetable if needed
-        'description' => ''
+        'venue' => 'TBD',
+        'description' => '',
+        'students' => $event['students'] ? $event['students'] : 'No students enrolled'
     ];
 }
 ?>
@@ -83,11 +98,9 @@ foreach ($events as $event) {
     <div class="dashboard-container">
         <?php require("../includes/Aside_Nav.php"); ?>
 
-        <!-- Main Content Area -->
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <!-- Calendar Section -->
             <div class="calendar-container">
                 <div class="calendar-header">
                     <div class="calendar-navigation">
@@ -122,12 +135,10 @@ foreach ($events as $event) {
     </div>
     
     <script>
-        // Pass PHP events to JavaScript with proper formatting
         const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-        console.log('Loaded events:', calendarEvents); // Debug output
     </script>
     
-    <script type="module" src="../../Scripts/dashboard.js"></script>
-    <script type="module" src="../../Scripts/common.js"></script>
+    <script src="../../Scripts/dashboard.js"></script>
+    <script src="../../Scripts/common.js"></script>
 </body>
 </html>
