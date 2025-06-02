@@ -1,5 +1,5 @@
 <?php
-include '../../setting.php';
+include '../setting.php';
 session_start();
 
 // Protect route
