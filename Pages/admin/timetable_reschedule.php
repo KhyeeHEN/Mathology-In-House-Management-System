@@ -12,7 +12,7 @@ if (isset($_GET['student_id'])) {
     $student_id = (int)$_GET['student_id'];
     
     // Fetch student details
-    $student_result = $conn->query("SELECT * FROM studnets WHERE student_id = $student_id");
+    $student_result = $conn->query("SELECT * FROM students WHERE student_id = $student_id");
     if ($student_result && $student_result->num_rows > 0) {
         $student = $student_result->fetch_assoc();
         
