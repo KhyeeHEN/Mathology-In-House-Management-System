@@ -147,7 +147,7 @@ $leave_stmt->close();
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("../includes/Aside_Nav.php"); ?>
+        <?php include("../includes/Aside_Nav_Student.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
