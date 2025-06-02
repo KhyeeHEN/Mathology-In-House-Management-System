@@ -2,6 +2,11 @@
 include '../setting.php'; // Adjust path as needed
 session_start();
 
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Ensure student is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
@@ -12,17 +17,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 $user_id = $_SESSION['user_id'];
 $user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
 $user_stmt = $conn->prepare($user_sql);
+if (!$user_stmt) {
+    echo "Error preparing user query: " . $conn->error;
+    exit();
+}
 $user_stmt->bind_param("i", $user_id);
 $user_stmt->execute();
 $user_result = $user_stmt->get_result();
 $user_info = $user_result->fetch_assoc();
 
 if (!$user_info || !isset($user_info['student_id'])) {
-    echo "<p>Error: Student ID not found for this user.</p>";
+    echo "<p>Error: Student ID not found for user ID $user_id.</p>";
     exit();
 }
 
 $student_id = $user_info['student_id'];
+
+// Debug: Output the student_id
+echo "<p>Debug: Student ID = $student_id</p>";
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
@@ -38,17 +50,31 @@ $sql = "SELECT
         ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
 
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    echo "Error preparing timetable query: " . $conn->error;
+    exit();
+}
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Debug: Output number of rows
+echo "<p>Debug: Number of timetable rows = " . $result->num_rows . "</p>";
+
 // Get student info for header
 $student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?";
 $student_stmt = $conn->prepare($student_sql);
+if (!$student_stmt) {
+    echo "Error preparing student query: " . $conn->error;
+    exit();
+}
 $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
 $student_result = $student_stmt->get_result();
 $student_info = $student_result ? $student_result->fetch_assoc() : null;
+
+// Debug: Output student info
+echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true) : "No student info found") . "</p>";
 ?>
 
 <!DOCTYPE html>
