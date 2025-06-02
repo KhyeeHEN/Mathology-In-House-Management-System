@@ -29,5 +29,10 @@
             <i class="fas fa-credit-card"></i>
             <span>Payments</span>
         </a>
+        <a href="../admin/leave.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
+            <i class="fas fa-credit-card"></i>
+            <span>Leave</span>
+        </a>
     </nav>
 </aside>
