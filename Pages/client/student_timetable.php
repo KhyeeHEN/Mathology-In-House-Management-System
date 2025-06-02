@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$studentId = $_SESSION['user_id']; 
+$student_id = $_SESSION['user_id']; // Changed from $studentId to $student_id for consistency
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
@@ -37,7 +37,8 @@ $student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?"
 $student_stmt = $conn->prepare($student_sql);
 $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
-$student_info = $student_stmt->get_result()->fetch_assoc();
+$student_result = $student_stmt->get_result();
+$student_info = $student_result ? $student_result->fetch_assoc() : null;
 ?>
 
 <!DOCTYPE html>
@@ -46,8 +47,9 @@ $student_info = $student_stmt->get_result()->fetch_assoc();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Timetable</title>
-    <link rel="stylesheet" href="../../styles/common.css">
-    <link rel="stylesheet" href="../../styles/timtable.css">
+    <!-- Use absolute paths for CSS files -->
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timetable-container {
@@ -158,7 +160,7 @@ $student_info = $student_stmt->get_result()->fetch_assoc();
             <div class="student-header">
                 <h2>
                     <i class="fas fa-calendar-alt"></i> 
-                    Timetable for <?= htmlspecialchars($student_info['First_Name'] . ' ' . $student_info['Last_Name']) ?>
+                    Timetable for <?= $student_info ? htmlspecialchars($student_info['First_Name'] . ' ' . $student_info['Last_Name']) : 'Student' ?>
                 </h2>
             </div>
 
@@ -209,6 +211,6 @@ $student_info = $student_stmt->get_result()->fetch_assoc();
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="/scripts/common.js"></script>
 </body>
 </html>
