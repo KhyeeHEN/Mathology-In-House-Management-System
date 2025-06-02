@@ -190,12 +190,6 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
 
             <div class="action-buttons">
-                <a href="timetable_reschedule.php?student_id=<?= $student_id ?>" class="btn btn-primary">
-                    <i class="fas fa-calendar-alt"></i> Reschedule Timetable
-                </a>
-                <a href="timetable_add.php?student_id=<?= $student_id ?>" class="btn btn-secondary">
-                    <i class="fas fa-plus"></i> Add New Session
-                </a>
                 <?php if (!empty($timetable_data)): ?>
                     <a href="print_timetable.php?student_id=<?= $student_id ?>" class="btn btn-danger" target="_blank">
                         <i class="fas fa-print"></i> Print Timetable
