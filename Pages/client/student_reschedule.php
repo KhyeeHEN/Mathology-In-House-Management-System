@@ -15,7 +15,7 @@ $_SESSION['student_id'] = $student_id; // Store in session for consistency
 //$student_id = $_SESSION['student_id'];
 
 // Fetch student details
-$student = $conn->query("SELECT * FROM Students WHERE student_id = $student_id")->fetch_assoc();
+$student = $conn->query("SELECT * FROM students WHERE student_id = $student_id")->fetch_assoc();
 
 // Fetch student's current timetable
 $current_timetable = $conn->query("
@@ -91,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Timetable Change</title>
-    <link rel="stylesheet" href="../../styles/common.css">
-    <link rel="stylesheet" href="../../styles/attendence.css">
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../Styles/attendence.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .content-container {
