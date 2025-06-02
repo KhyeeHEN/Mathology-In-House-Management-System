@@ -98,7 +98,7 @@ foreach ($events as $event) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("../includes/Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav_Instructor.php"); ?>
 
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
