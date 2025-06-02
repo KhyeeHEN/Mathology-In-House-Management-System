@@ -228,6 +228,7 @@ class ScheduleCalendar {
         });
     }
 
+    // Enhanced renderWeekView method - FIXED VERSION
     renderWeekView() {
         const grid = document.getElementById('scheduleGrid');
         if (!grid) return;
@@ -279,20 +280,44 @@ class ScheduleCalendar {
             `;
             dayColumn.appendChild(dayHeader);
 
+            // Track classes that span multiple slots
+            const processedClasses = new Set();
+
             // Time slots for this day
-            this.timeSlots.forEach(time => {
+            this.timeSlots.forEach((time, timeIndex) => {
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'time-grid-slot';
                 timeSlot.setAttribute('data-time', time);
                 
                 // Find classes for this day and time
                 const dayClasses = this.getClassesForDayAndTime(day, time);
+                const availableClasses = dayClasses.filter(cls => 
+                    !processedClasses.has(`${cls.course}-${cls.startTime}-${cls.endTime}`)
+                );
                 
-                if (dayClasses.length > 0) {
-                    // Pass the number of classes to adjust width
-                    dayClasses.forEach(classInfo => {
-                        const classBlock = this.createClassBlock(classInfo, dayClasses.length);
-                        timeSlot.appendChild(classBlock);
+                // Add class count indicator for styling
+                if (availableClasses.length > 1) {
+                    if (availableClasses.length === 2) {
+                        timeSlot.classList.add('multiple-classes');
+                    } else if (availableClasses.length >= 3) {
+                        timeSlot.classList.add('triple-classes');
+                    }
+                }
+                
+                if (availableClasses.length > 0) {
+                    availableClasses.forEach(classInfo => {
+                        const classId = `${classInfo.course}-${classInfo.startTime}-${classInfo.endTime}`;
+                        
+                        if (!processedClasses.has(classId)) {
+                            const classBlock = this.createClassBlock(classInfo, availableClasses.length);
+                            timeSlot.appendChild(classBlock);
+                            
+                            // Mark long duration classes as processed
+                            const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
+                            if (duration > 30) {
+                                processedClasses.add(classId);
+                            }
+                        }
                     });
                 }
 
@@ -318,28 +343,68 @@ class ScheduleCalendar {
         });
     }
 
+    // Enhanced createClassBlock method - FIXED VERSION
     createClassBlock(classInfo, classCount = 1) {
         const block = document.createElement('div');
         block.className = `class-block ${this.getCourseType(classInfo.course)}`;
         
         const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
-        const height = Math.max(40, (duration / 30) * 60 - 8); // Minimum 40px height
-        block.style.height = `${height}px`;
         
-        // Adjust width based on number of classes in the same time slot
-        if (classCount > 1) {
-            block.style.flex = `0 0 ${100 / classCount}%`; // Divide width equally
+        // Calculate height based on duration (each 30-minute slot = 50px height)
+        const slotsSpanned = Math.ceil(duration / 30);
+        const height = Math.max(40, (slotsSpanned * 50) - 4); // Minimum 40px height
+        
+        // Handle long duration classes differently
+        if (slotsSpanned > 1) {
+            block.classList.add('long-duration');
+            block.style.height = `${height}px`;
+            block.style.position = 'absolute';
+            block.style.top = '2px';
+            block.style.left = '2px';
+            block.style.right = '2px';
+            block.style.zIndex = '5';
+        } else {
+            block.style.height = `${height}px`;
         }
         
+        // Adjust for multiple classes in the same time slot
+        if (classCount > 1 && slotsSpanned === 1) {
+            if (classCount === 2) {
+                block.style.width = 'calc(50% - 2px)';
+            } else if (classCount === 3) {
+                block.style.width = 'calc(33.33% - 2px)';
+            } else {
+                block.style.width = `calc(${100/classCount}% - 2px)`;
+            }
+        }
+        
+        // Create content with proper truncation
+        const courseTitle = this.truncateText(classInfo.course, classCount > 1 ? 12 : 18);
+        const instructorName = this.truncateText(classInfo.instructor, classCount > 1 ? 15 : 25);
+        const studentCount = this.getStudentCount(classInfo.students);
+        
         block.innerHTML = `
-            <div class="class-title">${this.truncateText(classInfo.course, 15)}</div>
-            <div class="class-instructor">${this.truncateText(classInfo.instructor, 20)}</div>
-            <div class="class-students">${this.getStudentCount(classInfo.students)} students</div>
+            <div class="class-title" title="${classInfo.course}">${courseTitle}</div>
+            <div class="class-instructor" title="${classInfo.instructor}">
+                <i class="fas fa-user"></i>
+                ${instructorName}
+            </div>
+            <div class="class-students" title="${classInfo.students}">
+                <i class="fas fa-users"></i>
+                ${studentCount} student${studentCount !== 1 ? 's' : ''}
+            </div>
         `;
 
         // Add tooltip functionality
         block.addEventListener('mouseenter', (e) => this.showTooltip(e, classInfo));
         block.addEventListener('mouseleave', () => this.hideTooltip());
+        
+        // Add click functionality for mobile
+        block.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.showTooltip(e, classInfo);
+            setTimeout(() => this.hideTooltip(), 3000); // Auto-hide after 3 seconds
+        });
 
         return block;
     }
@@ -363,22 +428,59 @@ class ScheduleCalendar {
         return text.substring(0, maxLength) + '...';
     }
 
+    // Enhanced tooltip positioning
     showTooltip(event, classInfo) {
         const tooltip = document.getElementById('classTooltip');
         if (!tooltip) return;
         
         const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
+        const studentCount = this.getStudentCount(classInfo.students);
         
         tooltip.innerHTML = `
             <div class="tooltip-title">${classInfo.course}</div>
-            <div class="tooltip-info"><i class="fas fa-clock"></i> ${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)} (${duration} min)</div>
-            <div class="tooltip-info"><i class="fas fa-chalkboard-teacher"></i> ${classInfo.instructor}</div>
-            <div class="tooltip-info"><i class="fas fa-users"></i> ${classInfo.students}</div>
+            <div class="tooltip-info">
+                <i class="fas fa-clock"></i> 
+                ${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)} 
+                <span style="color: #4a6cf7; font-weight: 600;">(${duration} min)</span>
+            </div>
+            <div class="tooltip-info">
+                <i class="fas fa-chalkboard-teacher"></i> 
+                ${classInfo.instructor}
+            </div>
+            <div class="tooltip-info">
+                <i class="fas fa-users"></i> 
+                ${studentCount} student${studentCount !== 1 ? 's' : ''}
+            </div>
+            <div class="tooltip-info">
+                <i class="fas fa-calendar-day"></i> 
+                ${classInfo.day}
+            </div>
         `;
 
         const rect = event.target.getBoundingClientRect();
-        tooltip.style.left = `${rect.right + 10}px`;
-        tooltip.style.top = `${rect.top}px`;
+        const tooltipRect = tooltip.getBoundingClientRect();
+        
+        // Smart positioning to avoid going off-screen
+        let left = rect.right + 10;
+        let top = rect.top;
+        
+        // Adjust if tooltip would go off right edge
+        if (left + 300 > window.innerWidth) {
+            left = rect.left - 310;
+        }
+        
+        // Adjust if tooltip would go off bottom edge
+        if (top + tooltipRect.height > window.innerHeight) {
+            top = window.innerHeight - tooltipRect.height - 10;
+        }
+        
+        // Adjust if tooltip would go off top edge
+        if (top < 10) {
+            top = 10;
+        }
+        
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
         tooltip.classList.add('show');
     }
 
@@ -388,6 +490,9 @@ class ScheduleCalendar {
             tooltip.classList.remove('show');
         }
     }
+
+    // Click outside to hide tooltip
+    
 
     getClassDuration(startTime, endTime) {
         const start = this.timeToMinutes(startTime);

@@ -202,7 +202,7 @@
     border: 2px dashed #ddd;
 }
 
-/* Week View Styles */
+/* Week View Styles - FIXED VERSION */
 .week-view-roster {
     animation: fadeIn 0.5s ease-in-out;
 }
@@ -210,7 +210,7 @@
 .schedule-grid {
     display: grid;
     grid-template-columns: 120px repeat(7, 1fr);
-    gap: 2px;
+    gap: 1px;
     background: #e9ecef;
     border: 2px solid #e9ecef;
     border-radius: 12px;
@@ -228,12 +228,12 @@
 }
 
 .time-slot {
-    height: 60px; /* Reduced from 70px to fit more time slots */
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #f8f9fa;
-    font-size: 0.85em;
+    font-size: 0.8em;
     color: #666;
     font-weight: 500;
     border-bottom: 1px solid #e9ecef;
@@ -248,16 +248,17 @@
     position: sticky;
     top: 0;
     z-index: 3;
+    height: 60px;
 }
 
 .day-column {
     background: white;
     position: relative;
-    min-width: 0; /* Prevent flex items from overflowing */
+    min-width: 0;
 }
 
 .day-header {
-    height: 60px; /* Reduced from 70px to match time-slot */
+    height: 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -267,6 +268,7 @@
     position: sticky;
     top: 0;
     z-index: 2;
+    font-weight: 600;
 }
 
 .day-header.today {
@@ -274,122 +276,209 @@
     color: white;
 }
 
+.day-name {
+    font-size: 0.9em;
+    font-weight: 700;
+}
+
+.day-date {
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
 .time-grid-slot {
-    height: 60px; /* Reduced from 70px to fit more time slots */
+    height: 50px;
     border-bottom: 1px solid #f0f0f0;
     position: relative;
     transition: background-color 0.2s ease;
     display: flex;
-    flex-direction: column; /* Changed from row to column */
-    overflow: hidden;
-    gap: 2px; /* Smaller gap between class blocks */
-    padding: 1px; /* Small padding to prevent overlap with borders */
+    flex-direction: row; /* Changed back to row for side-by-side layout */
+    overflow: visible; /* Changed from hidden to visible */
+    padding: 2px;
+    gap: 1px;
 }
 
 .time-grid-slot:hover {
     background: rgba(74, 108, 247, 0.05);
 }
 
+/* FIXED CLASS BLOCK STYLES */
 .class-block {
     position: relative;
     flex: 1;
-    min-height: 20px; /* Minimum height for visibility */
+    min-height: 40px;
     background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-    border-left: 4px solid #4a6cf7;
-    border-radius: 4px;
-    padding: 4px;
-    font-size: 0.75em; /* Smaller font size */
+    border: 2px solid #4a6cf7;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.7em;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    margin: 1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    z-index: 1;
 }
 
 .class-block:hover {
-    transform: none; /* Removed scale effect */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
     z-index: 10;
+    border-width: 2px;
 }
 
-.class-block .class-title {
-    font-weight: 600;
-    margin-bottom: 2px;
-    color: #333;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.class-block .class-instructor {
-    font-size: 0.7em;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.class-block .class-students {
+/* When multiple classes in same slot */
+.time-grid-slot.multiple-classes .class-block {
+    flex: 0 0 calc(50% - 2px); /* Split width for 2 classes */
     font-size: 0.65em;
-    color: #888;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 4px 6px;
 }
 
-/* Subject-specific colors */
-.class-block.math {
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border-left-color: #28a745;
-}
-
-.class-block.science {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    border-left-color: #ff9800;
-}
-
-.class-block.english {
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-    border-left-color: #9c27b0;
-}
-
-.class-block.history {
-    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
-    border-left-color: #00bcd4;
-}
-
-.class-block.art {
-    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
-    border-left-color: #e91e63;
-}
-
-.class-block.default {
-    background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
-    border-left-color: #757575;
+.time-grid-slot.triple-classes .class-block {
+    flex: 0 0 calc(33.33% - 2px); /* Split width for 3 classes */
+    font-size: 0.6em;
+    padding: 3px 4px;
 }
 
 .class-block .class-title {
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     color: #333;
-    line-height: 1.2;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1em; /* Relative to parent */
 }
 
 .class-block .class-instructor {
-    font-size: 0.75em;
+    font-size: 0.9em; /* Relative to parent */
     color: #666;
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+}
+
+.class-block .class-instructor i {
+    margin-right: 4px;
+    font-size: 0.8em;
+    color: inherit;
 }
 
 .class-block .class-students {
-    font-size: 0.7em;
+    font-size: 0.8em; /* Relative to parent */
     color: #888;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+}
+
+.class-block .class-students i {
+    margin-right: 4px;
+    font-size: 0.8em;
+    color: inherit;
+}
+
+/* Enhanced Subject-specific colors with better contrast */
+.class-block.math {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-color: #2e7d32;
+    color: #1b5e20;
+}
+
+.class-block.science {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border-color: #f57c00;
+    color: #e65100;
+}
+
+.class-block.english {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    border-color: #7b1fa2;
+    color: #4a148c;
+}
+
+.class-block.history {
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+    border-color: #0097a7;
+    color: #006064;
+}
+
+.class-block.art {
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+    border-color: #c2185b;
+    color: #880e4f;
+}
+
+.class-block.pe, .class-block.physical {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    border-color: #ffa000;
+    color: #ff6f00;
+}
+
+.class-block.music {
+    background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+    border-color: #689f38;
+    color: #33691e;
+}
+
+.class-block.computer, .class-block.tech {
+    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    border-color: #3f51b5;
+    color: #1a237e;
+}
+
+.class-block.default {
+    background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+    border-color: #616161;
+    color: #424242;
+}
+
+/* Long duration classes (spanning multiple time slots) */
+.class-block.long-duration {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    z-index: 5;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.class-block.long-duration:hover {
+    z-index: 15;
+}
+
+/* Current time indicator enhancements */
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff4757, #ff6348);
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 1px 3px rgba(255, 71, 87, 0.5);
+}
+
+.current-time-dot {
+    position: absolute;
+    left: -8px;
+    top: -6px;
+    width: 15px;
+    height: 15px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.6);
+    animation: pulse 2s infinite;
 }
 
 /* Class Details Expansion */
