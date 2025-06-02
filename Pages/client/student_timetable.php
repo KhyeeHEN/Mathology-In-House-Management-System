@@ -8,23 +8,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$student_id = $_SESSION['user_id']; // Changed from $studentId to $student_id for consistency
+$student_id = $_SESSION['user_id'];
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
             st.id, 
-            s.First_Name, 
-            s.Last_Name, 
-            c.course_name as course,
+            st.course,
             st.day,
             TIME_FORMAT(st.start_time, '%h:%i %p') as start_time,
             TIME_FORMAT(st.end_time, '%h:%i %p') as end_time,
             DATE_FORMAT(st.approved_at, '%M %d, %Y') as approved_at
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
-        JOIN students s ON sc.student_id = s.student_id
-        JOIN courses c ON sc.course_id = c.course_id
-        WHERE s.student_id = ?
+        WHERE sc.student_id = ?
         ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
 
 $stmt = $conn->prepare($sql);
@@ -47,7 +43,6 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Timetable</title>
-    <!-- Use absolute paths for CSS files -->
     <link rel="stylesheet" href="../../Styles/common.css">
     <link rel="stylesheet" href="../../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -211,6 +206,6 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
         </main>
     </div>
-    <script type="module" src="/scripts/common.js"></script>
+    <script type="module" src="../../scripts/common.js"></script>
 </body>
 </html>
