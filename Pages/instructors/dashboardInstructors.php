@@ -35,7 +35,7 @@ $query = "SELECT
           FROM instructor_timetable it
           JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
           JOIN courses c ON ic.course_id = c.course_id
-          LEFT JOIN student_courses sc ON ic.instructor_course_id = sc.instructor_course_id
+          LEFT JOIN student_courses sc ON sc.course_id = c.course_id
           LEFT JOIN students s ON sc.student_id = s.student_id
           WHERE ic.instructor_id = ? AND it.status = 'active'
           GROUP BY it.id";
