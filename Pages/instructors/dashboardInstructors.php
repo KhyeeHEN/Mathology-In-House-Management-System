@@ -107,6 +107,8 @@ foreach ($events as $event) {
         }
     }
 }
+
+echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEvents) . ');</script>';
 ?>
 
 <!DOCTYPE html>

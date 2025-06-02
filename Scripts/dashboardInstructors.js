@@ -166,10 +166,15 @@ class InstructorCalendar {
     }
 
     getEventsForDate(date) {
-        // Format the date consistently with how PHP outputs it
-        const dateString = date.toISOString().split('T')[0];
+    // Create a date string in YYYY-MM-DD format, ignoring timezone
+        const dateString = date.getFullYear() + '-' + 
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(date.getDate()).padStart(2, '0');
+        
+        console.log('Filtering for:', dateString, 'All events:', this.events);
+        
+        // Filter events where the date matches exactly
         const filteredEvents = this.events.filter(event => event.date === dateString);
-        console.log('Filtering for:', dateString, 'Events:', filteredEvents);
         return filteredEvents;
     }
 
@@ -331,5 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.instructorCalendar = new InstructorCalendar();
 });
 
+console.log("All calendar events with dates:");
+this.events.forEach(event => {
+    console.log(event.date, event.title);
+});
 // Export for global access
 window.InstructorCalendar = InstructorCalendar;
