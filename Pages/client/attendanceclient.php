@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'];
 $user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
-    echo "Error preparing user query: " . $conn->error;
+    echo "<p>Error: Unable to retrieve student information. Please try again later.</p>";
     exit();
 }
 $user_stmt->bind_param("i", $user_id);
@@ -22,7 +22,7 @@ $user_result = $user_stmt->get_result();
 $user_info = $user_result->fetch_assoc();
 
 if (!$user_info || !isset($user_info['student_id'])) {
-    echo "<p>Error: Student ID not found for user ID $user_id.</p>";
+    echo "<p>Error: Student ID not found for this user.</p>";
     exit();
 }
 
@@ -43,12 +43,18 @@ $sql = "
 
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
-    echo "Error preparing attendance query: " . $conn->error;
+    echo "<p>Error: Unable to fetch attendance records. Please try again later.</p>";
     exit();
 }
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Store results in an array to ensure data is available for rendering
+$attendance_data = [];
+while ($row = $result->fetch_assoc()) {
+    $attendance_data[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -104,8 +110,8 @@ $result = $stmt->get_result();
                 </tr>
             </thead>
             <tbody>
-            <?php if ($result && $result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): ?>
+            <?php if (!empty($attendance_data)): ?>
+                <?php foreach ($attendance_data as $row): ?>
                     <tr>
                         <td><?= htmlspecialchars(date("Y-m-d H:i", strtotime($row['timetable_datetime']))) ?></td>
                         <td><?= $row['attendance_datetime'] ? date("Y-m-d H:i", strtotime($row['attendance_datetime'])) : '-' ?></td>
@@ -116,7 +122,7 @@ $result = $stmt->get_result();
                         <td><?= htmlspecialchars($row['course']) ?></td>
                         <td><?= date("Y-m-d H:i", strtotime($row['updated_at'])) ?></td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             <?php else: ?>
                 <tr><td colspan="8">No attendance records found.</td></tr>
             <?php endif; ?>
