@@ -2,11 +2,6 @@
 include '../setting.php'; // Adjust path as needed
 session_start();
 
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Ensure student is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
@@ -33,9 +28,6 @@ if (!$user_info || !isset($user_info['student_id'])) {
 
 $student_id = $user_info['student_id'];
 
-// Debug: Output the student_id
-echo "<p>Debug: Student ID = $student_id</p>";
-
 // Fetch timetable data with student and course details
 $sql = "SELECT 
             st.id, 
@@ -58,20 +50,10 @@ $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Debug: Output number of rows
-echo "<p>Debug: Number of timetable rows = " . $result->num_rows . "</p>";
-
-// Store the results in an array to avoid pointer issues
+// Store the results in an array to ensure data is available for rendering
 $timetable_data = [];
 while ($row = $result->fetch_assoc()) {
     $timetable_data[] = $row;
-}
-
-// Debug: Output raw query results
-if (!empty($timetable_data)) {
-    echo "<p>Debug: Raw timetable data:</p><pre>";
-    print_r($timetable_data);
-    echo "</pre>";
 }
 
 // Get student info for header
@@ -85,9 +67,6 @@ $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
 $student_result = $student_stmt->get_result();
 $student_info = $student_result ? $student_result->fetch_assoc() : null;
-
-// Debug: Output student info
-echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true) : "No student info found") . "</p>";
 ?>
 
 <!DOCTYPE html>
@@ -215,7 +194,6 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
 
             <div class="timetable-container">
                 <?php if (!empty($timetable_data)): ?>
-                    <?php echo "<p>Debug: Rendering table with " . count($timetable_data) . " rows</p>"; ?>
                     <table class="timetable">
                         <thead>
                             <tr>
