@@ -258,6 +258,6 @@ echo "<p>Debug: Student Info = " . ($student_info ? print_r($student_info, true)
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="../../Scripts/common.js"></script>
 </body>
 </html>
