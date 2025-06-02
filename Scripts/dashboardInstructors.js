@@ -107,28 +107,23 @@ class InstructorCalendar {
         const currentDate = new Date(year, month, day);
         const today = new Date();
         
-        // Check if it's today
         if (this.isSameDay(currentDate, today)) {
             dayElement.classList.add('today');
         }
 
-        // Create day number
         const dayNumber = document.createElement('div');
         dayNumber.classList.add('day-number');
         dayNumber.textContent = day;
         dayElement.appendChild(dayNumber);
 
-        // Find events for this day
         const dayEvents = this.getEventsForDate(currentDate);
+        console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents); // Debug log
         
         if (dayEvents.length > 0) {
             dayElement.classList.add('has-events');
-            
-            // Create events container
             const eventsContainer = document.createElement('div');
             eventsContainer.classList.add('day-events');
             
-            // Add up to 2 events, then show "more" indicator
             const maxVisibleEvents = 2;
             const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
             
@@ -143,7 +138,6 @@ class InstructorCalendar {
                 eventsContainer.appendChild(eventElement);
             });
 
-            // Show "more" indicator if there are additional events
             if (dayEvents.length > maxVisibleEvents) {
                 const moreIndicator = document.createElement('div');
                 moreIndicator.classList.add('more-events');
@@ -158,7 +152,6 @@ class InstructorCalendar {
             dayElement.appendChild(eventsContainer);
         }
 
-        // Add click event for day
         dayElement.addEventListener('click', () => {
             this.showDayEvents(dayEvents, currentDate);
         });
@@ -170,11 +163,15 @@ class InstructorCalendar {
         const dateString = this.formatDate(date);
         const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
         
-        return this.events.filter(event => {
-            // Match either exact date or recurring day of week
-            return event.date === dateString || 
+        console.log('Filtering events for:', { dateString, dayOfWeek });
+        const filteredEvents = this.events.filter(event => {
+            const isMatch = event.date === dateString || 
                 (event.dayOfWeek && event.dayOfWeek.toLowerCase() === dayOfWeek.toLowerCase());
+            console.log('Event:', { eventDate: event.date, eventDayOfWeek: event.dayOfWeek, isMatch });
+            return isMatch;
         });
+        console.log('Filtered Events:', filteredEvents);
+        return filteredEvents;
     }
 
     showEventDetails(event, date) {
