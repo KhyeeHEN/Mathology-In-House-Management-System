@@ -10,38 +10,7 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <h2>Mathology</h2>
-            </div>
-            <nav class="side-nav">
-                <a href="dashboardclient.php" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-                <a href="attendanceclient.php" class="nav-item">
-                    <i class="fas fa-user-check"></i>
-                    <span>Attendance</span>
-                </a>
-                <a href="replacement.php" class="nav-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Schedule Replacement</span>
-                </a>
-                <a href="learninghours.php" class="nav-item ">
-                    <i class="fas fa-clock"></i>
-                    <span>Learning Hours</span>
-                </a>
-                <a href="leave.php" class="nav-item active">
-                    <i class="fas fa-check"></i>
-                    <span>Apply Leave</span>
-                </a>
-                <a href="paymentclient.php" class="nav-item">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Payments</span>
-                </a>
-            </nav>
-        </aside>
+        <?php require("../includes/Aside_Nav.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
