@@ -91,15 +91,22 @@ if ($result->num_rows > 0) {
             <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
             <td>" . $row['email'] . "</td>
             <td>
-                <button onclick=\"toggleDetails('$detailsId')\">View Details</button>
-                <a href='../../sql/edit_student.php?student_id={$row['student_id']}'>Edit</a>
-                <a href='../../sql/delete_student.php?student_id={$row['student_id']}' onclick=\"return confirm('Are you sure you want to delete this student?');\">Delete</a>
+                <button class='action-btn view' onclick=\"toggleDetails('$detailsId')\">View Details</button>
+                <form method='get' action='../../sql/edit_student.php' style='display:inline; margin:0; padding:0;'>
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn edit'>Edit</button>
+                </form>
+                <form method='get' action='../../sql/delete_student.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn delete'>Delete</button>
+                </form>
             </td>
           </tr>";
 
         // Hidden detailed information row
-        echo "<tr id='$detailsId' style='display: none;'>
+        echo "<tr id='$detailsId' class='details-row' style='display: none;'>
             <td colspan='6'>
+            <div class='details-box'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
                 <strong>School Intake:</strong> " . $row['School_Intake'] . "<br>
@@ -109,6 +116,7 @@ if ($result->num_rows > 0) {
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
                 <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
+            </div>
             </td>
           </tr>";
     }

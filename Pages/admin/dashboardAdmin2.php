@@ -87,7 +87,7 @@ foreach ($classes as $class) {
     <title>Admin Dashboard</title> 
     <link rel="stylesheet" href="/Styles/dashboard.css">
     <link rel="stylesheet" href="/Styles/common.css">
-    <link rel="stylesheet" href="/Styles/dashboardAdmin.css">
+    <link rel="stylesheet" href="/Styles/dashboardAdmin2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .event-details {
@@ -106,34 +106,95 @@ foreach ($classes as $class) {
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
             <!-- Calendar Section -->
-            <div class="schedule-container" style="width: calc(100% - 40px); margin: 20px;">
-                <div class="schedule-header">
-                    <div class="schedule-title">
-                        <h1><i class="fas fa-calendar-week"></i> Class Schedule</h1>
-                        <div class="schedule-subtitle">Weekly timetable view</div>
+            <div class="staff-duty-roster">
+                <h2 class="section-title">Current Classes Roster</h2>
+                
+                <div class="roster-controls">
+                    <div class="current-time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentDateTime"><?php echo date('l, F j, Y - g:i A'); ?></span>
                     </div>
-                    <div class="schedule-controls">
-                        <div class="week-nav">
-                            <button class="nav-btn" id="prevWeek">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div class="current-week" id="currentWeek">
-                                Dec 1 - Dec 7, 2024
-                            </div>
-                            <button class="nav-btn" id="nextWeek">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                        <div class="view-toggle">
-                            <button class="toggle-btn active" id="weekView">Week</button>
-                            <button class="toggle-btn" id="monthView">Month</button>
+                    <div class="view-toggle">
+                        <button id="dayView" class="toggle-btn active">Day View</button>
+                        <button id="weekView" class="toggle-btn">Week View</button>
+                    </div>
+                </div>
+                
+                <div class="roster-container">
+                    <!-- Current Day Classes -->
+                    <div class="current-day-roster">
+                        <h3>Today's Classes (<?php echo date('l'); ?>)</h3>
+                        
+                        <?php
+                        $currentDay = date('l');
+                        $currentTime = date('H:i:s');
+                        $todayClasses = [];
+                        
+                        foreach ($classes as $class) {
+                            if ($class['day'] === $currentDay) {
+                                $startTime = $class['start_time'];
+                                $endTime = $class['end_time'];
+                                
+                                // Check if current time is within class time
+                                $isCurrent = ($currentTime >= $startTime && $currentTime <= $endTime);
+                                
+                                $todayClasses[] = [
+                                    'class' => $class,
+                                    'is_current' => $isCurrent
+                                ];
+                            }
+                        }
+                        
+                        if (empty($todayClasses)) {
+                            echo '<div class="no-classes">No classes scheduled for today.</div>';
+                        } else {
+                            echo '<div class="class-cards-container">';
+                            foreach ($todayClasses as $item) {
+                                $class = $item['class'];
+                                $isCurrent = $item['is_current'];
+                                $duration = calculateDuration($class['start_time'], $class['end_time']);
+                                
+                                echo '<div class="class-card ' . ($isCurrent ? 'current-class' : '') . '">';
+                                echo '<div class="class-header">';
+                                echo '<span class="class-time">' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . '</span>';
+                                echo '<span class="class-duration">' . $duration . '</span>';
+                                if ($isCurrent) {
+                                    echo '<span class="current-badge">Now</span>';
+                                }
+                                echo '</div>';
+                                echo '<h4 class="class-title">' . $class['course_name'] . '</h4>';
+                                echo '<div class="class-instructor"><i class="fas fa-chalkboard-teacher"></i> ' . $class['instructor'] . '</div>';
+                                echo '<div class="class-students"><i class="fas fa-users"></i> ' . (count(explode(',', $class['students'])) > 3 ? substr($class['students'], 0, 30) . '...' : $class['students']) . '</div>';
+                                
+                                // Expanded details (hidden by default)
+                                echo '<div class="class-details">';
+                                echo '<div class="detail-row"><strong>Course:</strong> ' . $class['course_name'] . '</div>';
+                                echo '<div class="detail-row"><strong>Instructor:</strong> ' . $class['instructor'] . '</div>';
+                                echo '<div class="detail-row"><strong>Time:</strong> ' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . ' (' . $duration . ')</div>';
+                                echo '<div class="detail-row"><strong>Students:</strong> ' . $class['students'] . '</div>';
+                                echo '</div>';
+                                
+                                echo '<button class="toggle-details-btn">Show Details <i class="fas fa-chevron-down"></i></button>';
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                        }
+                        ?>
+                    </div>
+                    
+                    <!-- Week View (hidden by default) -->
+                    <div class="week-view-roster" style="display: none;">
+                        <div class="schedule-grid" id="scheduleGrid"></div>
+                        <div class="week-navigation">
+                            <button id="prevWeek"><i class="fas fa-chevron-left"></i> Previous Week</button>
+                            <span id="currentWeek"></span>
+                            <button id="nextWeek">Next Week <i class="fas fa-chevron-right"></i></button>
                         </div>
                     </div>
                 </div>
-
-                <div class="schedule-grid" id="scheduleGrid">
-                    <!-- Grid will be populated by JavaScript -->
-                </div>
+                
+                <!-- Tooltip for class details -->
+                <div id="classTooltip" class="class-tooltip"></div>
             </div>
 
             <!-- Additional Admin Summary Section -->
@@ -489,317 +550,6 @@ foreach ($classes as $class) {
             </div>
         </main>
     </div>
-    
-    <script>
-        // Pass PHP events to JavaScript with proper formatting
-        const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-        console.log('Admin loaded events:', calendarEvents);
-        
-        // Customize event display to show instructor and students
-        function formatEventDetails(event) {
-            return `
-                <strong>${event.title}</strong>
-                <div class="event-details">
-                    <div>Time: ${event.time} (${event.duration})</div>
-                    <div>Students: ${event.students}</div>
-                </div>
-            `;
-        }
-
-        class ScheduleCalendar {
-            constructor() {
-                this.currentWeek = new Date();
-                this.timeSlots = this.generateTimeSlots();
-                this.currentTooltip = null;
-                
-                // Sample data - replace with your PHP data
-                this.classes = [
-                    {
-                        course: 'Mathematics',
-                        instructor: 'John Smith',
-                        students: 'Alice Johnson, Bob Wilson',
-                        day: 'Monday',
-                        startTime: '09:00',
-                        endTime: '10:30',
-                        type: 'math'
-                    },
-                    {
-                        course: 'Physics',
-                        instructor: 'Sarah Davis',
-                        students: 'Charlie Brown, Diana Prince',
-                        day: 'Monday',
-                        startTime: '11:00',
-                        endTime: '12:00',
-                        type: 'science'
-                    },
-                    {
-                        course: 'English Literature',
-                        instructor: 'Michael Johnson',
-                        students: 'Emma Watson, Frank Miller',
-                        day: 'Tuesday',
-                        startTime: '10:00',
-                        endTime: '11:30',
-                        type: 'english'
-                    },
-                    {
-                        course: 'Chemistry',
-                        instructor: 'Lisa Anderson',
-                        students: 'Grace Lee, Henry Ford',
-                        day: 'Wednesday',
-                        startTime: '14:00',
-                        endTime: '15:30',
-                        type: 'science'
-                    },
-                    {
-                        course: 'History',
-                        instructor: 'Robert Taylor',
-                        students: 'Ivy Chen, Jack Robinson',
-                        day: 'Thursday',
-                        startTime: '09:30',
-                        endTime: '11:00',
-                        type: 'history'
-                    },
-                    {
-                        course: 'Art',
-                        instructor: 'Maria Garcia',
-                        students: 'Kate Williams, Leo Martinez',
-                        day: 'Friday',
-                        startTime: '13:00',
-                        endTime: '14:30',
-                        type: 'art'
-                    }
-                ];
-
-                this.init();
-            }
-
-            generateTimeSlots() {
-                const slots = [];
-                for (let hour = 8; hour <= 17; hour++) {
-                    slots.push(`${hour.toString().padStart(2, '0')}:00`);
-                    if (hour < 17) {
-                        slots.push(`${hour.toString().padStart(2, '0')}:30`);
-                    }
-                }
-                return slots;
-            }
-
-            init() {
-                this.setupEventListeners();
-                this.renderSchedule();
-                this.updateCurrentWeekDisplay();
-                this.showCurrentTimeIndicator();
-            }
-
-            setupEventListeners() {
-                document.getElementById('prevWeek').addEventListener('click', () => {
-                    this.currentWeek.setDate(this.currentWeek.getDate() - 7);
-                    this.updateCurrentWeekDisplay();
-                    this.renderSchedule();
-                });
-
-                document.getElementById('nextWeek').addEventListener('click', () => {
-                    this.currentWeek.setDate(this.currentWeek.getDate() + 7);
-                    this.updateCurrentWeekDisplay();
-                    this.renderSchedule();
-                });
-
-                document.getElementById('weekView').addEventListener('click', (e) => {
-                    document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                });
-
-                document.getElementById('monthView').addEventListener('click', (e) => {
-                    document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    // Implement month view if needed
-                });
-            }
-
-            updateCurrentWeekDisplay() {
-                const startOfWeek = new Date(this.currentWeek);
-                startOfWeek.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
-                
-                const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-                const options = { month: 'short', day: 'numeric' };
-                const startStr = startOfWeek.toLocaleDateString('en-US', options);
-                const endStr = endOfWeek.toLocaleDateString('en-US', options);
-                const year = startOfWeek.getFullYear();
-
-                document.getElementById('currentWeek').textContent = `${startStr} - ${endStr}, ${year}`;
-            }
-
-            renderSchedule() {
-                const grid = document.getElementById('scheduleGrid');
-                grid.innerHTML = '';
-
-                // Create time column
-                const timeColumn = document.createElement('div');
-                timeColumn.className = 'time-column';
-
-                // Time header
-                const timeHeader = document.createElement('div');
-                timeHeader.className = 'time-slot';
-                timeHeader.textContent = 'Time';
-                timeColumn.appendChild(timeHeader);
-
-                // Time slots
-                this.timeSlots.forEach(time => {
-                    const timeSlot = document.createElement('div');
-                    timeSlot.className = 'time-slot';
-                    timeSlot.textContent = this.formatTime12Hour(time);
-                    timeColumn.appendChild(timeSlot);
-                });
-
-                grid.appendChild(timeColumn);
-
-                // Create day columns
-                const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                const startOfWeek = new Date(this.currentWeek);
-                startOfWeek.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
-
-                daysOfWeek.forEach((day, index) => {
-                    const dayColumn = document.createElement('div');
-                    dayColumn.className = 'day-column';
-
-                    const currentDate = new Date(startOfWeek);
-                    currentDate.setDate(startOfWeek.getDate() + index);
-
-                    // Day header
-                    const dayHeader = document.createElement('div');
-                    dayHeader.className = 'day-header';
-                    dayHeader.innerHTML = `
-                        <div class="day-name">${day.substring(0, 3)}</div>
-                        <div class="day-date">${currentDate.getDate()}</div>
-                    `;
-                    dayColumn.appendChild(dayHeader);
-
-                    // Time slots for this day
-                    this.timeSlots.forEach(time => {
-                        const timeSlot = document.createElement('div');
-                        timeSlot.className = 'time-grid-slot';
-                        
-                        // Find classes for this day and time
-                        const dayClasses = this.getClassesForDayAndTime(day, time);
-                        
-                        if (dayClasses.length > 0) {
-                            dayClasses.forEach(classInfo => {
-                                const classBlock = this.createClassBlock(classInfo);
-                                timeSlot.appendChild(classBlock);
-                            });
-                        }
-
-                        dayColumn.appendChild(timeSlot);
-                    });
-
-                    grid.appendChild(dayColumn);
-                });
-            }
-
-            getClassesForDayAndTime(day, time) {
-                return this.classes.filter(classInfo => {
-                    if (classInfo.day !== day) return false;
-                    
-                    const classStart = this.timeToMinutes(classInfo.startTime);
-                    const classEnd = this.timeToMinutes(classInfo.endTime);
-                    const slotTime = this.timeToMinutes(time);
-                    
-                    return slotTime >= classStart && slotTime < classEnd;
-                });
-            }
-
-            createClassBlock(classInfo) {
-                const block = document.createElement('div');
-                block.className = `class-block ${classInfo.type}`;
-                
-                const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
-                const height = Math.max(40, (duration / 30) * 60 - 8); // Minimum 40px height
-                block.style.height = `${height}px`;
-                
-                block.innerHTML = `
-                    <div class="class-title">${classInfo.course}</div>
-                    <div class="class-instructor">${classInfo.instructor}</div>
-                    <div class="class-students">${classInfo.students}</div>
-                `;
-
-                // Add tooltip functionality
-                block.addEventListener('mouseenter', (e) => this.showTooltip(e, classInfo));
-                block.addEventListener('mouseleave', () => this.hideTooltip());
-
-                return block;
-            }
-
-            showTooltip(event, classInfo) {
-                const tooltip = document.getElementById('classTooltip');
-                const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
-                
-                tooltip.innerHTML = `
-                    <div class="tooltip-title">${classInfo.course}</div>
-                    <div class="tooltip-info"><i class="fas fa-clock"></i> ${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)} (${duration} min)</div>
-                    <div class="tooltip-info"><i class="fas fa-chalkboard-teacher"></i> ${classInfo.instructor}</div>
-                    <div class="tooltip-info"><i class="fas fa-users"></i> ${classInfo.students}</div>
-                `;
-
-                const rect = event.target.getBoundingClientRect();
-                tooltip.style.left = `${rect.right + 10}px`;
-                tooltip.style.top = `${rect.top}px`;
-                tooltip.classList.add('show');
-            }
-
-            hideTooltip() {
-                const tooltip = document.getElementById('classTooltip');
-                tooltip.classList.remove('show');
-            }
-
-            getClassDuration(startTime, endTime) {
-                const start = this.timeToMinutes(startTime);
-                const end = this.timeToMinutes(endTime);
-                return end - start;
-            }
-
-            timeToMinutes(time) {
-                const [hours, minutes] = time.split(':').map(Number);
-                return hours * 60 + minutes;
-            }
-
-            formatTime12Hour(time24) {
-                const [hours, minutes] = time24.split(':').map(Number);
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                const hours12 = hours % 12 || 12;
-                return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-            }
-
-            showCurrentTimeIndicator() {
-                const now = new Date();
-                const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                const currentMinutes = this.timeToMinutes(currentTime);
-                
-                // Only show if within schedule hours
-                if (currentMinutes >= this.timeToMinutes('08:00') && currentMinutes <= this.timeToMinutes('17:00')) {
-                    const firstTimeSlot = this.timeToMinutes(this.timeSlots[0]);
-                    const position = ((currentMinutes - firstTimeSlot) / 30) * 60 + 60; // +60 for header
-                    
-                    const dayColumns = document.querySelectorAll('.day-column');
-                    const currentDay = now.getDay();
-                    
-                    if (dayColumns[currentDay]) {
-                        const indicator = document.createElement('div');
-                        indicator.className = 'current-time-indicator';
-                        indicator.style.top = `${position}px`;
-                        indicator.innerHTML = '<div class="current-time-dot"></div>';
-                        dayColumns[currentDay].appendChild(indicator);
-                    }
-                }
-            }
-        }
-
-        // Initialize the schedule calendar
-        document.addEventListener('DOMContentLoaded', () => {
-            new ScheduleCalendar();
-        });
-    </script>
     
     <script type="module" src="/Scripts/dashboard.js"></script>
     <script type="module" src="/Scripts/common.js"></script>

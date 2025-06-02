@@ -48,7 +48,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
                 <!-- Add Entry Button -->
                 <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                    <button type="submit" class="add-entry-button" style="margin-left: 8px;">
+                    <button type="submit" style="margin-left: 8px;">
                         Add Entry
                     </button>
                 </form>

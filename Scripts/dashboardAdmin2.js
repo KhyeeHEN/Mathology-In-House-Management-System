@@ -1,22 +1,23 @@
-// Enhanced Schedule Calendar for Dashboard
+// Enhanced Schedule Calendar Class
 class ScheduleCalendar {
     constructor() {
         this.currentWeek = new Date();
+        this.currentDate = new Date();
         this.timeSlots = this.generateTimeSlots();
-        this.classes = calendarEvents || []; // Use the PHP data
         this.currentTooltip = null;
-        this.viewMode = 'week'; // 'week' or 'month'
+        this.currentView = 'day'; // Track current view
         
-        console.log('Schedule Calendar initialized with classes:', this.classes);
+        // Convert PHP classes data to JavaScript format
+        this.classes = window.rosterClasses || [];
+        
         this.init();
     }
 
     generateTimeSlots() {
         const slots = [];
-        // Generate time slots from 8 AM to 6 PM in 30-minute intervals
-        for (let hour = 8; hour <= 18; hour++) {
+        for (let hour = 8; hour <= 17; hour++) {
             slots.push(`${hour.toString().padStart(2, '0')}:00`);
-            if (hour < 18) {
+            if (hour < 17) {
                 slots.push(`${hour.toString().padStart(2, '0')}:30`);
             }
         }
@@ -25,55 +26,124 @@ class ScheduleCalendar {
 
     init() {
         this.setupEventListeners();
-        this.renderSchedule();
+        if (this.currentView === 'week') {
+            this.renderWeekView();
+        } else {
+            this.renderDayView();
+        }
         this.updateCurrentWeekDisplay();
         this.showCurrentTimeIndicator();
-        
-        // Update current time indicator every minute
-        setInterval(() => this.showCurrentTimeIndicator(), 60000);
     }
 
     setupEventListeners() {
         // Week navigation
-        document.getElementById('prevWeek').addEventListener('click', () => {
-            this.currentWeek.setDate(this.currentWeek.getDate() - 7);
-            this.updateCurrentWeekDisplay();
-            this.renderSchedule();
+        document.getElementById('prevWeek')?.addEventListener('click', () => {
+            if (this.currentView === 'week') {
+                this.currentWeek.setDate(this.currentWeek.getDate() - 7);
+                this.updateCurrentWeekDisplay();
+                this.renderWeekView();
+            } else {
+                this.currentDate.setDate(this.currentDate.getDate() - 1);
+                this.updateCurrentDateDisplay();
+                this.renderDayView();
+            }
         });
 
-        document.getElementById('nextWeek').addEventListener('click', () => {
-            this.currentWeek.setDate(this.currentWeek.getDate() + 7);
-            this.updateCurrentWeekDisplay();
-            this.renderSchedule();
+        document.getElementById('nextWeek')?.addEventListener('click', () => {
+            if (this.currentView === 'week') {
+                this.currentWeek.setDate(this.currentWeek.getDate() + 7);
+                this.updateCurrentWeekDisplay();
+                this.renderWeekView();
+            } else {
+                this.currentDate.setDate(this.currentDate.getDate() + 1);
+                this.updateCurrentDateDisplay();
+                this.renderDayView();
+            }
         });
 
-        // View toggle
-        document.getElementById('weekView').addEventListener('click', (e) => {
-            this.switchView('week', e.target);
+        // View toggle listeners
+        document.getElementById('dayView')?.addEventListener('click', () => {
+            this.switchToDay();
         });
 
-        document.getElementById('monthView').addEventListener('click', (e) => {
-            this.switchView('month', e.target);
+        document.getElementById('weekView')?.addEventListener('click', () => {
+            this.switchToWeek();
         });
 
-        // Click outside to close tooltip
+        // Toggle class details
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.class-block') && !e.target.closest('.class-tooltip')) {
-                this.hideTooltip();
+            if (e.target.classList.contains('toggle-details-btn')) {
+                const button = e.target;
+                const details = button.previousElementSibling;
+                button.classList.toggle('active');
+                details.classList.toggle('show');
+                
+                if (details.classList.contains('show')) {
+                    button.innerHTML = 'Hide Details <i class="fas fa-chevron-up"></i>';
+                } else {
+                    button.innerHTML = 'Show Details <i class="fas fa-chevron-down"></i>';
+                }
             }
         });
     }
 
-    switchView(mode, button) {
-        this.viewMode = mode;
-        document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+    switchToDay() {
+        this.currentView = 'day';
         
-        if (mode === 'week') {
-            this.renderSchedule();
+        // Update button states
+        document.getElementById('dayView')?.classList.add('active');
+        document.getElementById('weekView')?.classList.remove('active');
+        
+        // Show/hide appropriate containers
+        const dayContainer = document.querySelector('.current-day-roster');
+        const weekContainer = document.querySelector('.week-view-roster');
+        
+        if (dayContainer) dayContainer.style.display = 'block';
+        if (weekContainer) weekContainer.style.display = 'none';
+        
+        // Update navigation labels
+        this.updateNavigationLabels();
+        this.renderDayView();
+        this.updateCurrentDateDisplay();
+    }
+
+    switchToWeek() {
+        this.currentView = 'week';
+        
+        // Update button states
+        document.getElementById('weekView')?.classList.add('active');
+        document.getElementById('dayView')?.classList.remove('active');
+        
+        // Show/hide appropriate containers
+        const dayContainer = document.querySelector('.current-day-roster');
+        const weekContainer = document.querySelector('.week-view-roster');
+        
+        if (dayContainer) dayContainer.style.display = 'none';
+        if (weekContainer) weekContainer.style.display = 'block';
+        
+        // Update navigation labels
+        this.updateNavigationLabels();
+        this.renderWeekView();
+        this.updateCurrentWeekDisplay();
+    }
+
+    updateNavigationLabels() {
+        const prevBtn = document.getElementById('prevWeek');
+        const nextBtn = document.getElementById('nextWeek');
+        
+        if (this.currentView === 'day') {
+            if (prevBtn) prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous Day';
+            if (nextBtn) nextBtn.innerHTML = 'Next Day <i class="fas fa-chevron-right"></i>';
         } else {
-            this.renderMonthView();
+            if (prevBtn) prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous Week';
+            if (nextBtn) nextBtn.innerHTML = 'Next Week <i class="fas fa-chevron-right"></i>';
         }
+    }
+
+    updateCurrentDateDisplay() {
+        const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+        const dateStr = this.currentDate.toLocaleDateString('en-US', options);
+        document.getElementById('currentWeek').textContent = dateStr;
     }
 
     updateCurrentWeekDisplay() {
@@ -91,26 +161,87 @@ class ScheduleCalendar {
         document.getElementById('currentWeek').textContent = `${startStr} - ${endStr}, ${year}`;
     }
 
-    renderSchedule() {
-        const grid = document.getElementById('scheduleGrid');
-        grid.innerHTML = '';
-        grid.className = 'schedule-grid'; // Reset to weekly grid
+    renderDayView() {
+        const container = document.querySelector('.current-day-roster .class-cards-container');
+        if (!container) return;
 
-        // Create time column
-        this.createTimeColumn(grid);
+        const currentDayName = this.currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+        const currentTime = new Date().toTimeString().split(' ')[0]; // HH:MM:SS format
+        
+        // Update day title
+        const dayTitle = document.querySelector('.current-day-roster h3');
+        if (dayTitle) {
+            dayTitle.textContent = `${currentDayName}'s Classes (${this.currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+        }
 
-        // Create day columns
-        this.createDayColumns(grid);
+        // Filter classes for current day
+        const dayClasses = this.classes.filter(classInfo => {
+            return classInfo.day === currentDayName;
+        });
+
+        container.innerHTML = '';
+
+        if (dayClasses.length === 0) {
+            container.innerHTML = '<div class="no-classes">No classes scheduled for this day.</div>';
+            return;
+        }
+
+        // Sort classes by start time
+        dayClasses.sort((a, b) => {
+            return this.timeToMinutes(a.startTime) - this.timeToMinutes(b.startTime);
+        });
+
+        dayClasses.forEach(classInfo => {
+            const startTime = classInfo.startTime;
+            const endTime = classInfo.endTime;
+            
+            // Check if current time is within class time (only for today)
+            const isToday = this.currentDate.toDateString() === new Date().toDateString();
+            const isCurrent = isToday && (currentTime >= startTime && currentTime <= endTime);
+            
+            const duration = this.getClassDuration(startTime, endTime);
+            
+            const classCard = document.createElement('div');
+            classCard.className = `class-card ${isCurrent ? 'current-class' : ''}`;
+            
+            classCard.innerHTML = `
+                <div class="class-header">
+                    <span class="class-time">${this.formatTime12Hour(startTime)} - ${this.formatTime12Hour(endTime)}</span>
+                    <span class="class-duration">${duration} min</span>
+                    ${isCurrent ? '<span class="current-badge">Now</span>' : ''}
+                </div>
+                <h4 class="class-title">${classInfo.course}</h4>
+                <div class="class-instructor"><i class="fas fa-chalkboard-teacher"></i> ${classInfo.instructor}</div>
+                <div class="class-students"><i class="fas fa-users"></i> ${this.truncateText(classInfo.students, 30)}</div>
+                
+                <div class="class-details">
+                    <div class="detail-row"><strong>Course:</strong> ${classInfo.course}</div>
+                    <div class="detail-row"><strong>Instructor:</strong> ${classInfo.instructor}</div>
+                    <div class="detail-row"><strong>Time:</strong> ${this.formatTime12Hour(startTime)} - ${this.formatTime12Hour(endTime)} (${duration} min)</div>
+                    <div class="detail-row"><strong>Students:</strong> ${classInfo.students}</div>
+                </div>
+                
+                <button class="toggle-details-btn">Show Details <i class="fas fa-chevron-down"></i></button>
+            `;
+
+            container.appendChild(classCard);
+        });
     }
 
-    createTimeColumn(grid) {
+    renderWeekView() {
+        const grid = document.getElementById('scheduleGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '';
+
+        // Create time column
         const timeColumn = document.createElement('div');
         timeColumn.className = 'time-column';
 
         // Time header
         const timeHeader = document.createElement('div');
         timeHeader.className = 'time-slot time-header';
-        timeHeader.innerHTML = '<i class="fas fa-clock"></i>';
+        timeHeader.textContent = 'Time';
         timeColumn.appendChild(timeHeader);
 
         // Time slots
@@ -122,9 +253,8 @@ class ScheduleCalendar {
         });
 
         grid.appendChild(timeColumn);
-    }
 
-    createDayColumns(grid) {
+        // Create day columns
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const startOfWeek = new Date(this.currentWeek);
         startOfWeek.setDate(this.currentWeek.getDate() - this.currentWeek.getDay());
@@ -137,458 +267,153 @@ class ScheduleCalendar {
             const currentDate = new Date(startOfWeek);
             currentDate.setDate(startOfWeek.getDate() + index);
 
+            // Check if this is today
+            const isToday = currentDate.toDateString() === new Date().toDateString();
+
             // Day header
             const dayHeader = document.createElement('div');
-            dayHeader.className = 'day-header';
-            const isToday = this.isToday(currentDate);
-            if (isToday) dayHeader.classList.add('today');
-            
+            dayHeader.className = `day-header ${isToday ? 'today' : ''}`;
             dayHeader.innerHTML = `
                 <div class="day-name">${day.substring(0, 3)}</div>
                 <div class="day-date">${currentDate.getDate()}</div>
-                ${isToday ? '<div class="today-indicator"></div>' : ''}
             `;
             dayColumn.appendChild(dayHeader);
 
-            // Create container for time slots
-            const timeGridContainer = document.createElement('div');
-            timeGridContainer.className = 'time-grid-container';
-
             // Time slots for this day
-            this.timeSlots.forEach((time, timeIndex) => {
+            this.timeSlots.forEach(time => {
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'time-grid-slot';
                 timeSlot.setAttribute('data-time', time);
                 
-                // Create container for class blocks
-                const classBlockContainer = document.createElement('div');
-                classBlockContainer.className = 'class-block-container';
-                
                 // Find classes for this day and time
-                const dayClasses = this.getClassesForDayAndTime(day, time, currentDate);
+                const dayClasses = this.getClassesForDayAndTime(day, time);
                 
                 if (dayClasses.length > 0) {
                     dayClasses.forEach(classInfo => {
-                        const classBlock = this.createClassBlock(classInfo, currentDate);
-                        classBlockContainer.appendChild(classBlock);
+                        const classBlock = this.createClassBlock(classInfo);
+                        timeSlot.appendChild(classBlock);
                     });
-                } else if (timeIndex % 2 === 0) { // Show placeholder every hour
-                    classBlockContainer.innerHTML = '<div class="empty-slot"></div>';
                 }
-                
-                timeSlot.appendChild(classBlockContainer);
-                timeGridContainer.appendChild(timeSlot);
+
+                dayColumn.appendChild(timeSlot);
             });
 
-            dayColumn.appendChild(timeGridContainer);
             grid.appendChild(dayColumn);
         });
+
+        // Add current time indicator after rendering
+        setTimeout(() => this.showCurrentTimeIndicator(), 100);
     }
 
-    getClassesForDayAndTime(dayName, time, date) {
+    getClassesForDayAndTime(day, time) {
         return this.classes.filter(classInfo => {
-            // Convert the class date to check if it matches current week's date for this day
-            const classDate = new Date(classInfo.date);
-            const isSameDate = classDate.toDateString() === date.toDateString();
+            if (classInfo.day !== day) return false;
             
-            if (!isSameDate) return false;
-            
-            // Parse time from class info (assuming format "HH:MM AM/PM")
-            const classTime = this.parseTime12Hour(classInfo.time);
+            const classStart = this.timeToMinutes(classInfo.startTime);
+            const classEnd = this.timeToMinutes(classInfo.endTime);
             const slotTime = this.timeToMinutes(time);
             
-            // Get duration in minutes
-            const durationMatch = classInfo.duration.match(/(\d+)\s*hours?\s*(\d*)\s*minutes?/i);
-            let durationMinutes = 60; // Default 1 hour
-            
-            if (durationMatch) {
-                const hours = parseInt(durationMatch[1]) || 0;
-                const minutes = parseInt(durationMatch[2]) || 0;
-                durationMinutes = hours * 60 + minutes;
-            }
-            
-            const classEnd = classTime + durationMinutes;
-            
-            return slotTime >= classTime && slotTime < classEnd;
+            return slotTime >= classStart && slotTime < classEnd;
         });
     }
 
-    createClassBlock(classInfo, date) {
+    createClassBlock(classInfo) {
         const block = document.createElement('div');
-        const courseType = this.getCourseType(classInfo.title);
-        block.className = `class-block ${courseType}`;
+        block.className = `class-block ${this.getCourseType(classInfo.course)}`;
         
-        // Calculate height based on duration
-        const durationMatch = classInfo.duration.match(/(\d+)\s*hours?\s*(\d*)\s*minutes?/i);
-        let durationMinutes = 60; // Default 1 hour
-        
-        if (durationMatch) {
-            const hours = parseInt(durationMatch[1]) || 0;
-            const minutes = parseInt(durationMatch[2]) || 0;
-            durationMinutes = hours * 60 + minutes;
-        }
-        
-        // Calculate how many time slots this class spans
-        const slotCount = Math.ceil(durationMinutes / 30);
-        const height = `${(slotCount * 100)}%`;
-        const top = '0%';
-        
-        block.style.height = height;
-        block.style.top = top;
-        
-        // Extract course name and instructor
-        const [courseName, instructor] = classInfo.title.split(' - ');
+        const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
+        const height = Math.max(40, (duration / 30) * 60 - 8); // Minimum 40px height
+        block.style.height = `${height}px`;
         
         block.innerHTML = `
-            <div>
-                <div class="class-title">${courseName}</div>
-                <div class="class-instructor">${instructor || 'Unknown Instructor'}</div>
-            </div>
-            <div>
-                <div class="class-time">${classInfo.time}</div>
-                <div class="class-students-count">${this.getStudentCount(classInfo.students)} students</div>
-            </div>
+            <div class="class-title">${this.truncateText(classInfo.course, 15)}</div>
+            <div class="class-instructor">${this.truncateText(classInfo.instructor, 20)}</div>
+            <div class="class-students">${this.getStudentCount(classInfo.students)} students</div>
         `;
 
-        // Add click event for detailed view
-        block.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.showClassDetails(e, classInfo, date);
-        });
-
-        // Add hover effects
-        block.addEventListener('mouseenter', (e) => this.showQuickTooltip(e, classInfo));
-        block.addEventListener('mouseleave', () => this.hideQuickTooltip());
+        // Add tooltip functionality
+        block.addEventListener('mouseenter', (e) => this.showTooltip(e, classInfo));
+        block.addEventListener('mouseleave', () => this.hideTooltip());
 
         return block;
     }
 
-    getCourseType(title) {
-        const course = title.toLowerCase();
+    getCourseType(courseName) {
+        const course = courseName.toLowerCase();
         if (course.includes('math')) return 'math';
-        if (course.includes('science') || course.includes('physics') || course.includes('chemistry') || course.includes('biology')) return 'science';
-        if (course.includes('english') || course.includes('literature') || course.includes('language')) return 'english';
-        if (course.includes('history') || course.includes('social')) return 'history';
-        if (course.includes('art') || course.includes('music') || course.includes('drama')) return 'art';
-        if (course.includes('computer') || course.includes('programming') || course.includes('coding')) return 'computer';
-        return 'general';
+        if (course.includes('science')) return 'science';
+        if (course.includes('english')) return 'english';
+        if (course.includes('history')) return 'history';
+        if (course.includes('art')) return 'art';
+        return 'default';
     }
 
     getStudentCount(studentsString) {
-        if (!studentsString) return 0;
         return studentsString.split(',').length;
     }
 
-    showClassDetails(event, classInfo, date) {
-        this.hideTooltip(); // Hide any existing tooltip
-        
-        const modal = this.createClassModal(classInfo, date);
-        document.body.appendChild(modal);
-        
-        // Show modal with animation
-        setTimeout(() => modal.classList.add('show'), 10);
-        
-        // Close modal on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                this.closeModal(modal);
-            }
-        });
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
     }
 
-    createClassModal(classInfo, date) {
-        const modal = document.createElement('div');
-        modal.className = 'class-modal';
+    showTooltip(event, classInfo) {
+        const tooltip = document.getElementById('classTooltip');
+        if (!tooltip) return;
         
-        const [courseName, instructor] = classInfo.title.split(' - ');
-        const students = classInfo.students ? classInfo.students.split(', ') : [];
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2><i class="fas fa-graduation-cap"></i> ${courseName}</h2>
-                    <button class="close-modal"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="modal-body">
-                    <div class="class-info-grid">
-                        <div class="info-item">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <div>
-                                <label>Instructor</label>
-                                <span>${instructor || 'Not assigned'}</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-clock"></i>
-                            <div>
-                                <label>Time</label>
-                                <span>${classInfo.time} (${classInfo.duration})</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-calendar"></i>
-                            <div>
-                                <label>Date</label>
-                                <span>${this.formatDate(date)}</span>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-users"></i>
-                            <div>
-                                <label>Students</label>
-                                <span>${students.length} enrolled</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="students-section">
-                        <h3><i class="fas fa-user-graduate"></i> Enrolled Students</h3>
-                        <div class="students-list">
-                            ${students.map(student => `
-                                <div class="student-card">
-                                    <div class="student-avatar">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="student-info">
-                                        <span class="student-name">${student.trim()}</span>
-                                    </div>
-                                    <div class="student-actions">
-                                        <button class="btn-sm" onclick="viewStudentDetails('${student.trim()}')">
-                                            <i class="fas fa-eye"></i> View
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-secondary" onclick="this.closest('.class-modal').remove()">Close</button>
-                    <button class="btn-primary" onclick="editClass('${classInfo.title}')">
-                        <i class="fas fa-edit"></i> Edit Class
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Add close button functionality
-        modal.querySelector('.close-modal').addEventListener('click', () => {
-            this.closeModal(modal);
-        });
-        
-        return modal;
-    }
-
-    closeModal(modal) {
-        modal.classList.add('closing');
-        setTimeout(() => modal.remove(), 300);
-    }
-
-    showQuickTooltip(event, classInfo) {
-        const tooltip = document.getElementById('classTooltip') || this.createTooltipElement();
-        const [courseName, instructor] = classInfo.title.split(' - ');
-        const studentCount = this.getStudentCount(classInfo.students);
+        const duration = this.getClassDuration(classInfo.startTime, classInfo.endTime);
         
         tooltip.innerHTML = `
-            <div class="tooltip-title">${courseName}</div>
-            <div class="tooltip-info"><i class="fas fa-chalkboard-teacher"></i> ${instructor || 'No instructor'}</div>
-            <div class="tooltip-info"><i class="fas fa-clock"></i> ${classInfo.time} (${classInfo.duration})</div>
-            <div class="tooltip-info"><i class="fas fa-users"></i> ${studentCount} student${studentCount !== 1 ? 's' : ''}</div>
-            <div class="tooltip-hint">Click for details</div>
+            <div class="tooltip-title">${classInfo.course}</div>
+            <div class="tooltip-info"><i class="fas fa-clock"></i> ${this.formatTime12Hour(classInfo.startTime)} - ${this.formatTime12Hour(classInfo.endTime)} (${duration} min)</div>
+            <div class="tooltip-info"><i class="fas fa-chalkboard-teacher"></i> ${classInfo.instructor}</div>
+            <div class="tooltip-info"><i class="fas fa-users"></i> ${classInfo.students}</div>
         `;
 
-        this.positionTooltip(tooltip, event.target);
+        const rect = event.target.getBoundingClientRect();
+        tooltip.style.left = `${rect.right + 10}px`;
+        tooltip.style.top = `${rect.top}px`;
         tooltip.classList.add('show');
     }
 
-    createTooltipElement() {
-        const tooltip = document.createElement('div');
-        tooltip.id = 'classTooltip';
-        tooltip.className = 'class-tooltip';
-        document.body.appendChild(tooltip);
-        return tooltip;
-    }
-
-    positionTooltip(tooltip, target) {
-        const rect = target.getBoundingClientRect();
-        const tooltipRect = tooltip.getBoundingClientRect();
-        
-        let left = rect.right + 10;
-        let top = rect.top;
-        
-        // Adjust if tooltip goes off screen
-        if (left + tooltipRect.width > window.innerWidth) {
-            left = rect.left - tooltipRect.width - 10;
-        }
-        
-        if (top + tooltipRect.height > window.innerHeight) {
-            top = window.innerHeight - tooltipRect.height - 10;
-        }
-        
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
-    }
-
-    hideQuickTooltip() {
+    hideTooltip() {
         const tooltip = document.getElementById('classTooltip');
         if (tooltip) {
             tooltip.classList.remove('show');
         }
     }
 
-    hideTooltip() {
-        this.hideQuickTooltip();
+    getClassDuration(startTime, endTime) {
+        const start = this.timeToMinutes(startTime);
+        const end = this.timeToMinutes(endTime);
+        return end - start;
     }
 
-    renderMonthView() {
-        // Implementation for month view (similar to original calendar)
-        const grid = document.getElementById('scheduleGrid');
-        grid.innerHTML = '';
-        grid.className = 'calendar-month-grid';
-        
-        // Create month calendar structure
-        this.renderMonthCalendar(grid);
+    timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
     }
 
-    renderMonthCalendar(grid) {
-        const monthContainer = document.createElement('div');
-        monthContainer.className = 'month-calendar-container';
-        
-        // Calendar weekdays header
-        const weekdaysHeader = document.createElement('div');
-        weekdaysHeader.className = 'calendar-weekdays';
-        ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-            const dayElement = document.createElement('div');
-            dayElement.textContent = day;
-            weekdaysHeader.appendChild(dayElement);
-        });
-        monthContainer.appendChild(weekdaysHeader);
-        
-        // Calendar days
-        const daysContainer = document.createElement('div');
-        daysContainer.className = 'calendar-days';
-        
-        const currentMonth = this.currentWeek.getMonth();
-        const currentYear = this.currentWeek.getFullYear();
-        const firstDay = new Date(currentYear, currentMonth, 1);
-        const lastDay = new Date(currentYear, currentMonth + 1, 0);
-        const startingDay = firstDay.getDay();
-        const totalDays = lastDay.getDate();
-
-        // Previous month's days
-        for (let i = 0; i < startingDay; i++) {
-            const dayElement = document.createElement('div');
-            dayElement.className = 'calendar-day prev-month';
-            daysContainer.appendChild(dayElement);
-        }
-
-        // Current month's days
-        for (let day = 1; day <= totalDays; day++) {
-            const date = new Date(currentYear, currentMonth, day);
-            const dateString = date.toISOString().split('T')[0];
-            const dayElement = document.createElement('div');
-            dayElement.className = 'calendar-day';
-            
-            if (this.isToday(date)) {
-                dayElement.classList.add('today');
-            }
-            
-            dayElement.innerHTML = `<div class="day-number">${day}</div>`;
-            
-            // Find events for this day
-            const dayEvents = this.classes.filter(event => event.date === dateString);
-            
-            if (dayEvents.length > 0) {
-                const eventIndicator = document.createElement('div');
-                eventIndicator.className = 'event-indicator';
-                eventIndicator.innerHTML = `
-                    <i class="fas fa-circle"></i>
-                    <span class="event-count">${dayEvents.length}</span>
-                `;
-                dayElement.appendChild(eventIndicator);
-                
-                dayElement.addEventListener('click', (e) => {
-                    this.showDayEvents(e, date, dayEvents);
-                });
-                dayElement.classList.add('has-events');
-            }
-            
-            daysContainer.appendChild(dayElement);
-        }
-        
-        monthContainer.appendChild(daysContainer);
-        grid.appendChild(monthContainer);
-    }
-
-    showDayEvents(event, date, events) {
-        // Similar to original showStudentList functionality but updated
-        const modal = this.createDayEventsModal(date, events);
-        document.body.appendChild(modal);
-        setTimeout(() => modal.classList.add('show'), 10);
-    }
-
-    createDayEventsModal(date, events) {
-        const modal = document.createElement('div');
-        modal.className = 'class-modal';
-        
-        const displayDate = date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2><i class="fas fa-calendar-day"></i> ${displayDate}</h2>
-                    <button class="close-modal"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="modal-body">
-                    <div class="day-events-list">
-                        ${events.map(event => {
-                            const [courseName, instructor] = event.title.split(' - ');
-                            return `
-                                <div class="event-card">
-                                    <div class="event-time">${event.time}</div>
-                                    <div class="event-details">
-                                        <h4>${courseName}</h4>
-                                        <p><i class="fas fa-chalkboard-teacher"></i> ${instructor}</p>
-                                        <p><i class="fas fa-clock"></i> ${event.duration}</p>
-                                        <p><i class="fas fa-users"></i> ${this.getStudentCount(event.students)} students</p>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-secondary" onclick="this.closest('.class-modal').remove()">Close</button>
-                </div>
-            </div>
-        `;
-        
-        modal.querySelector('.close-modal').addEventListener('click', () => {
-            this.closeModal(modal);
-        });
-        
-        return modal;
+    formatTime12Hour(time24) {
+        const [hours, minutes] = time24.split(':').map(Number);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const hours12 = hours % 12 || 12;
+        return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
     }
 
     showCurrentTimeIndicator() {
         // Remove existing indicators
-        document.querySelectorAll('.current-time-indicator').forEach(indicator => {
-            indicator.remove();
-        });
-        
-        if (this.viewMode !== 'week') return;
-        
+        document.querySelectorAll('.current-time-indicator').forEach(el => el.remove());
+
         const now = new Date();
         const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
         const currentMinutes = this.timeToMinutes(currentTime);
         
-        // Only show if within schedule hours
-        if (currentMinutes >= this.timeToMinutes('08:00') && currentMinutes <= this.timeToMinutes('18:00')) {
+        // Only show if within schedule hours and in week view
+        if (this.currentView === 'week' && 
+            currentMinutes >= this.timeToMinutes('08:00') && 
+            currentMinutes <= this.timeToMinutes('17:00')) {
+            
             const firstTimeSlot = this.timeToMinutes(this.timeSlots[0]);
             const position = ((currentMinutes - firstTimeSlot) / 30) * 60 + 60; // +60 for header
             
@@ -604,66 +429,30 @@ class ScheduleCalendar {
             }
         }
     }
+}
 
-    // Utility functions
-    parseTime12Hour(time12) {
-        const [time, ampm] = time12.split(' ');
-        const [hours, minutes] = time.split(':').map(Number);
-        let hours24 = hours;
-        
-        if (ampm === 'PM' && hours !== 12) {
-            hours24 += 12;
-        } else if (ampm === 'AM' && hours === 12) {
-            hours24 = 0;
+// Main roster functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the schedule calendar
+    window.scheduleCalendar = new ScheduleCalendar();
+    
+    // Update current time display every minute
+    function updateCurrentTime() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const timeDisplay = document.getElementById('currentDateTime');
+        if (timeDisplay) {
+            timeDisplay.textContent = now.toLocaleDateString('en-US', options);
         }
-        
-        return hours24 * 60 + minutes;
     }
-
-    timeToMinutes(time) {
-        const [hours, minutes] = time.split(':').map(Number);
-        return hours * 60 + minutes;
-    }
-
-    formatTime12Hour(time24) {
-        const [hours, minutes] = time24.split(':').map(Number);
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const hours12 = hours % 12 || 12;
-        return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-    }
-
-    formatDate(date) {
-        return date.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
-    isToday(date) {
-        const today = new Date();
-        return date.toDateString() === today.toDateString();
-    }
-}
-
-// Global functions for external use
-function viewStudentDetails(studentName) {
-    console.log('Viewing details for student:', studentName);
-    // Implement based on your needs - could open modal, redirect, etc.
-    // Example: window.location.href = `student-profile.php?name=${encodeURIComponent(studentName)}`;
-}
-
-function editClass(classTitle) {
-    console.log('Editing class:', classTitle);
-    // Implement class editing functionality
-    // Example: window.location.href = `edit-class.php?class=${encodeURIComponent(classTitle)}`;
-}
-
-// Initialize calendar when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit to ensure calendarEvents is available
-    setTimeout(() => {
-        window.scheduleCalendar = new ScheduleCalendar();
-    }, 100);
+    
+    setInterval(updateCurrentTime, 60000);
+    updateCurrentTime();
+    
+    // Update time indicator every minute
+    setInterval(() => {
+        if (window.scheduleCalendar) {
+            window.scheduleCalendar.showCurrentTimeIndicator();
+        }
+    }, 60000);
 });
