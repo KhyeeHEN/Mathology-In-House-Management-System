@@ -3,7 +3,7 @@ ob_start();
 
 // require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
 require_once('../../vendor/tecnickcom/tcpdf/tcpdf.php');
-include 'setting.php';
+include '../setting.php';
 
 if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET['date'])) {
     $selectedDate = $_GET['date'];
