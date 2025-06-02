@@ -103,33 +103,38 @@ foreach ($events as $event) {
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar.php"); ?>
 
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <div class="calendar-navigation">
-                        <button class="nav-btn" id="prevMonth">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
-                        <button class="nav-btn" id="nextMonth">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+            <div class="calendar-wrapper">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-navigation">
+                            <button class="nav-btn" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
+                            <button class="nav-btn" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="date-picker-container">
+                            <input type="date" id="datePicker" class="date-picker">
+                        </div>
                     </div>
-                    <div class="date-picker-container">
-                        <input type="date" id="datePicker" class="date-picker">
-                    </div>
-                </div>
-                <div class="calendar-grid">
-                    <div class="calendar-weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
-                    </div>
-                    <div class="calendar-days" id="calendarDays">
-                        <!-- Days will be populated by JavaScript -->
+                    
+                    <div class="calendar-scroll-container">
+                        <div class="calendar-grid">
+                            <div class="calendar-weekdays">
+                                <div>Sun</div>
+                                <div>Mon</div>
+                                <div>Tue</div>
+                                <div>Wed</div>
+                                <div>Thu</div>
+                                <div>Fri</div>
+                                <div>Sat</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays">
+                                <!-- Days will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
