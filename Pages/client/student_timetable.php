@@ -1,5 +1,5 @@
 <?php
-include '../setting.php'; // adjust path as needed
+include '../setting.php'; // Adjust path as needed
 session_start();
 
 // Ensure student is logged in
@@ -8,7 +8,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$student_id = $_SESSION['user_id'];
+// Fetch the actual student_id from the users table using the session's user_id
+$user_id = $_SESSION['user_id'];
+$user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
+$user_stmt = $conn->prepare($user_sql);
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+$user_info = $user_result->fetch_assoc();
+
+if (!$user_info || !isset($user_info['student_id'])) {
+    echo "<p>Error: Student ID not found for this user.</p>";
+    exit();
+}
+
+$student_id = $user_info['student_id'];
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
@@ -21,8 +35,7 @@ $sql = "SELECT
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
         WHERE sc.student_id = ?
-        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time
-        ";
+        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $student_id);
