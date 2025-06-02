@@ -48,8 +48,8 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Timetable</title>
     <!-- Use absolute paths for CSS files -->
-    <link rel="stylesheet" href="/styles/common.css">
-    <link rel="stylesheet" href="/styles/timtable.css">
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../styles/timtable.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timetable-container {
