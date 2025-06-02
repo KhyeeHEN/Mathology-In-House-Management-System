@@ -1,5 +1,5 @@
 <?php
-include '../setting.php'; // adjust path as needed
+include '../setting.php'; // Adjust path as needed
 session_start();
 
 // Ensure student is logged in
@@ -8,7 +8,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$student_id = $_SESSION['user_id'];
+// Fetch the actual student_id from the users table using the session's user_id
+$user_id = $_SESSION['user_id'];
+$user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
+$user_stmt = $conn->prepare($user_sql);
+if (!$user_stmt) {
+    echo "Error preparing user query: " . $conn->error;
+    exit();
+}
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
+$user_result = $user_stmt->get_result();
+$user_info = $user_result->fetch_assoc();
+
+if (!$user_info || !isset($user_info['student_id'])) {
+    echo "<p>Error: Student ID not found for user ID $user_id.</p>";
+    exit();
+}
+
+$student_id = $user_info['student_id'];
 
 // Fetch timetable data with student and course details
 $sql = "SELECT 
@@ -21,17 +39,30 @@ $sql = "SELECT
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
         WHERE sc.student_id = ?
-        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time
-        ";
+        ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
 
 $stmt = $conn->prepare($sql);
+if (!$stmt) {
+    echo "Error preparing timetable query: " . $conn->error;
+    exit();
+}
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Store the results in an array to ensure data is available for rendering
+$timetable_data = [];
+while ($row = $result->fetch_assoc()) {
+    $timetable_data[] = $row;
+}
+
 // Get student info for header
 $student_sql = "SELECT First_Name, Last_Name FROM students WHERE student_id = ?";
 $student_stmt = $conn->prepare($student_sql);
+if (!$student_stmt) {
+    echo "Error preparing student query: " . $conn->error;
+    exit();
+}
 $student_stmt->bind_param("i", $student_id);
 $student_stmt->execute();
 $student_result = $student_stmt->get_result();
@@ -56,6 +87,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            display: table; /* Ensure table is visible */
         }
         .timetable th, .timetable td {
             border: 1px solid #ddd;
@@ -161,7 +193,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
 
             <div class="timetable-container">
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
                     <table class="timetable">
                         <thead>
                             <tr>
@@ -173,15 +205,15 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php foreach ($timetable_data as $row): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($row['course']) ?></td>
-                                    <td><?= htmlspecialchars($row['day']) ?></td>
-                                    <td><?= htmlspecialchars($row['start_time']) ?></td>
-                                    <td><?= htmlspecialchars($row['end_time']) ?></td>
-                                    <td><?= htmlspecialchars($row['approved_at']) ?></td>
+                                    <td><?= htmlspecialchars($row['course'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['day'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['start_time'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['end_time'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['approved_at'] ?? 'N/A') ?></td>
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 <?php else: ?>
@@ -199,7 +231,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                 <a href="timetable_add.php?student_id=<?= $student_id ?>" class="btn btn-secondary">
                     <i class="fas fa-plus"></i> Add New Session
                 </a>
-                <?php if ($result && $result->num_rows > 0): ?>
+                <?php if (!empty($timetable_data)): ?>
                     <a href="print_timetable.php?student_id=<?= $student_id ?>" class="btn btn-danger" target="_blank">
                         <i class="fas fa-print"></i> Print Timetable
                     </a>
