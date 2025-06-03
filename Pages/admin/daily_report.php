@@ -5,7 +5,13 @@ date_default_timezone_set('Asia/Kuala_Lumpur');
 $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
 // Fetch attendance records for the given date
-$sql = "SELECT * FROM attendance_records WHERE DATE(attendance_datetime) = ?";
+$sql = "SELECT ar.*,
+       CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
+       CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor_name
+FROM attendance_records ar
+LEFT JOIN students s ON ar.student_id = s.student_id
+LEFT JOIN instructors i ON ar.instructor_id = i.instructor_id
+WHERE DATE(ar.attendance_datetime) = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $date);
 $stmt->execute();
