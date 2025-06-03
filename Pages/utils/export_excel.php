@@ -44,7 +44,7 @@ if (isset($_GET['download_excel']) && $_GET['download_excel'] == '1' && isset($_
             ar.status,
             ar.course
         FROM attendance_records ar
-        LEFT JOIN users s ON ar.student_id = s.user_id
+        LEFT JOIN students s ON ar.student_id = s.user_id
         LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
         WHERE DATE(ar.attendance_datetime) = ?";
 

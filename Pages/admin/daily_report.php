@@ -140,8 +140,8 @@ $result = $stmt->get_result();
                         ?>
                                 <tr>
                                     <td><?= $row['record_id'] ?></td>
-                                    <td><?= $row['student_id'] ?></td>
-                                    <td><?= $row['instructor_id'] ?? '-' ?></td>
+                                    <td><?= $row['student_name'] ?></td>
+                                    <td><?= $row['instructor_name'] ?? '-' ?></td>
                                     <td><?= $row['timetable_datetime'] ?></td>
                                     <td><?= $row['attendance_datetime'] ?? '-' ?></td>
                                     <td><?= $row['hours_attended'] ?></td>
