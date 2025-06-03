@@ -132,6 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="Email">Email:</label>
         <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($instructor['email']); ?>" required><br>
 
+        <br>
+
         <button type="submit">Update</button>
         <a href="../Pages/admin/users.php?active_tab=instructors">Cancel</a>
     </form>
