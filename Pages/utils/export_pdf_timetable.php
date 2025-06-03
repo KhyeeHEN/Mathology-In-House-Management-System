@@ -1,12 +1,13 @@
-```php
 <?php
-// Enable error reporting for debugging
+// Ensure no output before this point
+if (ob_get_length()) {
+    ob_end_clean();
+}
+
+// Enable error reporting for debugging (disable in production)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
-// Start output buffering
-ob_start();
 
 // Include required files
 try {
@@ -76,6 +77,7 @@ if ($result->num_rows == 0) {
 // Create PDF
 try {
     $pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    $pdf->SetAutoPageBreak(true, 10);
     $pdf->AddPage();
     $pdf->SetTitle('Timetable for ' . $student_name);
     $pdf->SetFont('helvetica', '', 12);
@@ -105,12 +107,11 @@ try {
     die('Error generating PDF: ' . $e->getMessage());
 }
 
-// Ensure no output before PDF
-ob_end_clean();
-
 // Set headers for PDF download
 header('Content-Type: application/pdf');
 header('Content-Disposition: attachment; filename="Timetable_' . $student_id . '_' . date('Y-m-d') . '.pdf"');
+header('Content-Transfer-Encoding: binary');
+header('Accept-Ranges: bytes');
 header('Cache-Control: private, max-age=0, must-revalidate');
 header('Pragma: public');
 
@@ -123,4 +124,3 @@ try {
 
 exit;
 ?>
-```
