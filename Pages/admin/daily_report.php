@@ -5,7 +5,13 @@ date_default_timezone_set('Asia/Kuala_Lumpur');
 $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
 // Fetch attendance records for the given date
-$sql = "SELECT * FROM attendance_records WHERE DATE(attendance_datetime) = ?";
+$sql = "SELECT ar.*,
+       CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
+       CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name
+FROM attendance_records ar
+LEFT JOIN students s ON ar.student_id = s.student_id
+LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+WHERE DATE(ar.attendance_datetime) = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $date);
 $stmt->execute();
@@ -116,8 +122,8 @@ $result = $stmt->get_result();
                     <thead>
                         <tr>
                             <th>Record ID</th>
-                            <th>Student ID</th>
-                            <th>Instructor ID</th>
+                            <th>Student Name</th>
+                            <th>Instructor Name</th>
                             <th>Scheduled Time</th>
                             <th>Attendance Time</th>
                             <th>Hours Attended</th>
@@ -134,8 +140,8 @@ $result = $stmt->get_result();
                         ?>
                                 <tr>
                                     <td><?= $row['record_id'] ?></td>
-                                    <td><?= $row['student_id'] ?></td>
-                                    <td><?= $row['instructor_id'] ?? '-' ?></td>
+                                    <td><?= $row['student_name'] ?></td>
+                                    <td><?= $row['instructor_name'] ?? '-' ?></td>
                                     <td><?= $row['timetable_datetime'] ?></td>
                                     <td><?= $row['attendance_datetime'] ?? '-' ?></td>
                                     <td><?= $row['hours_attended'] ?></td>
