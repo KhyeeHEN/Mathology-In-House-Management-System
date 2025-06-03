@@ -6,8 +6,8 @@ $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 
 // Fetch attendance records for the given date
 $sql = "SELECT ar.*,
-       CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
-       CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor_name
+       CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
+       CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
@@ -122,8 +122,8 @@ $result = $stmt->get_result();
                     <thead>
                         <tr>
                             <th>Record ID</th>
-                            <th>Student ID</th>
-                            <th>Instructor ID</th>
+                            <th>Student Name</th>
+                            <th>Instructor Name</th>
                             <th>Scheduled Time</th>
                             <th>Attendance Time</th>
                             <th>Hours Attended</th>
