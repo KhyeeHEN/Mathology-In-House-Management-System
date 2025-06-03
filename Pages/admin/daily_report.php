@@ -108,7 +108,7 @@ $result = $stmt->get_result();
     <div class="dashboard-container">
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("/includes/Top_Nav_Bar.php"); ?>
             <div class="container">
                 <h2>Daily Attendance Report for <?php echo htmlspecialchars($date); ?></h2>
 
