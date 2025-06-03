@@ -21,8 +21,8 @@ if (isset($_GET['download_excel']) && $_GET['download_excel'] == '1' && isset($_
 
     // Header row
     $sheet->setCellValue('A1', 'Record ID');
-    $sheet->setCellValue('B1', 'Student ID');
-    $sheet->setCellValue('C1', 'Instructor ID');
+    $sheet->setCellValue('B1', 'Student Name');
+    $sheet->setCellValue('C1', 'Instructor Name');
     $sheet->setCellValue('D1', 'Scheduled Time');
     $sheet->setCellValue('E1', 'Attendance Time');
     $sheet->setCellValue('F1', 'Hours Attended');
@@ -32,10 +32,21 @@ if (isset($_GET['download_excel']) && $_GET['download_excel'] == '1' && isset($_
     $sheet->setCellValue('J1', 'Course');
 
     // SQL query with date filter
-    $sql = "SELECT record_id, student_id, instructor_id, timetable_datetime, attendance_datetime,
-            hours_attended, hours_replacement, hours_remaining, status, course
-            FROM attendance_records
-            WHERE DATE(attendance_datetime) = ?";
+    $sql = "SELECT
+            ar.record_id,
+            CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
+            CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name,
+            ar.timetable_datetime,
+            ar.attendance_datetime,
+            ar.hours_attended,
+            ar.hours_replacement,
+            ar.hours_remaining,
+            ar.status,
+            ar.course
+        FROM attendance_records ar
+        LEFT JOIN users s ON ar.student_id = s.user_id
+        LEFT JOIN instructors i ON ar.instructor_id = i.instructor_id
+        WHERE DATE(ar.attendance_datetime) = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $selectedDate);
@@ -51,8 +62,8 @@ if (isset($_GET['download_excel']) && $_GET['download_excel'] == '1' && isset($_
     $rowNum = 2;
     while ($row = $result->fetch_assoc()) {
         $sheet->setCellValue('A' . $rowNum, $row['record_id']);
-        $sheet->setCellValue('B' . $rowNum, $row['student_id']);
-        $sheet->setCellValue('C' . $rowNum, $row['instructor_id'] ?? '-');
+        $sheet->setCellValue('B' . $rowNum, $row['student_name']);
+        $sheet->setCellValue('C' . $rowNum, $row['instructor_name'] ?? '-');
         $sheet->setCellValue('D' . $rowNum, $row['timetable_datetime']);
         $sheet->setCellValue('E' . $rowNum, $row['attendance_datetime'] ?? '-');
         $sheet->setCellValue('F' . $rowNum, $row['hours_attended']);

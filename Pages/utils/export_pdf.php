@@ -20,8 +20,8 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->Ln(5);
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(20, 7, 'Record ID', 1, 0, 'L');
-    $pdf->Cell(20, 7, 'Student ID', 1, 0, 'L');
-    $pdf->Cell(25, 7, 'Instructor ID', 1, 0, 'L');
+    $pdf->Cell(20, 7, 'Student Name', 1, 0, 'L');
+    $pdf->Cell(25, 7, 'Instructor Name', 1, 0, 'L');
     $pdf->Cell(32, 7, 'Scheduled Time', 1, 0, 'L');
     $pdf->Cell(32, 7, 'Attendance Time', 1, 0, 'L');
     $pdf->Cell(28, 7, 'Hours Attended', 1, 0, 'L');
@@ -30,7 +30,23 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->Cell(20, 7, 'Status', 1, 0, 'L');
     $pdf->Cell(30, 7, 'Course', 1, 1, 'L');
 
-    $stmt = $conn->prepare("SELECT record_id, student_id, instructor_id, timetable_datetime, attendance_datetime, hours_attended, hours_replacement, hours_remaining, status, course FROM attendance_records WHERE DATE(attendance_datetime) = ?");
+    $sql = "SELECT
+            ar.record_id,
+            CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
+            CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name,
+            ar.timetable_datetime,
+            ar.attendance_datetime,
+            ar.hours_attended,
+            ar.hours_replacement,
+            ar.hours_remaining,
+            ar.status,
+            ar.course
+        FROM attendance_records ar
+        LEFT JOIN users s ON ar.student_id = s.user_id
+        LEFT JOIN instructors i ON ar.instructor_id = i.instructor_id
+        WHERE DATE(ar.attendance_datetime) = ?";
+
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $selectedDate);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -42,8 +58,8 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->SetFont('helvetica', '', 9);
     while ($row = $result->fetch_assoc()) {
         $pdf->Cell(20, 6, $row['record_id'], 1, 0, 'L');
-        $pdf->Cell(20, 6, $row['student_id'], 1, 0, 'L');
-        $pdf->Cell(25, 6, $row['instructor_id'] ?? '-', 1, 0, 'L');
+        $pdf->Cell(20, 6, $row['student_name'], 1, 0, 'L');
+        $pdf->Cell(25, 6, $row['instructor_name'] ?? '-', 1, 0, 'L');
         $pdf->Cell(32, 6, $row['timetable_datetime'], 1, 0, 'L');
         $pdf->Cell(32, 6, $row['attendance_datetime'] ?? '-', 1, 0, 'L');
         $pdf->Cell(28, 6, $row['hours_attended'], 1, 0, 'L');
