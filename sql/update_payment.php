@@ -21,9 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ssssi", $payment_method, $payment_mode, $deposit_status, $payment_status, $payment_id);
 
     if ($stmt->execute()) {
-        header("Location: ../Pages/admin/payment.php?message=Payment+updated+successfully");
+        echo "<script>
+        alert('Payment updated successfully!');
+        window.location.href = '../Pages/admin/payment.php';
+    </script>";
     } else {
-        header("Location: ../Pages/admin/payment.php?error=Update+failed");
+        echo "<script>
+        alert('Update failed. Please try again.');
+        window.location.href = '../Pages/admin/payment.php';
+    </script>";
     }
 
     $stmt->close();

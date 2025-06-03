@@ -20,8 +20,8 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->Ln(5);
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(20, 7, 'Record ID', 1, 0, 'L');
-    $pdf->Cell(20, 7, 'Student Name', 1, 0, 'L');
-    $pdf->Cell(25, 7, 'Instructor Name', 1, 0, 'L');
+    $pdf->Cell(27, 7, 'Student Name', 1, 0, 'L');
+    $pdf->Cell(27, 7, 'Instructor Name', 1, 0, 'L');
     $pdf->Cell(32, 7, 'Scheduled Time', 1, 0, 'L');
     $pdf->Cell(32, 7, 'Attendance Time', 1, 0, 'L');
     $pdf->Cell(28, 7, 'Hours Attended', 1, 0, 'L');

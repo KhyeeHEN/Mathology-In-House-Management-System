@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Edit Attendance Record</h1>
     <form method="POST">
         <p><strong>Student:</strong> <?php echo htmlspecialchars($record['student_last'] . ' ' . $record['student_first']); ?></p>
-        <p><strong>Instructor:</strong> <?php echo htmlspecialchars($record['instructor_first'] . ' ' . $record['instructor_last']); ?></p>
+        <p><strong>Instructor:</strong> <?php echo htmlspecialchars($record['instructor_last'] . ' ' . $record['instructor_first']); ?></p>
         <p><strong>Timetable DateTime:</strong> <?php echo htmlspecialchars($record['timetable_datetime']); ?></p>
 
         <label for="attendance_datetime">Attendance DateTime:</label>

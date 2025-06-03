@@ -34,7 +34,7 @@ $payment = $result->fetch_assoc();
     <meta charset="UTF-8">
     <title>Edit Payment</title>
     <link rel="stylesheet" href="../../Styles/common.css">
-     <style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f3f4f6;
@@ -127,8 +127,11 @@ $payment = $result->fetch_assoc();
                 <input type="hidden" name="payment_id" value="<?php echo $payment['payment_id']; ?>">
 
                 <p><strong>Student:</strong> <?php echo htmlspecialchars($payment['student_name']); ?></p>
-                <p><strong>Amount:</strong> RM <?php echo number_format($payment['payment_amount'], 2); ?></p>
                 <p><strong>Date:</strong> <?php echo htmlspecialchars($payment['payment_date']); ?></p>
+
+                <label>Amount (RM):
+                    <input type="number" name="payment_amount" value="<?php echo htmlspecialchars($payment['payment_amount']); ?>" step="0.01" min="0" required>
+                </label>
 
                 <label>Payment Method:
                     <select name="payment_method" required>
@@ -164,7 +167,7 @@ $payment = $result->fetch_assoc();
 
 
                 <button type="submit">Update Payment</button>
-                <a href="payment.php">Cancel</a>
+                <a href="../Pages/admin/payment.php">Cancel</a>
             </form>
         </main>
     </div>
