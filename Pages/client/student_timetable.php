@@ -191,7 +191,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
 
             <div class="action-buttons">
                 <?php if (!empty($timetable_data)): ?>
-                    <a href="print_timetable.php?student_id=<?= $student_id ?>" class="btn btn-danger" target="_blank">
+                    <a href="../utils/export_pdf_timetable.php?student_id=<?= $student_id ?>&download_pdf=1" class="btn btn-danger" target="_blank">
                         <i class="fas fa-print"></i> Print Timetable
                     </a>
                 <?php endif; ?>
