@@ -10,7 +10,7 @@ $sql = "SELECT ar.*,
        CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor_name
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
-LEFT JOIN instructors i ON ar.instructor_id = i.instructor_id
+LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
 WHERE DATE(ar.attendance_datetime) = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $date);
