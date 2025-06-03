@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $training_status = $conn->real_escape_string($_POST['Training_Status']);
     $email = $conn->real_escape_string($_POST['Email']);
     $employment_type = $conn->real_escape_string($_POST['Employment_Type']);
-    $working_days = $conn->real_escape_string($_POST['Working_Days']);
+    // Handle Working_Days: if Employment_Type is Full-Time, set to NULL; otherwise, get from form
+    $working_days = ($employment_type === 'Full-Time') ? NULL : (isset($_POST['Working_Days']) ? $conn->real_escape_string($_POST['Working_Days']) : '');
     $worked_days = (int)$_POST['Worked_Days'];
 
     // Validate worked_days (must be non-negative)
@@ -52,7 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$stmt) {
             $error = "Failed to prepare update statement: " . $conn->error;
         } else {
-            $stmt->bind_param("sss/sssssi", $last_name, $first_name, $gender, $dob, $highest_education, $remark, $training_status, $employment_type, $working_days, $worked_days, $instructor_id);
+            // Corrected type definition string: ssssssssssi (10 strings + 1 integer)
+            $stmt->bind_param("ssssssssssi", $last_name, $first_name, $gender, $dob, $highest_education, $remark, $training_status, $employment_type, $working_days, $worked_days, $instructor_id);
             if ($stmt->execute()) {
                 // Update users table
                 $stmt_user = $conn->prepare("UPDATE users SET email = ? WHERE instructor_id = ?");
@@ -129,6 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label for="Email">Email:</label>
         <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($instructor['email']); ?>" required><br>
+
+        <br>
 
         <button type="submit">Update</button>
         <a href="../Pages/admin/users.php?active_tab=instructors">Cancel</a>
