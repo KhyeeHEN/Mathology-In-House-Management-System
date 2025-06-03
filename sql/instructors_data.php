@@ -32,7 +32,10 @@ $sql = "
         i.DOB, 
         i.Highest_Education, 
         i.Remark, 
-        i.Training_Status, 
+        i.Training_Status,
+        i.Employment_Type,
+        i.Working_Days,
+        i.Worked_Days,
         u.email, 
         GROUP_CONCAT(DISTINCT c.course_name SEPARATOR ', ') AS courses,
         GROUP_CONCAT(
@@ -95,7 +98,7 @@ if ($result->num_rows > 0) {
                     <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn edit'>Edit</button>
                 </form>
-                <form method='get' action='../../sql/delete_instructor.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                <form method='get' action='../../sql/delete_instructor.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this instructor?');\">
                     <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn delete'>Delete</button>
                 </form>
@@ -108,6 +111,9 @@ if ($result->num_rows > 0) {
             <div class='details-box'>
                 <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
                 <strong>Highest Education:</strong> " . $row['Highest_Education'] . "<br>
+                <strong>Employment Type:</strong> " . ($row['Employment_Type'] ?? 'N/A') . "<br>
+                <strong>Working Days:</strong> " . ($row['Working_Days'] ?? 'N/A') . "<br>
+                <strong>Worked Days:</strong> " . ($row['Worked_Days'] ?? 'N/A') . "<br>
                 <strong>Remark:</strong> " . $row['Remark'] . "<br>
                 <strong>Training Status:</strong> " . $row['Training_Status'] . "<br>
                 <strong>Courses:</strong> " . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "<br>
@@ -121,16 +127,16 @@ if ($result->num_rows > 0) {
     // Pagination controls
     echo "<div class='pagination'>";
     if ($page > 1) {
-        echo "<a href='?instructors_page=" . ($page - 1) . "&active_tab=instructors&search=$search'>Previous</a>";
+        echo "<a href='?instructors_page=" . ($page - 1) . "&active_tab=instructors&search=" . urlencode($search) . "'>Previous</a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
     for ($i = 1; $i <= $totalPages; $i++) {
         $activeClass = $i == $page ? 'active' : '';
-        echo "<a href='?instructors_page=$i&active_tab=instructors&search=$search' class='$activeClass'>$i</a>";
+        echo "<a href='?instructors_page=$i&active_tab=instructors&search=" . urlencode($search) . "' class='$activeClass'>$i</a>";
     }
     if ($page < $totalPages) {
-        echo "<a href='?instructors_page=" . ($page + 1) . "&active_tab=instructors&search=$search'>Next</a>";
+        echo "<a href='?instructors_page=" . ($page + 1) . "&active_tab=instructors&search=" . urlencode($search) . "'>Next</a>";
     } else {
         echo "<a class='disabled'>Next</a>";
     }
@@ -151,3 +157,37 @@ if ($result->num_rows > 0) {
         }
     }
 </script>
+
+<style>
+    .details-box {
+        padding: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .action-btn {
+        padding: 5px 10px;
+        margin: 2px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .action-btn.view { background-color: #2196F3; color: white; }
+    .action-btn.edit { background-color: #4CAF50; color: white; }
+    .action-btn.delete { background-color: #f44336; color: white; }
+    .pagination a {
+        padding: 5px 10px;
+        margin: 0 2px;
+        text-decoration: none;
+        color: #333;
+        background-color: #f1f1f1;
+    }
+    .pagination a.active {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .pagination a.disabled {
+        color: #999;
+        cursor: not-allowed;
+    }
+</style>
