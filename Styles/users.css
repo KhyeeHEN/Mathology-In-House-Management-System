@@ -29,86 +29,106 @@ h1 {
 }
 
 /* Button styling */
-.users-controls-row button,
-.users-controls-row .add-entry-button {
-    background: #1f2937;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    margin: 0 3px;
-    font-weight: 500;
-}
-
-.users-controls-row button:hover,
-.users-controls-row .add-entry-button:hover {
-    background: #374151;
-    box-shadow: 0 2px 8px rgba(31, 41, 55, 0.12);
-}
-
-.users-controls-row button.active {
-    background: rgb(71, 82, 95);
-    color: #fff;
-}
-
-.users-controls-row button:focus,
-.users-controls-row .add-entry-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgb(71, 82, 95);
-}
-
-/* Hide tables initially */
-.table-container {
-    display: none;
-}
-.table-container.active {
-    display: block;
-}
-
-/* Style for the search bar */
-.search-bar {
+.users-controls-row {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
 }
 
-.search-bar input[type="text"] {
-    width: 300px;
-    padding: 10px;
+.users-controls-row .search-bar {
+    flex: 1;
+    min-width: 250px;
+}
+
+#search-form {
+    display: flex;
+    gap: 8px;
+}
+
+#search-form input[type="text"],
+#search-form input[type="search"] {
+    flex: 1;
+    min-width: 210px;
+    height: 42px;
+    font-size: 1rem;
+    border-radius: 8px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: box-shadow 0.3s ease-in-out;
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
-.search-bar input[type="text"]:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgb(71, 82, 95);
-    border-color: rgb(71, 82, 95);
-}
-
-.search-bar button {
-    padding: 10px 15px;
-    margin-left: 10px;
+#search-form button[type="submit"],
+#search-form button[type="button"] {
+    height: 42px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border-radius: 8px;
     border: none;
-    background-color: #1f2937;
-    color: white;
-    font-size: 16px;
-    border-radius: 5px;
+    background: #222e3a;
+    color: #fff;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+#search-form button[type="submit"]:hover,
+#search-form button[type="button"]:hover {
+    background: #1a2330;
 }
 
-.search-bar button:hover {
-    background-color: rgb(71, 82, 95);
+/* FILTER BUTTONS (STUDENTS/INSTRUCTORS/ADMINS) */
+.filter-buttons {
+    display: flex;
+    gap: 8px;
 }
 
-.search-bar button:focus {
+.filter-buttons button {
+    height: 42px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: #222e3a;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.filter-buttons button.active,
+.filter-buttons button:focus {
+    background: #34495e;
     outline: none;
-    box-shadow: 0 0 5px rgb(71, 82, 95);
+}
+.filter-buttons button:hover {
+    background: #1a2330;
+}
+
+/* ADD ENTRY BUTTON (in control row) */
+.users-controls-row form[action*="add_entry.php"] button {
+    height: 42px;
+    padding: 0 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: none;
+    background: #222e3a;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.users-controls-row form[action*="add_entry.php"] button:hover {
+    background: #1a2330;
 }
 
  /*Show Details part*/

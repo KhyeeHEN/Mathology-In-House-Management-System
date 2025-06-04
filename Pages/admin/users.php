@@ -30,9 +30,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
             <div class="users-controls-row"
                 style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-
                 <!-- Search Bar -->
-                <div class="search-bar" style="flex: 1; min-width: 220px;">
+                <div class="search-form" style="flex: 1; min-width: 220px;">
                     <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
                         <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
                             value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
@@ -44,7 +43,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                         <button type="button" id="reset-button">Reset</button>
                     </form>
                 </div>
-                
+
                 <!-- Filter Buttons -->
                 <div class="filter-buttons" style="display: flex; gap: 8px;">
                     <button onclick="showTable('students-table')" id="students-btn"
@@ -67,9 +66,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                         Add Entry
                     </button>
                 </form>
-
-
             </div>
+            
 
             <!-- Display messages or errors -->
             <?php if ($message): ?>
