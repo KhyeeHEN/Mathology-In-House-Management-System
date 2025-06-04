@@ -44,13 +44,13 @@ h1 {
     min-width: 250px;
 }
 
-#search-bar {
+.search-bar {
     display: flex;
     gap: 8px;
 }
 
-#search-bar input[type="text"],
-#search-bar input[type="search"] {
+.search-bar input[type="text"],
+.search-bar input[type="search"] {
     flex: 1;
     min-width: 210px;
     height: 42px;
@@ -61,8 +61,8 @@ h1 {
     box-sizing: border-box;
 }
 
-#search-bar button[type="submit"],
-#search-bar button[type="button"] {
+.search-bar button[type="submit"],
+.search-bar button[type="button"] {
     height: 42px;
     padding: 0 20px;
     font-size: 1rem;
@@ -77,8 +77,8 @@ h1 {
     align-items: center;
     gap: 6px;
 }
-#search-bar button[type="submit"]:hover,
-#search-bar button[type="button"]:hover {
+.search-bar button[type="submit"]:hover,
+.search-bar button[type="button"]:hover {
     background: #1a2330;
 }
 
