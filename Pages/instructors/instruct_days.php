@@ -30,7 +30,10 @@ if (!$user_stmt) {
     exit();
 }
 $user_stmt->bind_param("i", $user_id);
-$user_stmt->execute();
+if (!$user_stmt->execute()) {
+    echo "Error executing user query: " . $user_stmt->error;
+    exit();
+}
 $user_result = $user_stmt->get_result();
 $user_info = $user_result->fetch_assoc();
 
@@ -41,6 +44,14 @@ if (!$user_info || !isset($user_info['instructor_id'])) {
 
 $instructor_id = $user_info['instructor_id'];
 echo "<!-- Debugging: Retrieved instructor_id = $instructor_id -->";
+
+// Verify the instructor table exists and has the expected columns
+$check_table = $conn->query("SHOW TABLES LIKE 'instructor'");
+if ($check_table->num_rows == 0) {
+    echo "<p>Error: Table 'instructor' does not exist in the database.</p>";
+    exit();
+}
+echo "<!-- Debugging: Table 'instructor' exists -->";
 
 // Fetch instructor details
 $sql = "SELECT First_Name, Last_Name, Highest_Education, Training_Status, Employment_Type, Working_Days, Worked_Days 
@@ -62,11 +73,9 @@ $instructor = $result->fetch_assoc();
 echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
 
 if (!$instructor) {
-    echo "<div style='padding: 20px; text-align: center; background-color: #f8f9fa; border-radius: 5px;'>";
-    echo "<i class='fas fa-info-circle' style='font-size: 24px; color: #6c757d;'></i>";
-    echo "<p style='margin-top: 10px;'>No instructor details found for ID $instructor_id.</p>";
-    echo "</div>";
-    exit();
+    // Additional debugging: Check if the instructor_id exists at all
+    $check_id = $conn->query("SELECT instructor_id FROM instructor WHERE instructor_id = $instructor_id");
+    echo "<!-- Debugging: Instructor ID $instructor_id exists = " . ($check_id->num_rows > 0 ? 'Yes' : 'No') . " -->";
 }
 
 $stmt->close();
@@ -119,32 +128,39 @@ $stmt->close();
             <?php require("../includes/Top_Nav_Bar_Instructor.php"); ?>
 
             <div class="instructor-details">
-                <h2>
-                    <i class="fas fa-user-tie"></i> 
-                    Instructor Details - <?= htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']) ?>
-                </h2>
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <strong>Highest Education</strong>
-                        <?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?>
+                <?php if ($instructor): ?>
+                    <h2>
+                        <i class="fas fa-user-tie"></i> 
+                        Instructor Details - <?= htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']) ?>
+                    </h2>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <strong>Highest Education</strong>
+                            <?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Training Status</strong>
+                            <?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Employment Type</strong>
+                            <?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Working Days</strong>
+                            <?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Worked Days</strong>
+                            <?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <strong>Training Status</strong>
-                        <?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?>
+                <?php else: ?>
+                    <div style="padding: 20px; text-align: center; background-color: #f8f9fa; border-radius: 5px;">
+                        <i class="fas fa-info-circle" style="font-size: 24px; color: #6c757d;"></i>
+                        <p style="margin-top: 10px;">No instructor details found for ID <?= $instructor_id ?>.</p>
                     </div>
-                    <div class="detail-item">
-                        <strong>Employment Type</strong>
-                        <?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Working Days</strong>
-                        <?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Worked Days</strong>
-                        <?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
         </main>
     </div>
