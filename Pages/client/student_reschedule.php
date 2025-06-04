@@ -310,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
         }
     });
     </script>
-    <script type="module" src="Scripts/common.js"></script>
+    <script type="module" src="/Scripts/common.js"></script>
 
 </body>
 </html>
