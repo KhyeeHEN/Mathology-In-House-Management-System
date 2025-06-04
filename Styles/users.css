@@ -29,6 +29,8 @@ h1 {
 }
 
 /* Button styling */
+/* USERS PAGE CONTROL ROWS & SEARCH BAR */
+
 .users-controls-row {
     display: flex;
     align-items: center;
@@ -42,13 +44,13 @@ h1 {
     min-width: 250px;
 }
 
-#search-form {
+#search-bar {
     display: flex;
     gap: 8px;
 }
 
-#search-form input[type="text"],
-#search-form input[type="search"] {
+#search-bar input[type="text"],
+#search-bar input[type="search"] {
     flex: 1;
     min-width: 210px;
     height: 42px;
@@ -59,8 +61,8 @@ h1 {
     box-sizing: border-box;
 }
 
-#search-form button[type="submit"],
-#search-form button[type="button"] {
+#search-bar button[type="submit"],
+#search-bar button[type="button"] {
     height: 42px;
     padding: 0 20px;
     font-size: 1rem;
@@ -75,8 +77,8 @@ h1 {
     align-items: center;
     gap: 6px;
 }
-#search-form button[type="submit"]:hover,
-#search-form button[type="button"]:hover {
+#search-bar button[type="submit"]:hover,
+#search-bar button[type="button"]:hover {
     background: #1a2330;
 }
 
@@ -110,25 +112,32 @@ h1 {
     background: #1a2330;
 }
 
-/* ADD ENTRY BUTTON (in control row) */
-.users-controls-row form[action*="add_entry.php"] button {
-    height: 42px;
-    padding: 0 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    background: #222e3a;
-    color: #fff;
-    font-weight: 500;
-    cursor: pointer;
-    margin-left: 8px;
-    transition: background 0.2s;
+/* PAGINATION */
+.pagination {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 2px;
+    margin-top: 18px;
 }
-.users-controls-row form[action*="add_entry.php"] button:hover {
-    background: #1a2330;
+.pagination a,
+.pagination a.active {
+    padding: 4px 10px;
+    margin: 0 2px;
+    border-radius: 3px;
+    text-decoration: none;
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+}
+.pagination a.active {
+    background: #3498db;
+    color: #fff;
+    border: 1px solid #3498db;
+}
+.pagination a.disabled {
+    background: #eee;
+    color: #bbb;
+    pointer-events: none;
+    border: 1px solid #eee;
 }
 
  /*Show Details part*/
@@ -221,4 +230,12 @@ h1 {
     color: #FFFFFF;
     border-color: #1f2937;
     cursor: default;
+}
+
+/* Hide tables initially */
+.table-container {
+    display: none;
+}
+.table-container.active {
+    display: block;
 }
