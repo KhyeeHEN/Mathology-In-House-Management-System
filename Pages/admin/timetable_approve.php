@@ -534,7 +534,7 @@ if (!$viewing_id && !$show_search_results) {
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <div class = contents>
                 <div class="content-header">

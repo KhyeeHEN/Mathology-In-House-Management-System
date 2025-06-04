@@ -124,7 +124,7 @@ echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEven
         <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Instructor.php"); ?>
 
             <div class="calendar-wrapper">
                 <div class="calendar-container">

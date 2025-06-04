@@ -25,7 +25,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <?php if ($message): ?>
                 <div style="color: green; font-weight: bold;"><?php echo htmlspecialchars($message); ?></div>

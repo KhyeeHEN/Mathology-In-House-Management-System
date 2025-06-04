@@ -68,6 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
 
+                $insertAttendanceQuery = "INSERT INTO attendance (student_id)
+                                         VALUES ('$student_id')";
+                if (!$conn->query($insertAttendanceQuery)) {
+                    throw new Exception("Error adding into attendance table: " . $conn->error);
+                }
+
                 // Commit the transaction
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+and+associated+user+added+successfully");
