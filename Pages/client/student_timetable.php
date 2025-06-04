@@ -198,6 +198,6 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>
