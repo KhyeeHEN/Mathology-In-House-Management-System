@@ -59,55 +59,53 @@ function calculateDuration($start, $end) {
     return ($hours > 0 ? "$hours hours " : "") . ($minutes > 0 ? "$minutes minutes" : "");
 }
 
-function getNextDateForDay($dayName) {
-    $daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    $today = new DateTime();
-    $currentDay = (int)$today->format('w');
-    $targetDay = array_search(ucfirst($dayName), $daysOfWeek);
-    if ($targetDay === false) return null;
-    $daysToAdd = ($targetDay - $currentDay + 7) % 7;
-    $today->modify("+$daysToAdd days");
-    return $today->format('Y-m-d');
-}
-
-// Format for calendar.js
+// Format for calendar.js - Generate events for multiple months
 $calendarEvents = [];
-$currentMonth = date('n');
 $currentYear = date('Y');
 
-foreach ($events as $event) {
-    $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
-    $studentsList = $event['students'] ? $event['students'] : 'No students enrolled';
+// Generate events for current month and next 2 months
+for ($monthOffset = 0; $monthOffset < 3; $monthOffset++) {
+    $targetMonth = date('n', strtotime("+$monthOffset months"));
+    $targetYear = date('Y', strtotime("+$monthOffset months"));
     
-    // Get all dates for this day of week in current month
-    $dayOfWeek = $event['day'];
-    $daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    $targetDayIndex = array_search(ucfirst($dayOfWeek), $daysOfWeek);
-    
-    if ($targetDayIndex !== false) {
-        // Find all dates in current month that match this day of week
-        $date = new DateTime("first $dayOfWeek of $currentYear-$currentMonth");
-        $month = $date->format('n');
+    foreach ($events as $event) {
+        $courseName = !empty($event['course_name']) ? $event['course_name'] : $event['fallback_course_name'];
+        $studentsList = $event['students'] ? $event['students'] : 'No students enrolled';
         
-        while ($month == $currentMonth) {
-            $calendarEvents[] = [
-                'title' => $courseName . ' (' . $event['student_count'] . ' students)',
-                'date' => $date->format('Y-m-d'),
-                'type' => '1',
-                'time' => date('h:i A', strtotime($event['start_time'])),
-                'duration' => calculateDuration($event['start_time'], $event['end_time']),
-                'venue' => 'TBD',
-                'description' => '',
-                'students' => $studentsList,
-                'dayOfWeek' => $dayOfWeek // Add day of week for reference
-            ];
-            
-            $date->modify('next ' . $dayOfWeek);
+        // Get all dates for this day of week in target month
+        $dayOfWeek = $event['day'];
+        $daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        $targetDayIndex = array_search(ucfirst($dayOfWeek), $daysOfWeek);
+        
+        if ($targetDayIndex !== false) {
+            // Find all dates in target month that match this day of week
+            $date = new DateTime("first $dayOfWeek of $targetYear-$targetMonth");
             $month = $date->format('n');
+            
+            while ($month == $targetMonth) {
+                $calendarEvents[] = [
+                    'title' => $courseName . ' (' . $event['student_count'] . ' students)',
+                    'date' => $date->format('Y-m-d'),
+                    'type' => '1',
+                    'time' => date('h:i A', strtotime($event['start_time'])),
+                    'duration' => calculateDuration($event['start_time'], $event['end_time']),
+                    'venue' => 'TBD',
+                    'description' => '',
+                    'students' => $studentsList,
+                    'dayOfWeek' => $dayOfWeek,
+                    'start_time' => $event['start_time'],
+                    'end_time' => $event['end_time']
+                ];
+                
+                $date->modify('next ' . $dayOfWeek);
+                $month = $date->format('n');
+            }
         }
     }
 }
 
+// Debug output
+echo '<script>console.log("PHP Generated Events Count:", ' . count($calendarEvents) . ');</script>';
 echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEvents) . ');</script>';
 ?>
 
@@ -166,12 +164,20 @@ echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEven
         </main>
     </div>
     
+    <!-- Pass PHP events to JavaScript -->
+    <script>
+        // Set calendar events globally BEFORE loading other scripts
+        window.calendarEvents = <?php echo json_encode($calendarEvents); ?>;
+        console.log('Events passed to JavaScript:', window.calendarEvents);
+    </script>
+    
     <script src="../../Scripts/common.js"></script>
     <script src="../../Scripts/dashboardInstructors.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Window calendarEvents:', window.calendarEvents);
             console.log('Type of calendarEvents:', typeof window.calendarEvents);
+            console.log('Events count:', window.calendarEvents ? window.calendarEvents.length : 0);
             window.instructorCalendar = new InstructorCalendar();
         });
     </script>

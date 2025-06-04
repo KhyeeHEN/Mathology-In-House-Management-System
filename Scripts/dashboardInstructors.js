@@ -4,14 +4,20 @@ class InstructorCalendar {
         this.currentDate = new Date();
         this.events = [];
 
+        // Load events from global variable
+        this.loadEvents();
+        this.init();
+    }
+
+    loadEvents() {
         if (window.calendarEvents && Array.isArray(window.calendarEvents)) {
             this.events = window.calendarEvents;
-            console.log('Loaded events:', this.events.length);
+            console.log('Successfully loaded events:', this.events.length);
+            console.log('Sample event:', this.events[0]);
         } else {
             console.warn('Warning: window.calendarEvents is undefined or not an array. No events loaded.');
+            console.log('window.calendarEvents:', window.calendarEvents);
         }
-
-        this.init();
     }
 
     init() {
@@ -23,13 +29,17 @@ class InstructorCalendar {
 
     showViewOnlyMessage() {
         const calendarContainer = document.querySelector('.calendar-container');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'view-only-message';
-        messageDiv.innerHTML = `
-            <i class="fas fa-info-circle"></i>
-            <p>This calendar displays your scheduled classes. View class details by clicking on any event.</p>
-        `;
-        calendarContainer.insertBefore(messageDiv, calendarContainer.firstChild);
+        const existingMessage = calendarContainer.querySelector('.view-only-message');
+        
+        if (!existingMessage) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'view-only-message';
+            messageDiv.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <p>This calendar displays your scheduled classes. View class details by clicking on any event.</p>
+            `;
+            calendarContainer.insertBefore(messageDiv, calendarContainer.firstChild);
+        }
     }
 
     bindEvents() {
@@ -71,6 +81,8 @@ class InstructorCalendar {
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth(); // Zero-based (e.g., 5 for June)
         
+        console.log(`Rendering calendar for: ${year}-${month + 1}`);
+        
         // Update header
         const monthNames = [
             'January', 'February', 'March', 'April', 'May', 'June',
@@ -85,8 +97,8 @@ class InstructorCalendar {
         }
 
         // Calculate first day and number of days
-        const firstDay = new Date(year, month, 1); // Correct: month is zero-based
-        const lastDay = new Date(year, month + 1, 0); // Correct: month + 1 for last day
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
         const startingDayOfWeek = firstDay.getDay();
         const daysInMonth = lastDay.getDate();
 
@@ -106,6 +118,8 @@ class InstructorCalendar {
             const dayElement = this.createDayElement(day, month, year);
             calendarDays.appendChild(dayElement);
         }
+        
+        console.log(`Calendar rendered for ${monthNames[month]} ${year}`);
     }
 
     createDayElement(day, month, year) {
@@ -131,9 +145,9 @@ class InstructorCalendar {
 
         // Get events for this date
         const dayEvents = this.getEventsForDate(currentDate);
-        console.log(`Rendering day ${day}-${month + 1}-${year}:`, dayEvents);
         
         if (dayEvents.length > 0) {
+            console.log(`Day ${day} has ${dayEvents.length} events:`, dayEvents);
             dayElement.classList.add('has-events');
             const eventsContainer = document.createElement('div');
             eventsContainer.classList.add('day-events');
@@ -179,9 +193,13 @@ class InstructorCalendar {
                          String(date.getMonth() + 1).padStart(2, '0') + '-' + 
                          String(date.getDate()).padStart(2, '0');
         
-        console.log('Filtering for:', dateString, 'Available events:', this.events);
+        const filteredEvents = this.events.filter(event => event.date === dateString);
         
-        return this.events.filter(event => event.date === dateString);
+        if (filteredEvents.length > 0) {
+            console.log(`Found ${filteredEvents.length} events for ${dateString}:`, filteredEvents);
+        }
+        
+        return filteredEvents;
     }
 
     showEventDetails(event, date) {
@@ -191,7 +209,7 @@ class InstructorCalendar {
         modalContent.innerHTML = `
             <div class="modal-header">
                 <h2>${event.title}</h2>
-                <button class="close-btn" onclick="instructorCalendar.closeModal()">&times;</button>
+                <button class="close-btn" onclick="window.instructorCalendar.closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="event-detail">
@@ -246,12 +264,12 @@ class InstructorCalendar {
         modalContent.innerHTML = `
             <div class="modal-header">
                 <h2>Classes on ${this.formatDateDisplay(date)}</h2>
-                <button class="close-btn" onclick="instructorCalendar.closeModal()">&times;</button>
+                <button class="close-btn" onclick="window.instructorCalendar.closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="events-list">
-                    ${events.map(event => `
-                        <div class="event-card" onclick="instructorCalendar.showEventDetails(${JSON.stringify(event).replace(/"/g, '&quot;')}, new Date('${date}'))">
+                    ${events.map((event, index) => `
+                        <div class="event-card" onclick="window.instructorCalendar.showEventFromList(${index}, '${date}')">
                             <div class="event-time">${event.time}</div>
                             <div class="event-title">${event.title}</div>
                             <div class="event-duration">${event.duration}</div>
@@ -262,8 +280,18 @@ class InstructorCalendar {
             </div>
         `;
         
+        // Store events temporarily for the modal
+        this.modalEvents = events;
+        this.modalDate = date;
+        
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+
+    showEventFromList(eventIndex, dateString) {
+        const event = this.modalEvents[eventIndex];
+        const date = new Date(dateString);
+        this.showEventDetails(event, date);
     }
 
     showNoEventsModal(date) {
@@ -273,7 +301,7 @@ class InstructorCalendar {
         modalContent.innerHTML = `
             <div class="modal-header">
                 <h2>No Classes Scheduled</h2>
-                <button class="close-btn" onclick="instructorCalendar.closeModal()">&times;</button>
+                <button class="close-btn" onclick="window.instructorCalendar.closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="no-events">
@@ -337,9 +365,5 @@ class InstructorCalendar {
     }
 }
 
-// Initialize calendar when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    window.instructorCalendar = new InstructorCalendar();
-});
 // Export for global access
 window.InstructorCalendar = InstructorCalendar;
