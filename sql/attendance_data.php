@@ -32,7 +32,7 @@ if ($role == 'student') {
     $instructor_id = $user_row['instructor_id'];
     $where = " WHERE ar.instructor_id = '$instructor_id'";
 }else{
-    header('Location: ../Pages/login.php');
+    header('Location: ../Pages/login.php    ');
     exit();
 }
 

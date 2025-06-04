@@ -28,7 +28,7 @@
         <a href="../client/paymentclient.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'payment.php' ? 'active' : ''; ?>">
             <i class="fas fa-credit-card"></i>
-            <span>Reschedule</span>
+            <span>Payment</span>
         </a>
 
         <a href="../client/leave.php"
