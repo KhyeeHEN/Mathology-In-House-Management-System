@@ -15,24 +15,24 @@
             <span>Learning hours</span>
         </a>
         <a href="../client/student_timetable.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/student_timetable.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'student_timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Timetable</span>
         </a>
         <a href="../client/student_reschedule.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/student_reschedule.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'student_reschedule.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Reschedule</span>
         </a>
 
         <a href="../client/paymentclient.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/paymentclient.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'paymentclient.php' ? 'active' : ''; ?>">
             <i class="fas fa-credit-card"></i>
             <span>Payment</span>
         </a>
 
         <a href="../client/leave.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/leave.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
             <i class="fas fa-check"></i>
             <span>Apply Leave</span>
         </a>
