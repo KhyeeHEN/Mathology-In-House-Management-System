@@ -113,7 +113,7 @@ $attendanceData = $attendanceResult->fetch_assoc();
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <!-- Calendar Section -->
             <div class="staff-duty-roster">
