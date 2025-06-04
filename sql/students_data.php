@@ -38,8 +38,8 @@ $sql = "
         s.How_Did_You_Heard_About_Us,
         u.email, 
         c.course_name,
-        pc.contact_number AS primary_contact,
-        sc.contact_number AS secondary_contact,
+        pc.contact_id AS primary_contact,
+        sc.contact_id AS secondary_contact,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
     FROM 
         students s
