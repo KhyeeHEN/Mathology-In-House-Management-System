@@ -216,7 +216,7 @@ if ($result && $result->num_rows > 0) {
         <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <div class="content-container">
                 <?php if ($message): ?>

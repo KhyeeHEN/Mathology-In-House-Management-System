@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_timetable'])) {
         <?php require("../includes/Aside_Nav.php"); ?>
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <?php if (isset($_SESSION['message'])): ?>
                 <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
