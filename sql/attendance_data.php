@@ -1,4 +1,42 @@
 <?php
+include '../Pages/setting.php';
+session_start();
+
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
+    header('Location: ../Pages/login.php');
+    exit();
+}
+
+$where ="";
+if ($role == 'student') {
+    $user_sql = "SELECT student_id FROM users WHERE user_id = ? AND role = 'student'";
+    $user_stmt = $conn->prepare($user_sql);
+    $user_stmt->bind_param('i', $user_id);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $user_row = $user_result->fetch_assoc();
+    $student_id = $user_row['student_id'];
+    $where = " WHERE ar.student_id = '$student_id'";
+} elseif($role == 'admin'){
+    $where = "WHERE 1";
+} elseif($role == 'instructor'){
+    $user_sql = "SELECT instructor_id FROM users WHERE user_id = ? AND role = 'instructor'";
+    $user_stmt = $conn->prepare($user_sql);
+    $user_stmt->bind_param('i', $user_id);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $user_row = $user_result->fetch_assoc();
+    $instructor_id = $user_row['instructor_id'];
+    $where = " WHERE ar.instructor_id = '$instructor_id'";
+}else{
+    header('Location: ../Pages/login.php');
+    exit();
+}
+
+//Handle Search and Sorting
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'timetable_datetime';
 $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
