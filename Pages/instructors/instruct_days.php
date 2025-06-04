@@ -113,7 +113,7 @@ $stmt->close();
             <div class="instructor-details">
                 <h2>
                     <i class="fas fa-user-tie"></i> 
-                    Instructor Details - <?php echo htmlspecialchars($instructor['first_name'] . ' ' . $instructor['last_name']); ?>
+                    Instructor Details - <?php echo htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']); ?>
                 </h2>
                 <div class="details-grid">
                     <div class="detail-item">
