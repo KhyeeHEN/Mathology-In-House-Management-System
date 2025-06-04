@@ -28,8 +28,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
-            <div class="users-controls-row"
-                style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            <div class="users-controls-row">
                 <!-- Search Bar -->
                 <div class="search-bar" style="flex: 1; min-width: 220px;">
                     <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
@@ -45,7 +44,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 </div>
 
                 <!-- Filter Buttons -->
-                <div class="filter-buttons" style="display: flex; gap: 8px;">
+                <div class="filter-buttons">
                     <button onclick="showTable('students-table')" id="students-btn"
                         class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">
                         Students
