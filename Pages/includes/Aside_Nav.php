@@ -36,7 +36,7 @@
         </a>
         <a href="../admin/leave.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
-            <i class="fas fa-credit-card"></i>
+            <i class="fas fa-check"></i>
             <span>Leave</span>
         </a>
     </nav>
