@@ -158,7 +158,7 @@ if ($result->num_rows > 0) {
     }
 </script>
 
-<style>
+<!-- <style>
     .details-box {
         padding: 10px;
         background-color: #f9f9f9;
@@ -190,4 +190,4 @@ if ($result->num_rows > 0) {
         color: #999;
         cursor: not-allowed;
     }
-</style>
+</style> -->
