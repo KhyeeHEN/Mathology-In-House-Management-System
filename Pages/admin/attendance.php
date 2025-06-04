@@ -75,7 +75,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         </main>
     </div>
 
-    <script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script>
+    <script src="/Scripts/attendance.js?v=<?php echo time(); ?>"></script>
     <script>
         function toggleDetails(id) {
             const row = document.getElementById(id);

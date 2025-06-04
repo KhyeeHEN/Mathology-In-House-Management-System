@@ -324,7 +324,7 @@ if ($result && $result->num_rows > 0) {
         </main>
     </div>
 
-    <script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script>
+    <script src="/Scripts/attendance.js?v=<?php echo time(); ?>"></script>
     <script>
         function confirmLeaveAction(leaveId, action) {
             const message = `Are you sure you want to ${action} this leave request?`;
