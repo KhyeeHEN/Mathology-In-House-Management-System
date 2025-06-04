@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
 
-                $insertAttendanceQuery = "INSERT INTO attendance (student_id)
+                $insertAttendanceQuery = "INSERT INTO attendance_records (student_id)
                                          VALUES ('$student_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
@@ -227,8 +227,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="time" id="student_start_time" name="Start_Time" required><br>
         <label for="student_end_time">End Time:</label>
         <input type="time" id="student_end_time" name="End_Time" required><br><br>
-        <label for="student_how_heard">How did you hear about us?</label>
-        <input type="text" id="student_how_heard" name="How_Heard_About_Us" maxlength="100"><br>
+        <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
+        <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100"><br>
         <button type="submit">Add Student</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
