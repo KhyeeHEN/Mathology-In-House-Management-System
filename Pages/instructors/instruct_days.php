@@ -24,7 +24,8 @@ echo "<!-- Debugging: Session user_id = $user_id, role = " . ($_SESSION['role'] 
 $user_sql = "SELECT instructor_id FROM users WHERE user_id = ? AND role = 'instructor'";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
-    die("Error preparing user query: " . $conn->error);
+    echo "Error preparing user query: " . $conn->error;
+    exit();
 }
 $user_stmt->bind_param("i", $user_id);
 $user_stmt->execute();
@@ -39,30 +40,29 @@ if (!$user_info || !isset($user_info['instructor_id'])) {
 $instructor_id = $user_info['instructor_id'];
 echo "<!-- Debugging: Retrieved instructor_id = $instructor_id -->";
 
-// Fetch instructor details (ensure exact column names from the database schema)
+// Fetch instructor details
 $sql = "SELECT First_Name, Last_Name, Highest_Education, Training_Status, Employment_Type, Working_Days, Worked_Days 
         FROM instructor WHERE instructor_id = ?";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
-    die("Error preparing instructor query: " . $conn->error);
+    echo "Error preparing instructor query: " . $conn->error;
+    exit();
 }
 $stmt->bind_param("i", $instructor_id);
-if (!$stmt->execute()) {
-    die("Error executing instructor query: " . $stmt->error);
-}
+$stmt->execute();
 $result = $stmt->get_result();
 $instructor = $result->fetch_assoc();
 
+echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
+
 if (!$instructor) {
-    echo "<p>Error: Instructor details not found for ID $instructor_id. Query: $sql with instructor_id = $instructor_id</p>";
-    // Debug: Check if the instructor_id exists in the table
-    $check_sql = "SELECT instructor_id FROM instructor WHERE instructor_id = $instructor_id";
-    $check_result = $conn->query($check_sql);
-    echo "<p>Debug: Number of rows for instructor_id $instructor_id = " . $check_result->num_rows . "</p>";
+    echo "<div style='padding: 20px; text-align: center; background-color: #f8f9fa; border-radius: 5px;'>";
+    echo "<i class='fas fa-info-circle' style='font-size: 24px; color: #6c757d;'></i>";
+    echo "<p style='margin-top: 10px;'>No instructor details found for ID $instructor_id.</p>";
+    echo "</div>";
     exit();
 }
 
-echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
 $stmt->close();
 ?>
 
@@ -115,36 +115,28 @@ $stmt->close();
             <div class="instructor-details">
                 <h2>
                     <i class="fas fa-user-tie"></i> 
-                    Instructor Details - 
-                    <?php 
-                    // Check if instructor data exists to avoid undefined key errors
-                    if (isset($instructor['First_Name']) && isset($instructor['Last_Name'])) {
-                        echo htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']);
-                    } else {
-                        echo 'Unknown Instructor';
-                    }
-                    ?>
+                    Instructor Details - <?= htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']) ?>
                 </h2>
                 <div class="details-grid">
                     <div class="detail-item">
                         <strong>Highest Education</strong>
-                        <?php echo htmlspecialchars($instructor['Highest_Education'] ?? 'N/A'); ?>
+                        <?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?>
                     </div>
                     <div class="detail-item">
                         <strong>Training Status</strong>
-                        <?php echo htmlspecialchars($instructor['Training_Status'] ?? 'N/A'); ?>
+                        <?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?>
                     </div>
                     <div class="detail-item">
                         <strong>Employment Type</strong>
-                        <?php echo htmlspecialchars($instructor['Employment_Type'] ?? 'N/A'); ?>
+                        <?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?>
                     </div>
                     <div class="detail-item">
                         <strong>Working Days</strong>
-                        <?php echo htmlspecialchars($instructor['Working_Days'] ?? 'N/A'); ?>
+                        <?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?>
                     </div>
                     <div class="detail-item">
                         <strong>Worked Days</strong>
-                        <?php echo htmlspecialchars($instructor['Worked_Days'] ?? '0'); ?>
+                        <?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?>
                     </div>
                 </div>
             </div>
