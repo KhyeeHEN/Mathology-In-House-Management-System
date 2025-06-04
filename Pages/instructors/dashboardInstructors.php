@@ -171,8 +171,8 @@ echo '<script>console.log("PHP Generated Events:", ' . json_encode($calendarEven
         console.log('Events passed to JavaScript:', window.calendarEvents);
     </script>
     
-    <script src="../../Scripts/common.js"></script>
-    <script src="../../Scripts/dashboardInstructors.js"></script>
+    <script src="/Scripts/common.js"></script>
+    <script src="/Scripts/dashboardInstructors.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Window calendarEvents:', window.calendarEvents);
