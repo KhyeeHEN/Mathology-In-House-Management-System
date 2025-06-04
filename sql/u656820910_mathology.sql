@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 01, 2025 at 11:18 AM
+-- Generation Time: Jun 04, 2025 at 01:46 PM
 -- Server version: 10.11.10-MariaDB-log
 -- PHP Version: 7.2.34
 
@@ -47,7 +47,7 @@ CREATE TABLE `attendance_records` (
 --
 
 INSERT INTO `attendance_records` (`record_id`, `student_id`, `instructor_id`, `timetable_datetime`, `attendance_datetime`, `hours_attended`, `hours_replacement`, `hours_remaining`, `status`, `created_at`, `updated_at`, `course`) VALUES
-(1, 1, NULL, '2023-11-01 16:00:00', '2023-11-01 16:05:00', 2.0, 0.0, 18.0, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'IGCSE Math Prep'),
+(1, 1, 2, '2023-11-01 16:00:00', '2023-11-01 16:05:00', 3.0, 0.0, 18.0, '', '2025-04-13 06:36:42', '2025-06-03 16:27:59', 'IGCSE Math Prep'),
 (2, 6, NULL, '2023-10-16 10:00:00', '2023-10-16 10:10:00', 2.0, 0.0, 16.0, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Economics Math'),
 (3, 7, NULL, '2023-10-18 16:00:00', '2023-10-18 16:00:00', 1.5, 0.0, 14.5, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Chemistry Math'),
 (4, 9, NULL, '2023-10-19 13:00:00', '2023-10-19 13:05:00', 2.5, 0.0, 17.5, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Advanced Physics'),
@@ -56,7 +56,8 @@ INSERT INTO `attendance_records` (`record_id`, `student_id`, `instructor_id`, `t
 (7, 3, NULL, '2023-11-03 09:00:00', NULL, 0.0, 0.0, 20.0, 'missed', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Physics Basics'),
 (8, 5, NULL, '2023-11-05 15:00:00', NULL, 0.0, 2.0, 18.0, 'replacement_booked', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Elementary Math'),
 (9, 2, NULL, '2023-11-02 14:00:00', NULL, 0.0, 1.5, 19.5, 'missed', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'SPM Add Math'),
-(10, 4, NULL, '2023-11-04 11:00:00', '2023-11-04 11:15:00', 1.0, 0.0, 19.0, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Biology Concepts');
+(10, 4, NULL, '2023-11-04 11:00:00', '2023-11-04 11:15:00', 1.0, 0.0, 19.0, 'attended', '2025-04-13 06:36:42', '2025-04-13 06:36:42', 'Biology Concepts'),
+(11, 44, NULL, '0000-00-00 00:00:00', NULL, 0.0, 0.0, 0.0, 'attended', '2025-06-04 12:55:06', '2025-06-04 12:55:06', '');
 
 -- --------------------------------------------------------
 
@@ -97,34 +98,37 @@ CREATE TABLE `instructor` (
   `DOB` date DEFAULT NULL,
   `Highest_Education` text DEFAULT NULL,
   `Remark` varchar(100) DEFAULT NULL,
-  `Training_Status` varchar(50) DEFAULT NULL
+  `Training_Status` varchar(50) DEFAULT NULL,
+  `Employment_Type` enum('Part-Time','Full-Time') NOT NULL DEFAULT 'Full-Time',
+  `Working_Days` varchar(100) DEFAULT NULL,
+  `Worked_Days` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `instructor`
 --
 
-INSERT INTO `instructor` (`instructor_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`, `Highest_Education`, `Remark`, `Training_Status`) VALUES
-(1, 'Tan', 'Kok Wei', 1, '1985-03-15', 'Bachelor, Master', 'Experienced in Math', 'Completed'),
-(2, 'Lim', 'Mei Lin', 0, '1990-07-22', 'Bachelor', 'Good communicator', 'In Progress'),
-(3, 'Chong', 'Ahmad bin', 1, '1978-11-30', 'Master, PhD', 'Specializes in Science', 'Completed'),
-(4, 'Ng', 'Siew Yee', 0, '1988-05-10', 'Bachelor', 'Needs more training', 'In Progress'),
-(5, 'Lee', 'Chin Fatt', 1, '1982-09-18', 'Bachelor, Master', 'Excellent in Physics', 'Completed'),
-(6, 'Wong', 'Li Ying', 0, '1995-01-25', 'Bachelor', 'New instructor', 'In Progress'),
-(7, 'Chew', 'Teck Guan', 1, '1980-04-12', 'Master', 'Strong in Chemistry', 'Completed'),
-(8, 'Yap', 'Sook Fun', 0, '1987-08-05', 'Bachelor, Master', 'Dedicated teacher', 'Completed'),
-(9, 'Khoo', 'Wei Ming', 1, '1992-12-20', 'Bachelor', 'Needs to improve', 'In Progress'),
-(10, 'Chan', 'Mei Chen', 0, '1983-06-14', 'Master, PhD', 'Expert in English', 'Completed'),
-(11, 'Goh', 'Kok Seng', 1, '1975-02-28', 'Bachelor, Master', 'Veteran instructor', 'Completed'),
-(12, 'Lau', 'Siew Har', 0, '1990-10-09', 'Bachelor', 'Good with students', 'In Progress'),
-(13, 'Teo', 'Chin Wei', 1, '1986-03-03', 'Master', 'Specializes in Geography', 'Completed'),
-(14, 'Ho', 'Li Mei', 0, '1993-07-17', 'Bachelor', 'Enthusiastic', 'In Progress'),
-(15, 'Ong', 'Teck Soon', 1, '1981-11-11', 'Bachelor, Master', 'Strong in History', 'Completed'),
-(16, 'Low', 'Siew Ling', 0, '1989-04-25', 'Master', 'Great at Biology', 'Completed'),
-(17, 'Soh', 'Wei Keong', 1, '1984-08-30', 'Bachelor', 'Needs more experience', 'In Progress'),
-(18, 'Chua', 'Mei Yin', 0, '1991-02-14', 'Bachelor, Master', 'Excellent in Literature', 'Completed'),
-(19, 'Pang', 'Kok Wai', 1, '1979-06-20', 'Master, PhD', 'Expert in Add Math', 'Completed'),
-(20, 'Yeoh', 'Siew Ching', 0, '1985-12-05', 'Bachelor', 'Promising instructor', 'In Progress');
+INSERT INTO `instructor` (`instructor_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`, `Highest_Education`, `Remark`, `Training_Status`, `Employment_Type`, `Working_Days`, `Worked_Days`) VALUES
+(1, 'Tan', 'Kok Wei', 1, '1985-03-15', 'Bachelor, Master', 'Experienced in Math', 'Completed', 'Full-Time', NULL, 11),
+(2, 'Lim', 'Mei Lin', 0, '1990-07-22', 'Bachelor', 'Good communicator', 'In Progress', 'Part-Time', 'Monday,Wednesday,Friday', 0),
+(3, 'Chong', 'Ahmad bin', 1, '1978-11-30', 'Master, PhD', 'Specializes in Science', 'Completed', 'Full-Time', NULL, 0),
+(4, 'Ng', 'Siew Yee', 0, '1988-05-10', 'Bachelor', 'Needs more training', 'In Progress', 'Part-Time', NULL, 0),
+(5, 'Lee', 'Chin Fatt', 1, '1982-09-18', 'Bachelor, Master', 'Excellent in Physics', 'Completed', 'Full-Time', NULL, 0),
+(6, 'Wong', 'Li Ying', 0, '1995-01-25', 'Bachelor', 'New instructor', 'In Progress', 'Part-Time', 'Monday,Wednesday,Friday', 0),
+(7, 'Chew', 'Teck Guan', 1, '1980-04-12', 'Master', 'Strong in Chemistry', 'Completed', 'Full-Time', NULL, 0),
+(8, 'Yap', 'Sook Fun', 0, '1987-08-05', 'Bachelor, Master', 'Dedicated teacher', 'Completed', 'Full-Time', NULL, 0),
+(9, 'Khoo', 'Wei Ming', 1, '1992-12-20', 'Bachelor', 'Needs to improve', 'In Progress', 'Part-Time', 'Monday,Wednesday,Friday', 0),
+(10, 'Chan', 'Mei Chen', 0, '1983-06-14', 'Master, PhD', 'Expert in English', 'Completed', 'Full-Time', NULL, 0),
+(11, 'Goh', 'Kok Seng', 1, '1975-02-28', 'Bachelor, Master', 'Veteran instructor', 'Completed', 'Full-Time', NULL, 0),
+(12, 'Lau', 'Siew Har', 0, '1990-10-09', 'Bachelor', 'Good with students', 'In Progress', 'Part-Time', 'Tuesday,Thursday', 0),
+(13, 'Teo', 'Chin Wei', 1, '1986-03-03', 'Master', 'Specializes in Geography', 'Completed', 'Full-Time', NULL, 0),
+(14, 'Ho', 'Li Mei', 0, '1993-07-17', 'Bachelor', 'Enthusiastic', 'In Progress', 'Part-Time', 'Tuesday,Thursday', 0),
+(15, 'Ong', 'Teck Soon', 1, '1981-11-11', 'Bachelor, Master', 'Strong in History', 'Completed', 'Full-Time', NULL, 0),
+(16, 'Low', 'Siew Ling', 0, '1989-04-25', 'Master', 'Great at Biology', 'Completed', 'Full-Time', NULL, 0),
+(17, 'Soh', 'Wei Keong', 1, '1984-08-30', 'Bachelor', 'Needs more experience', 'In Progress', 'Part-Time', 'Tuesday,Thursday', 0),
+(18, 'Chua', 'Mei Yin', 0, '1991-02-14', 'Bachelor, Master', 'Excellent in Literature', 'Completed', 'Full-Time', NULL, 0),
+(19, 'Pang', 'Kok Wai', 1, '1979-06-20', 'Master, PhD', 'Expert in Add Math', 'Completed', 'Full-Time', NULL, 0),
+(20, 'Yeoh', 'Siew Ching', 0, '1985-12-05', 'Bachelor', 'Promising instructor', 'In Progress', 'Part-Time', 'Tuesday,Thursday', 0);
 
 -- --------------------------------------------------------
 
@@ -211,6 +215,48 @@ INSERT INTO `instructor_timetable_requests` (`id`, `day`, `start_time`, `end_tim
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `leave_requests`
+--
+
+CREATE TABLE `leave_requests` (
+  `leave_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `user_type` enum('student','instructor','admin') NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `reason` text NOT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `requested_at` datetime DEFAULT current_timestamp(),
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `leave_requests`
+--
+
+INSERT INTO `leave_requests` (`leave_id`, `user_id`, `user_type`, `start_date`, `end_date`, `reason`, `status`, `requested_at`, `approved_by`, `approved_at`) VALUES
+(1, 2, 'student', '2025-06-03', '2025-06-05', 'Family vacation', 'pending', '2025-06-02 10:51:07', NULL, NULL),
+(2, 3, 'instructor', '2025-06-10', '2025-06-12', 'Medical leave', 'pending', '2025-06-02 10:51:07', NULL, NULL),
+(3, 2, 'student', '2025-06-02', '2025-06-04', 'family problem', 'approved', '2025-06-02 11:26:21', 4, '2025-06-02 11:37:35'),
+(8, 2, 'student', '2025-06-03', '2025-06-04', 'rrr', 'pending', '2025-06-02 11:40:14', NULL, NULL),
+(9, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:30', NULL, NULL),
+(10, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:34', NULL, NULL),
+(11, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:36', NULL, NULL),
+(12, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:37', NULL, NULL),
+(13, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:37', NULL, NULL),
+(14, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:38', NULL, NULL),
+(15, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:38', NULL, NULL),
+(16, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:39', NULL, NULL),
+(17, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:40', NULL, NULL),
+(18, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:40', NULL, NULL),
+(19, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:41', NULL, NULL),
+(20, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:42', NULL, NULL),
+(21, 2, 'student', '2025-06-16', '2025-05-20', 'sry', 'pending', '2025-06-02 11:59:42', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `payment`
 --
 
@@ -230,7 +276,7 @@ CREATE TABLE `payment` (
 --
 
 INSERT INTO `payment` (`payment_id`, `student_id`, `payment_method`, `payment_mode`, `payment_amount`, `deposit_status`, `payment_status`, `payment_date`) VALUES
-(1, 1, 'credit_card', 'monthly', 500.00, 'yes', 'paid', '2025-04-13 06:53:06'),
+(1, 1, 'cash', 'monthly', 500.00, 'yes', 'paid', '2025-04-13 06:53:06'),
 (2, 5, 'cash', 'quarterly', 1200.00, 'yes', 'paid', '2025-04-13 06:53:06'),
 (3, 6, 'bank_transfer', 'semi_annually', 2000.00, 'no', 'unpaid', '2025-04-13 06:53:06'),
 (4, 3, 'credit_card', 'monthly', 500.00, 'yes', 'pending', '2025-04-13 06:53:06'),
@@ -394,7 +440,9 @@ INSERT INTO `students` (`student_id`, `Last_Name`, `First_Name`, `Gender`, `DOB`
 (37, 'Phang', 'Jun Wei', 1, '2007-05-07', 'SPM, Physics, Math', '1', 'Form 4', 'SMK Seri Hartamas', 'Intermediate', NULL, 'active', NULL),
 (38, 'Chia', 'Mei Xin', 0, '2009-12-20', 'IGCSE, English, Science', '0', 'Year 10', 'IGB International School', 'Beginner', NULL, 'active', NULL),
 (39, 'Tiew', 'Zhi Yang', 1, '2006-04-15', 'SPM, Add Math, Chemistry', '1', 'Form 5', 'SMK Aminuddin Baki', 'Advanced', NULL, 'active', NULL),
-(40, 'Law', 'Jia Wen', 0, '2011-06-23', 'KSSR, Math, English', '1', 'Standard 5', 'SJK(C) Chung Kwok', 'Beginner', NULL, 'active', NULL);
+(40, 'Law', 'Jia Wen', 0, '2011-06-23', 'KSSR, Math, English', '1', 'Standard 5', 'SJK(C) Chung Kwok', 'Beginner', NULL, 'active', NULL),
+(42, 'Ong', 'Jian Wei', 1, '2025-06-24', 'IGCSE', 'August', 'Grade 5', '123 High School', 'Elementary ', NULL, 'active', ''),
+(44, 'Student', 'Dummy', 1, '2015-02-04', 'IGCSE, Math, Science', 'August', 'Year 10', 'Dummy School', 'Beginner', NULL, 'active', '');
 
 -- --------------------------------------------------------
 
@@ -416,30 +464,30 @@ CREATE TABLE `student_courses` (
 
 INSERT INTO `student_courses` (`student_course_id`, `student_id`, `course_id`, `enrollment_date`, `status`) VALUES
 (1, 10, 1, '2025-04-25', 'active'),
-(2, 7, 1, '2025-04-25', 'active'),
-(3, 38, 1, '2025-04-25', 'active'),
-(4, 27, 1, '2025-04-25', 'active'),
-(5, 3, 1, '2025-04-25', 'active'),
+(2, 7, 2, '2025-04-25', 'active'),
+(3, 38, 3, '2025-04-25', 'active'),
+(4, 27, 4, '2025-04-25', 'active'),
+(5, 3, 5, '2025-04-25', 'active'),
 (6, 18, 1, '2025-04-25', 'active'),
-(7, 23, 1, '2025-04-25', 'active'),
-(8, 11, 1, '2025-04-25', 'active'),
-(9, 29, 1, '2025-04-25', 'active'),
-(10, 14, 1, '2025-04-25', 'active'),
+(7, 23, 2, '2025-04-25', 'active'),
+(8, 11, 3, '2025-04-25', 'active'),
+(9, 29, 4, '2025-04-25', 'active'),
+(10, 14, 5, '2025-04-25', 'active'),
 (11, 9, 1, '2025-04-25', 'active'),
-(12, 26, 1, '2025-04-25', 'active'),
-(13, 22, 1, '2025-04-25', 'active'),
-(14, 31, 1, '2025-04-25', 'active'),
-(15, 12, 1, '2025-04-25', 'active'),
+(12, 26, 2, '2025-04-25', 'active'),
+(13, 22, 3, '2025-04-25', 'active'),
+(14, 31, 4, '2025-04-25', 'active'),
+(15, 12, 5, '2025-04-25', 'active'),
 (16, 40, 1, '2025-04-25', 'active'),
-(17, 5, 1, '2025-04-25', 'active'),
-(18, 32, 1, '2025-04-25', 'active'),
-(19, 24, 1, '2025-04-25', 'active'),
-(20, 2, 1, '2025-04-25', 'active'),
+(17, 5, 2, '2025-04-25', 'active'),
+(18, 32, 3, '2025-04-25', 'active'),
+(19, 24, 4, '2025-04-25', 'active'),
+(20, 2, 5, '2025-04-25', 'active'),
 (21, 16, 1, '2025-04-25', 'active'),
-(22, 4, 1, '2025-04-25', 'active'),
-(23, 15, 1, '2025-04-25', 'active'),
-(24, 34, 1, '2025-04-25', 'active'),
-(25, 19, 1, '2025-04-25', 'active'),
+(22, 4, 2, '2025-04-25', 'active'),
+(23, 15, 3, '2025-04-25', 'active'),
+(24, 34, 4, '2025-04-25', 'active'),
+(25, 19, 5, '2025-04-25', 'active'),
 (26, 37, 1, '2025-04-25', 'active'),
 (27, 30, 1, '2025-04-25', 'active'),
 (28, 36, 1, '2025-04-25', 'active'),
@@ -488,7 +536,10 @@ INSERT INTO `student_courses` (`student_course_id`, `student_id`, `course_id`, `
 (95, 1, 1, '2023-09-01', 'active'),
 (96, 1, 2, '2023-09-01', 'active'),
 (97, 2, 3, '2023-09-01', 'active'),
-(98, 3, 4, '2023-09-01', 'active');
+(98, 3, 4, '2023-09-01', 'active'),
+(100, 2, 1, '2025-06-02', 'active'),
+(101, 42, 1, '2025-07-01', 'active'),
+(103, 44, 1, '2025-06-11', 'active');
 
 -- --------------------------------------------------------
 
@@ -504,20 +555,24 @@ CREATE TABLE `student_timetable` (
   `end_time` time NOT NULL,
   `approved_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `status` enum('active','cancelled') DEFAULT 'active',
-  `student_course_id` int(11) NOT NULL
+  `student_course_id` int(11) NOT NULL,
+  `instructor_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student_timetable`
 --
 
-INSERT INTO `student_timetable` (`id`, `course`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `student_course_id`) VALUES
-(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 37),
-(2, 'IGCSE Math Prep', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00', 'active', 2),
-(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 38),
-(4, 'IGCSE Math Prep', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00', 'active', 11),
-(5, 'IGCSE Math Prep', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00', 'active', 1),
-(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 31);
+INSERT INTO `student_timetable` (`id`, `course`, `day`, `start_time`, `end_time`, `approved_at`, `status`, `student_course_id`, `instructor_id`) VALUES
+(1, 'IGCSE Math Prep', 'Monday', '10:00:00', '12:00:00', '2023-10-15 06:25:00', 'active', 37, 1),
+(2, 'IGCSE Math Prep', 'Wednesday', '16:00:00', '18:00:00', '2023-10-16 03:40:00', 'active', 2, 1),
+(3, 'IGCSE Math Prep', 'Friday', '14:00:00', '16:00:00', '2023-10-17 02:55:00', 'active', 38, 1),
+(4, 'IGCSE Math Prep', 'Tuesday', '13:00:00', '15:00:00', '2023-10-18 00:20:00', 'active', 11, 2),
+(5, 'IGCSE Math Prep', 'Thursday', '09:00:00', '11:00:00', '2023-10-19 07:30:00', 'active', 1, 3),
+(6, 'IGCSE Math Prep', 'Monday', '16:00:00', '18:00:00', '2025-04-30 14:01:19', 'active', 31, 1),
+(8, 'IGCSE Math Prep', 'Monday', '03:45:00', '04:59:00', '2025-06-02 08:41:50', 'active', 100, NULL),
+(9, 'IGCSE Math Prep', 'Monday', '01:28:00', '07:28:00', '2025-06-03 17:23:44', 'active', 101, NULL),
+(11, 'IGCSE Math Prep', 'Monday', '15:00:00', '17:00:00', '2025-06-04 12:55:06', 'active', 103, NULL);
 
 --
 -- Triggers `student_timetable`
@@ -561,7 +616,8 @@ INSERT INTO `student_timetable_requests` (`id`, `day`, `start_time`, `end_time`,
 (2, 'Wednesday', '14:00:00', '16:00:00', 'pending', NULL, '2023-11-02 05:45:00', NULL, NULL),
 (3, 'Friday', '09:00:00', '11:00:00', 'pending', NULL, '2023-11-03 02:20:00', NULL, NULL),
 (4, 'Tuesday', '11:00:00', '13:00:00', 'pending', NULL, '2023-11-04 07:10:00', NULL, NULL),
-(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math');
+(5, 'Thursday', '15:00:00', '17:00:00', 'pending', NULL, '2023-11-05 01:30:00', 77, 'Elementary Math'),
+(6, 'Monday', '05:59:00', '07:08:00', 'pending', NULL, '2025-06-02 08:59:52', 22, 'SPM Add Math');
 
 -- --------------------------------------------------------
 
@@ -622,7 +678,9 @@ INSERT INTO `users` (`user_id`, `email`, `password`, `role`, `student_id`, `inst
 (1, 'weijie@example.com', 'pass', 'student', 1, NULL, '2025-05-04 13:39:40'),
 (2, 'meiling@example.com', 'pass', 'student', 2, NULL, '2025-05-04 13:53:19'),
 (3, 'kokweitan@example.com', 'pass', 'instructor', NULL, 1, '2025-05-11 06:14:59'),
-(4, 'darrshan@example.com', 'pass', 'admin', NULL, NULL, '2025-05-11 06:19:46');
+(4, 'admin@example.com', 'pass', 'admin', NULL, NULL, '2025-05-11 06:19:46'),
+(6, 'ong@example.com', '$2y$10$rQVJlpkoZwO7sUG/vJoanuCsqCGcHd.Ju5blwDTYFhoZXpQRptbXC', 'student', 42, NULL, '2025-06-03 17:23:44'),
+(8, 'dummy@gmail.com', '$2y$10$pabpcg4LIwFelw3kyHvu/.bnPKtZUOkRvZruLrFfjSebtkyMlY2ii', 'student', 44, NULL, '2025-06-04 12:55:06');
 
 --
 -- Indexes for dumped tables
@@ -673,6 +731,14 @@ ALTER TABLE `instructor_timetable_requests`
   ADD KEY `instructor_course_id` (`instructor_course_id`);
 
 --
+-- Indexes for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  ADD PRIMARY KEY (`leave_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `approved_by` (`approved_by`);
+
+--
 -- Indexes for table `payment`
 --
 ALTER TABLE `payment`
@@ -714,7 +780,8 @@ ALTER TABLE `student_courses`
 --
 ALTER TABLE `student_timetable`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_student_course` (`student_course_id`);
+  ADD KEY `fk_student_course` (`student_course_id`),
+  ADD KEY `fk_student_timetable_instructor` (`instructor_id`);
 
 --
 -- Indexes for table `student_timetable_requests`
@@ -746,7 +813,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `attendance_records`
 --
 ALTER TABLE `attendance_records`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -779,6 +846,12 @@ ALTER TABLE `instructor_timetable_requests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  MODIFY `leave_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
 -- AUTO_INCREMENT for table `payment`
 --
 ALTER TABLE `payment`
@@ -800,25 +873,25 @@ ALTER TABLE `secondary_contact_number`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `student_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `student_courses`
 --
 ALTER TABLE `student_courses`
-  MODIFY `student_course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `student_course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 
 --
 -- AUTO_INCREMENT for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `student_timetable_requests`
 --
 ALTER TABLE `student_timetable_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `subjects`
@@ -830,7 +903,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -863,6 +936,13 @@ ALTER TABLE `instructor_timetable_requests`
   ADD CONSTRAINT `instructor_timetable_requests_ibfk_1` FOREIGN KEY (`instructor_course_id`) REFERENCES `instructor_courses` (`instructor_course_id`);
 
 --
+-- Constraints for table `leave_requests`
+--
+ALTER TABLE `leave_requests`
+  ADD CONSTRAINT `leave_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `leave_requests_ibfk_2` FOREIGN KEY (`approved_by`) REFERENCES `users` (`user_id`);
+
+--
 -- Constraints for table `payment`
 --
 ALTER TABLE `payment`
@@ -891,7 +971,8 @@ ALTER TABLE `student_courses`
 -- Constraints for table `student_timetable`
 --
 ALTER TABLE `student_timetable`
-  ADD CONSTRAINT `fk_student_course` FOREIGN KEY (`student_course_id`) REFERENCES `student_courses` (`student_course_id`);
+  ADD CONSTRAINT `fk_student_course` FOREIGN KEY (`student_course_id`) REFERENCES `student_courses` (`student_course_id`),
+  ADD CONSTRAINT `fk_student_timetable_instructor` FOREIGN KEY (`instructor_id`) REFERENCES `instructor` (`instructor_id`);
 
 --
 -- Constraints for table `student_timetable_requests`
