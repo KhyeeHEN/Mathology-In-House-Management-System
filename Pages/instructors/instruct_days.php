@@ -15,6 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
 
 // Fetch the actual instructor_id from the users table using the session's user_id
 $user_id = $_SESSION['user_id'];
+echo "<!-- Debugging: Session user_id = $user_id, role = " . ($_SESSION['role'] ?? 'N/A') . " -->";
 $user_sql = "SELECT instructor_id FROM users WHERE user_id = ? AND role = 'instructor'";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
@@ -31,6 +32,7 @@ if (!$user_info || !isset($user_info['instructor_id'])) {
 }
 
 $instructor_id = $user_info['instructor_id'];
+echo "<!-- Debugging: Retrieved instructor_id = $instructor_id -->";
 
 // Fetch instructor details
 $sql = "SELECT First_Name, Last_Name, Highest_Education, Training_Status, Employment_Type, Working_Days, Worked_Days FROM instructor WHERE instructor_id = ?";
@@ -46,10 +48,14 @@ $result = $stmt->get_result();
 $instructor = $result->fetch_assoc();
 
 if (!$instructor) {
-    echo "<p>Error: Instructor details not found for ID $instructor_id. Please check the database.</p>";
+    echo "<p>Error: Instructor details not found for ID $instructor_id. Query returned no rows. Raw query: $sql with instructor_id = $instructor_id</p>";
+    // Optional: Dump all rows to debug
+    $result->data_seek(0); // Reset result pointer
+    echo "<pre>Debug: All rows from query: " . print_r($result->fetch_all(MYSQLI_ASSOC), true) . "</pre>";
     exit();
 }
 
+echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
 $stmt->close();
 ?>
 
