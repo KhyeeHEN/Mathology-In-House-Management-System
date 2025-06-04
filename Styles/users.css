@@ -236,3 +236,35 @@ h1 {
 .table-container.active {
     display: block;
 }
+
+/*contact popup*/
+.contact-tooltip {
+    position: relative;
+    cursor: pointer;
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.contact-tooltip-popup {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 110%;
+    min-width: 220px;
+    background: #222e3a;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+    padding: 12px 16px;
+    z-index: 99;
+    font-size: 0.98em;
+    white-space: normal;
+    pointer-events: none;
+}
+
+.contact-tooltip:hover .contact-tooltip-popup,
+.contact-tooltip:focus .contact-tooltip-popup {
+    display: block;
+    pointer-events: auto;
+}

@@ -39,7 +39,13 @@ $sql = "
         u.email, 
         c.course_name,
         pc.phone AS primary_contact,
+        pc.Last_Name AS primary_owner_last_name,
+        pc.First_Name AS primary_owner_first_name,
+        pc.Relationship_with_Student AS primary_relationship,
         sc.phone AS secondary_contact,
+        sc.Last_Name AS secondary_owner_last_name,
+        sc.First_Name AS secondary_owner_first_name,
+        sc.Relationship_with_Student AS secondary_relationship,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
     FROM 
         students s
@@ -121,8 +127,28 @@ if ($result->num_rows > 0) {
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
-                <strong>Primary Contact:</strong> " . ($row['primary_contact'] ?? 'N/A') . "<br>
-                <strong>Secondary Contact:</strong> " . ($row['secondary_contact'] ?? 'N/A') . "<br>
+                        <strong>Primary Contact:</strong> " . (
+            $row['primary_contact']
+            ? "<span class='contact-tooltip' tabindex='0'>
+                {$row['primary_contact']}
+                <span class='contact-tooltip-popup'>
+                    <strong>Name:</strong> {$row['primary_owner_first_name']} {$row['primary_owner_last_name']}<br>
+                    <strong>Relationship:</strong> {$row['primary_relationship']}
+                </span>
+              </span>"
+            : 'N/A'
+        ) . "<br>
+                 <strong>Secondary Contact:</strong> " . (
+            $row['secondary_contact']
+            ? "<span class='contact-tooltip' tabindex='0'>
+                {$row['secondary_contact']}
+                <span class='contact-tooltip-popup'>
+                    <strong>Name:</strong> {$row['secondary_owner_first_name']} {$row['secondary_owner_last_name']}<br>
+                    <strong>Relationship:</strong> {$row['secondary_relationship']}
+                </span>
+              </span>"
+            : 'N/A'
+        ) . "<br>
                 <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
             </div>
             </td>
