@@ -5,12 +5,12 @@
     </div>
     <nav class="side-nav">
         <a href="../client/dashboardclient.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/dashboardclient.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboardclient.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
         <a href="../client/learninghours.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == '../client/learninghours.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'learninghours.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Learning hours</span>
         </a>
