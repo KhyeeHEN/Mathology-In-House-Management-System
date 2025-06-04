@@ -12,7 +12,7 @@
     <?php
     // Start session and check if user is logged in as instructor
     session_start();
-    require_once("../includes/db_connection.php");
+    require_once("../setting.php");
     
     if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
         header("Location: /login.php");
