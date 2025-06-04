@@ -24,7 +24,7 @@ if ($page < 1) {
 
 // Base query for students
 $sql = "
-    SELECT 
+ SELECT 
         s.student_id, 
         s.Last_Name, 
         s.First_Name, 
@@ -38,17 +38,23 @@ $sql = "
         s.How_Did_You_Heard_About_Us,
         u.email, 
         c.course_name,
+        pc.contact_number AS primary_contact,
+        sc.contact_number AS secondary_contact,
         GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
     FROM 
         students s
     LEFT JOIN 
         users u ON s.student_id = u.student_id
     LEFT JOIN 
-        student_courses sc ON s.student_id = sc.student_id
+        student_courses scs ON s.student_id = scs.student_id
     LEFT JOIN 
-        courses c ON sc.course_id = c.course_id
+        courses c ON scs.course_id = c.course_id
     LEFT JOIN 
-        student_timetable st ON sc.student_course_id = st.student_course_id
+        student_timetable st ON scs.student_course_id = st.student_course_id
+    LEFT JOIN 
+        primary_contact_number pc ON s.student_id = pc.student_id
+    LEFT JOIN 
+        secondary_contact_number sc ON s.student_id = sc.student_id
 ";
 
 // If a search term is provided
@@ -115,6 +121,8 @@ if ($result->num_rows > 0) {
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
                 <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
+                <strong>Primary Contact:</strong> " . ($row['primary_contact'] ?? 'N/A') . "<br>
+                <strong>Secondary Contact:</strong> " . ($row['secondary_contact'] ?? 'N/A') . "<br>
                 <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
             </div>
             </td>
