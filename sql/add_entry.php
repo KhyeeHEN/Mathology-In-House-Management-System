@@ -307,6 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
 
+
     <script>
         function toggleForms() {
             const userType = document.getElementById('user_type').value;
@@ -325,27 +326,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        function toggleWorkingDays() {
-            const employmentType = document.getElementById('instructor_employment_type').value;
-            const workingDaysField = document.getElementById('instructor_working_days');
-            if (employmentType === 'Full-Time') {
-                workingDaysField.disabled = true;
-                // Optionally, clear the selection if switching to Full-Time
-                for (let i = 0; i < workingDaysField.options.length; i++) {
-                    workingDaysField.options[i].selected = false;
+        // JavaScript to disable/enable Working_Days based on Employment_Type using the provided code and updated IDs
+        document.getElementById('instructor_employment_type').addEventListener('change', function() {
+            const workingDaysInput = document.getElementById('instructor_working_days');
+            workingDaysInput.disabled = this.value === 'Full-Time';
+            if (this.value === 'Full-Time') {
+                // Clear all selections if disabled
+                for (let i = 0; i < workingDaysInput.options.length; i++) {
+                    workingDaysInput.options[i].selected = false;
                 }
-            } else {
-                workingDaysField.disabled = false;
-            }
-        }
-
-        // Ensure the correct state when the page loads (e.g. after validation error)
-        document.addEventListener('DOMContentLoaded', function () {
-            if (document.getElementById('instructor-form').style.display === 'block') {
-                toggleWorkingDays();
             }
         });
-    </script>
+
+        // Ensure the correct state when the page loads (e.g. after validation error)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('instructor-form').style.display === 'block') {
+                const employmentType = document.getElementById('instructor_employment_type');
+                const workingDaysInput = document.getElementById('instructor_working_days');
+                workingDaysInput.disabled = employmentType.value === 'Full-Time';
+                if (employmentType.value === 'Full-Time') {
+                    for (let i = 0; i < workingDaysInput.options.length; i++) {
+                        workingDaysInput.options[i].selected = false;
+                    }
+                }
+            }
+        });
     </script>
 </body>
 
