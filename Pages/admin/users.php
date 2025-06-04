@@ -28,6 +28,21 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
+            <!-- Display messages or errors -->
+            <?php if ($message): ?>
+                <div style="color: green; font-weight: bold;">
+                    <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error): ?>
+                <div style="color: red; font-weight: bold;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <br><br>
+
             <div class="users-controls-row">
                 <!-- Search Bar -->
                 <div class="search-bar" style="flex: 1; min-width: 220px;">
@@ -68,19 +83,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </form>
                 </div>
             </div>        
-
-            <!-- Display messages or errors -->
-            <?php if ($message): ?>
-                <div style="color: green; font-weight: bold;">
-                    <?php echo htmlspecialchars($message); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($error): ?>
-                <div style="color: red; font-weight: bold;">
-                    <?php echo htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
 
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
