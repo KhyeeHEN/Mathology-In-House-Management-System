@@ -30,6 +30,21 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
             <div class="users-controls-row"
                 style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+
+                <!-- Search Bar -->
+                <div class="search-bar" style="flex: 1; min-width: 220px;">
+                    <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
+                        <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
+                            value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                        <input type="hidden" name="active_tab" id="active_tab"
+                            value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
+                        <input type="hidden" name="students_page" id="students_page" value="1">
+                        <input type="hidden" name="instructors_page" id="instructors_page" value="1">
+                        <button type="submit">Search</button>
+                        <button type="button" id="reset-button">Reset</button>
+                    </form>
+                </div>
+                
                 <!-- Filter Buttons -->
                 <div class="filter-buttons" style="display: flex; gap: 8px;">
                     <button onclick="showTable('students-table')" id="students-btn"
@@ -53,19 +68,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </button>
                 </form>
 
-                <!-- Search Bar -->
-                <div class="search-bar" style="flex: 1; min-width: 220px;">
-                    <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
-                        <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
-                            value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
-                        <input type="hidden" name="active_tab" id="active_tab"
-                            value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
-                        <input type="hidden" name="students_page" id="students_page" value="1">
-                        <input type="hidden" name="instructors_page" id="instructors_page" value="1">
-                        <button type="submit">Search</button>
-                        <button type="button" id="reset-button">Reset</button>
-                    </form>
-                </div>
+
             </div>
 
             <!-- Display messages or errors -->
