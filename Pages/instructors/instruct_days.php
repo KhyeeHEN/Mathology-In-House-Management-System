@@ -18,6 +18,8 @@ if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
+echo "<!-- Debugging: Database connection successful -->";
+
 // Fetch the actual instructor_id from the users table using the session's user_id
 $user_id = $_SESSION['user_id'];
 echo "<!-- Debugging: Session user_id = $user_id, role = " . ($_SESSION['role'] ?? 'N/A') . " -->";
@@ -49,8 +51,12 @@ if (!$stmt) {
     exit();
 }
 $stmt->bind_param("i", $instructor_id);
-$stmt->execute();
+if (!$stmt->execute()) {
+    echo "Error executing instructor query: " . $stmt->error;
+    exit();
+}
 $result = $stmt->get_result();
+echo "<!-- Debugging: Number of rows returned = " . $result->num_rows . " -->";
 $instructor = $result->fetch_assoc();
 
 echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
