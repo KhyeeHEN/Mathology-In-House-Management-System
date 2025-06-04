@@ -88,9 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $highest_education = $conn->real_escape_string($_POST['Highest_Education']);
                 $remark = $conn->real_escape_string($_POST['Remark']);
                 $training_status = $conn->real_escape_string($_POST['Training_Status']);
+                $employment_type = $conn->real_escape_string($_POST['Employment_Type']);
+                $working_days = isset($_POST['Working_Days']) ? $conn->real_escape_string(implode(',', (array) $_POST['Working_Days'])) : null;
                 $email = $conn->real_escape_string($_POST['email']);
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
                 $course_ids = $_POST['course_ids']; // Array of selected course IDs
+                $start_time = $conn->real_escape_string($_POST['Start_Time']);
+                $end_time = $conn->real_escape_string($_POST['End_Time']);
+
 
                 // Insert into instructor table
                 $insertInstructorQuery = "INSERT INTO instructor (Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status)
@@ -109,14 +114,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding user: " . $conn->error);
                 }
 
-                // Insert selected courses into instructor_courses table
+                // Insert selected courses into instructor_courses table and create timetable entries
                 foreach ($course_ids as $course_id) {
                     $course_id = intval($course_id); // Sanitize input
-                    $insertInstructorCourseQuery = "INSERT INTO instructor_courses (instructor_id, course_id)
-                                                    VALUES ('$instructor_id', '$course_id')";
+                    $assigned_date = date('Y-m-d');
+                    $insertInstructorCourseQuery = "INSERT INTO instructor_courses (instructor_id, course_id, assigned_date)
+                                                    VALUES ('$instructor_id', '$course_id', '$assigned_date')";
                     if (!$conn->query($insertInstructorCourseQuery)) {
                         throw new Exception("Error adding instructor course: " . $conn->error);
                     }
+                    $instructor_course_id = $conn->insert_id;
+
+                    // Optionally, get timetable info from form. For demo, insert a blank timetable entry per instructor_course.
+                    $insertTimetableQuery = "INSERT INTO instructor_timetable (day, start_time, end_time, status, instructor_course_id, course)
+                                             VALUES ('Monday', '$start_time', '$end_time', 'active', '$instructor_course_id', $course_id)";
+                    if (!$conn->query($insertTimetableQuery)) {
+                        throw new Exception("Error adding instructor timetable: " . $conn->error);
+                    }
+                }
+
+                $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id)
+                                         VALUES ('$instructor_id')";
+                if (!$conn->query($insertAttendanceQuery)) {
+                    throw new Exception("Error adding into attendance table: " . $conn->error);
                 }
 
                 // Commit the transaction
@@ -254,6 +274,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea id="instructor_remark" name="Remark"></textarea><br>
         <label for="instructor_training_status">Training Status:</label>
         <input type="text" id="instructor_training_status" name="Training_Status"><br>
+        <label for="instructor_employment_type">Employment Type:</label>
+        <select id="instructor_employment_type" name="Employment_Type" required>
+            <option value="Full-Time">Full-Time</option>
+            <option value="Part-Time">Part-Time</option>
+        </select><br>
+        <label for="instructor_working_days">Working Days:</label>
+        <select id="instructor_working_days" name="Working_Days[]" multiple>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+        </select><br>
         <label for="instructor_email">Email:</label>
         <input type="email" id="instructor_email" name="email" required><br>
         <label for="instructor_password">Password:</label>
