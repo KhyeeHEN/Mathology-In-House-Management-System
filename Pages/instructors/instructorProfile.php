@@ -33,6 +33,10 @@
     $result = $stmt->get_result();
     $instructor = $result->fetch_assoc();
     
+    if (!$instructor) {
+        die("Instructor data not found");
+    }
+    
     // Calculate age from DOB
     $age = '';
     if (!empty($instructor['DOB'])) {
@@ -43,6 +47,13 @@
     
     // Format gender
     $gender = isset($instructor['Gender']) ? ($instructor['Gender'] == 1 ? 'Male' : 'Female') : 'Not specified';
+    
+    // Set default values for potentially missing fields
+    $email = $instructor['email'] ?? 'Not available';
+    $created_at = isset($instructor['created_at']) ? date('F j, Y', strtotime($instructor['created_at'])) : 'Not available';
+    $first_name = $instructor['First_Name'] ?? '';
+    $last_name = $instructor['Last_Name'] ?? '';
+    $full_name = trim("$first_name $last_name") ?: 'Instructor';
     ?>
     
     <div class="dashboard-container">
@@ -64,18 +75,18 @@
                 <div class="profile-content">
                     <div class="profile-image-section">
                         <div class="image-container">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($instructor['First_Name'] . '+' . $instructor['Last_Name']); ?>&background=4e73df&color=ffffff" alt="Profile" class="profile-image">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($full_name); ?>&background=4e73df&color=ffffff" alt="Profile" class="profile-image">
                         </div>
                     </div>
 
                     <div class="profile-details">
-                        <h2 class="instructor-name"><?php echo htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']); ?></h2>
+                        <h2 class="instructor-name"><?php echo htmlspecialchars($full_name); ?></h2>
                         <p class="instructor-title">Mathematics Instructor</p>
                         
                         <div class="details-grid">
                             <div class="detail-item">
                                 <span class="detail-label">Email:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($instructor['email']); ?></span>
+                                <span class="detail-value"><?php echo htmlspecialchars($email); ?></span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Gender:</span>
@@ -95,7 +106,7 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Account Created:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars(date('F j, Y', strtotime($instructor['created_at']))); ?></span>
+                                <span class="detail-value"><?php echo htmlspecialchars($created_at); ?></span>
                             </div>
                         </div>
                         
