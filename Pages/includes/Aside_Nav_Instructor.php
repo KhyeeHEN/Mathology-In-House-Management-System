@@ -5,7 +5,7 @@
     </div>
     <nav class="side-nav">
         <a href="../instructors/dashboardInstructors.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboardInstructor.php' ? 'active' : ''; ?>">
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'dashboardInstructors.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
