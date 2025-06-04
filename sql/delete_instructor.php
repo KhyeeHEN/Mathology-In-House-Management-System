@@ -21,6 +21,11 @@ if (isset($_GET['instructor_id'])) {
             throw new Exception("Failed to delete associated user: " . $conn->error);
         }
 
+        $deleteAttendanceQuery = "DELETE FROM attendance_records WHERE instructor_id = $instructor_id";
+        if (!$conn->query($deleteInstructorQuery)) {
+            throw new Exception("Failed to delete associated attendance data: " . $conn->error);
+        }
+
         // Delete the instructor from the database
         $deleteInstructorQuery = "DELETE FROM instructor WHERE instructor_id = $instructor_id";
         if (!$conn->query($deleteInstructorQuery)) {
