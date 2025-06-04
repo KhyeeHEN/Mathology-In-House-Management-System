@@ -327,27 +327,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // JavaScript to disable/enable Working_Days based on Employment_Type
-        document.getElementById('instructor_employment_type').addEventListener('change', function() {
+        function setWorkingDaysState() {
+            const employmentType = document.getElementById('instructor_employment_type');
             const workingDaysInput = document.getElementById('instructor_working_days');
-            workingDaysInput.disabled = this.value === 'Full-Time';
-            if (this.value === 'Full-Time') {
-                workingDaysInput.value = '';
-            }
-        });
-
-        // Ensure the correct state when the page loads (e.g. after validation error)
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.getElementById('instructor-form').style.display === 'block') {
-                const employmentType = document.getElementById('instructor_employment_type');
-                const workingDaysInput = document.getElementById('instructor_working_days');
-                workingDaysInput.disabled = employmentType.value === 'Full-Time';
-                if (employmentType.value === 'Full-Time') {
-                    for (let i = 0; i < workingDaysInput.options.length; i++) {
-                        workingDaysInput.options[i].selected = false;
-                    }
+            workingDaysInput.disabled = employmentType.value === 'Full-Time';
+            if (employmentType.value === 'Full-Time') {
+                // Deselect all options
+                for (let i = 0; i < workingDaysInput.options.length; i++) {
+                    workingDaysInput.options[i].selected = false;
                 }
             }
-        });
+        }
+
+        // JavaScript to disable/enable Working_Days based on Employment_Type using event and also on load
+        document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
+
+        // Ensure the correct state when the page loads (e.g. after validation error)
+        document.addEventListener('DOMContentLoaded', setWorkingDaysState);
     </script>
 </body>
 
