@@ -82,7 +82,7 @@ foreach ($events as $event) {
 </head>
 <body>
     <div class="dashboard-container">
-        <?php require("../includes/Aside_Nav_Student.php"); ?>
+        <!-- <?php require("../includes/Aside_Nav_Student.php"); ?> -->
 
         <!-- Main Content Area -->
         <main class="main-content">
