@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: /Pages/client/dashboardclient.php");
                     exit;
                 } elseif ($user['role'] === 'admin') {
-                    header("Location: /Pages/admin/dashboardAdmin2.php");
+                    header("Location: /Pages/admin/dashboardAdmin.php");
                     exit;
                 } elseif ($user['role'] === 'instructor') {
                     header("Location: /Pages/instructors/dashboardInstructors.php");

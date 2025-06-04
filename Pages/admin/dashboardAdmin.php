@@ -15,8 +15,9 @@ $query = "
         st.day,
         st.start_time,
         st.end_time,
-        GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) SEPARATOR ', ') AS students,
-        CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor
+        GROUP_CONCAT(DISTINCT CONCAT(s.First_Name, ' ', s.Last_Name) ORDER BY s.First_Name SEPARATOR ', ') AS students,
+        CONCAT(i.First_Name, ' ', i.Last_Name) AS instructor,
+        sc.student_course_id
     FROM 
         student_timetable st
     JOIN 
@@ -25,9 +26,9 @@ $query = "
         courses c ON sc.course_id = c.course_id
     JOIN 
         students s ON sc.student_id = s.student_id
-    JOIN 
+    LEFT JOIN 
         instructor_courses ic ON ic.course_id = c.course_id
-    JOIN 
+    LEFT JOIN 
         instructor i ON ic.instructor_id = i.instructor_id
     WHERE 
         st.status = 'active'
@@ -69,24 +70,34 @@ function getNextDateForDay($dayName) {
 $calendarEvents = [];
 foreach ($classes as $class) {
     $calendarEvents[] = [
-        'title' => $class['course_name'] . ' - ' . $class['instructor'],
-        'date' => getNextDateForDay($class['day']),
-        'type' => '1',
-        'time' => date('h:i A', strtotime($class['start_time'])),
-        'duration' => calculateDuration($class['start_time'], $class['end_time']),
+        'course' => $class['course_name'],
+        'day' => $class['day'],
+        'startTime' => $class['start_time'],
+        'endTime' => $class['end_time'],
         'students' => $class['students'],
-        'description' => 'Students: ' . $class['students']
+        'instructor' => $class['instructor'],
+        'student_course_id' => $class['student_course_id']
     ];
 }
+
+// Fetch attendance summary for the summary cards
+$attendanceQuery = "SELECT 
+    COUNT(DISTINCT student_id) as total_students,
+    SUM(CASE WHEN status = 'attended' THEN hours_attended ELSE 0 END) as total_hours_attended,
+    SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as total_missed,
+    SUM(CASE WHEN status = 'replacement_booked' THEN hours_replacement ELSE 0 END) as total_replacement
+FROM attendance_records";
+$attendanceResult = $conn->query($attendanceQuery);
+$attendanceData = $attendanceResult->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title> 
-    <link rel="stylesheet" href="/Styles/dashboard.css">
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/Styles/common.css">
+    <link rel="stylesheet" href="/Styles/dashboardAdmin2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .event-details {
@@ -102,38 +113,121 @@ foreach ($classes as $class) {
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
 
             <!-- Calendar Section -->
-            <div class="calendar-container">
-                <div class="calendar-header">
-                    <div class="calendar-navigation">
-                        <button class="nav-btn" id="prevMonth">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 id="currentMonth"><?php echo date('F Y'); ?></h2>
-                        <button class="nav-btn" id="nextMonth">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+            <div class="staff-duty-roster">
+                <h2 class="section-title">Current Classes Roster</h2>
+                
+                <div class="roster-controls">
+                    <div class="current-time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentDateTime"><?php echo date('l, F j, Y - g:i A'); ?></span>
                     </div>
-                    <div class="date-picker-container">
-                        <input type="date" id="datePicker" class="date-picker">
+                    <div class="view-toggle">
+                        <button id="dayView" class="toggle-btn active">Day View</button>
+                        <button id="weekView" class="toggle-btn">Week View</button>
                     </div>
                 </div>
-                <div class="calendar-grid">
-                    <div class="calendar-weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
+                
+                <div class="roster-container">
+                    <!-- Current Day Classes -->
+                    <div class="current-day-roster">
+                        <h3>Today's Classes (<?php echo date('l'); ?>)</h3>
+                        
+                        <?php
+                        $currentDay = date('l');
+                        $currentTime = date('H:i:s');
+                        $todayClasses = [];
+                        
+                        foreach ($classes as $class) {
+                            if ($class['day'] === $currentDay) {
+                                $startTime = $class['start_time'];
+                                $endTime = $class['end_time'];
+                                
+                                // Check if current time is within class time
+                                $isCurrent = ($currentTime >= $startTime && $currentTime <= $endTime);
+                                
+                                $todayClasses[] = [
+                                    'class' => $class,
+                                    'is_current' => $isCurrent
+                                ];
+                            }
+                        }
+                        
+                        if (empty($todayClasses)) {
+                            echo '<div class="no-classes">No classes scheduled for today.</div>';
+                        } else {
+                            echo '<div class="class-cards-container">';
+                            foreach ($todayClasses as $item) {
+                                $class = $item['class'];
+                                $isCurrent = $item['is_current'];
+                                $duration = calculateDuration($class['start_time'], $class['end_time']);
+                                
+                                echo '<div class="class-card ' . ($isCurrent ? 'current-class' : '') . '">';
+                                echo '<div class="class-header">';
+                                echo '<span class="class-time">' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . '</span>';
+                                echo '<span class="class-duration">' . $duration . '</span>';
+                                if ($isCurrent) {
+                                    echo '<span class="current-badge">Now</span>';
+                                }
+                                echo '</div>';
+                                echo '<h4 class="class-title">' . $class['course_name'] . '</h4>';
+                                echo '<div class="class-instructor"><i class="fas fa-chalkboard-teacher"></i> ' . $class['instructor'] . '</div>';
+                                echo '<div class="class-students"><i class="fas fa-users"></i> ' . (count(explode(',', $class['students'])) > 3 ? substr($class['students'], 0, 30) . '...' : $class['students']) . '</div>';
+                                
+                                // Expanded details (hidden by default)
+                                echo '<div class="class-details">';
+                                echo '<div class="detail-row"><strong>Course:</strong> ' . $class['course_name'] . '</div>';
+                                echo '<div class="detail-row"><strong>Instructor:</strong> ' . $class['instructor'] . '</div>';
+                                echo '<div class="detail-row"><strong>Time:</strong> ' . date('g:i A', strtotime($class['start_time'])) . ' - ' . date('g:i A', strtotime($class['end_time'])) . ' (' . $duration . ')</div>';
+                                echo '<div class="detail-row"><strong>Students:</strong> ' . $class['students'] . '</div>';
+                                
+                                // Add attendance information if available
+                                $attendanceQuery = "SELECT 
+                                    COUNT(*) as total_sessions,
+                                    SUM(CASE WHEN status = 'attended' THEN 1 ELSE 0 END) as attended,
+                                    SUM(CASE WHEN status = 'missed' THEN 1 ELSE 0 END) as missed,
+                                    SUM(CASE WHEN status = 'replacement_booked' THEN 1 ELSE 0 END) as replacement
+                                FROM attendance_records 
+                                WHERE course = ?";
+                                $attendanceStmt = $conn->prepare($attendanceQuery);
+                                $attendanceStmt->bind_param("s", $class['course_name']);
+                                $attendanceStmt->execute();
+                                $attendanceResult = $attendanceStmt->get_result();
+                                $attendanceData = $attendanceResult->fetch_assoc();
+                                
+                                if ($attendanceData) {
+                                    echo '<div class="detail-row"><strong>Attendance:</strong> ';
+                                    echo $attendanceData['attended'] . ' attended, ';
+                                    echo $attendanceData['missed'] . ' missed, ';
+                                    echo $attendanceData['replacement'] . ' replacements';
+                                    echo '</div>';
+                                }
+                                
+                                echo '</div>';
+                                
+                                echo '<button class="toggle-details-btn">Show Details <i class="fas fa-chevron-down"></i></button>';
+                                echo '</div>';
+                            }
+                            echo '</div>';
+                        }
+                        ?>
                     </div>
-                    <div class="calendar-days" id="calendarDays">
-                        <!-- Days will be populated by JavaScript -->
+                    
+                    <!-- Week View (hidden by default) -->
+                    <div class="week-view-roster" style="display: none;">
+                        <div class="schedule-grid" id="scheduleGrid"></div>
+                        <div class="week-navigation">
+                            <button id="prevWeek"><i class="fas fa-chevron-left"></i> Previous Week</button>
+                            <span id="currentWeek"></span>
+                            <button id="nextWeek">Next Week <i class="fas fa-chevron-right"></i></button>
+                        </div>
                     </div>
                 </div>
+                
+                <!-- Tooltip for class details -->
+                <div id="classTooltip" class="class-tooltip"></div>
             </div>
 
             <!-- Additional Admin Summary Section -->
@@ -164,6 +258,10 @@ foreach ($classes as $class) {
                     $totalCourses = $result->fetch_assoc()['total'];
                     ?>
                     <p><?php echo $totalCourses; ?></p>
+                </div>
+                <div class="summary-card">
+                    <h3>Hours Attended</h3>
+                    <p><?php echo $attendanceData['total_hours_attended'] ?? '0'; ?></p>
                 </div>
             </div>
 
@@ -231,7 +329,7 @@ foreach ($classes as $class) {
                                         <div class="bar-container">
                                             <div class="bar-label"><?php echo $item['syllabus']; ?></div>
                                             <div class="bar-outer">
-                                                <div class="bar-inner" style="width: <?php echo ($item['count'] / 40) * 100; ?>%"></div>
+                                                <div class="bar-inner" style="width: <?php echo ($item['count'] / $totalStudents) * 100; ?>%"></div>
                                             </div>
                                             <div class="bar-value"><?php echo $item['count']; ?></div>
                                         </div>
@@ -323,7 +421,7 @@ foreach ($classes as $class) {
                                     <div class="qualification-chart" id="educationChart">
                                         <?php foreach ($educationData as $edu): ?>
                                         <div class="qualification-segment <?php echo strtolower($edu['education']); ?>" 
-                                            style="height: <?php echo ($edu['count'] / 20) * 100; ?>%"
+                                            style="height: <?php echo ($edu['count'] / $totalInstructors) * 100; ?>%"
                                             title="<?php echo $edu['education']; ?>: <?php echo $edu['count']; ?>">
                                             <span class="qualification-label"><?php echo $edu['education']; ?></span>
                                             <span class="qualification-count"><?php echo $edu['count']; ?></span>
@@ -340,7 +438,7 @@ foreach ($classes as $class) {
                                     <div class="experience-bar">
                                         <div class="experience-label"><?php echo $exp['age_group']; ?></div>
                                         <div class="experience-bar-outer">
-                                            <div class="experience-bar-inner" style="width: <?php echo ($exp['count'] / 20) * 100; ?>%"></div>
+                                            <div class="experience-bar-inner" style="width: <?php echo ($exp['count'] / $totalInstructors) * 100; ?>%"></div>
                                         </div>
                                         <div class="experience-count"><?php echo $exp['count']; ?></div>
                                     </div>
@@ -476,7 +574,7 @@ foreach ($classes as $class) {
                                     $completedPercentage = round(($completedCount / $totalInstructors) * 100);
                                     ?>
                                     
-                                    <li><?php echo $maxSyllabus; ?> is the most common syllabus with <?php echo $maxCount; ?> students (<?php echo round(($maxCount / 40) * 100); ?>%).</li>
+                                    <li><?php echo $maxSyllabus; ?> is the most common syllabus with <?php echo $maxCount; ?> students (<?php echo round(($maxCount / $totalStudents) * 100); ?>%).</li>
                                     <li>Most students are at the <?php echo $maxLevel; ?> level (<?php echo $maxLevelCount; ?> students).</li>
                                     <li>The male to female ratio among students is <?php echo $genderRatio; ?>:1.</li>
                                     <li><?php echo $completedPercentage; ?>% of instructors have completed their training.</li>
@@ -490,26 +588,13 @@ foreach ($classes as $class) {
         </main>
     </div>
     
-    <script>
-        // Pass PHP events to JavaScript with proper formatting
-        const calendarEvents = <?php echo json_encode($calendarEvents); ?>;
-        console.log('Admin loaded events:', calendarEvents);
-        
-        // Customize event display to show instructor and students
-        function formatEventDetails(event) {
-            return `
-                <strong>${event.title}</strong>
-                <div class="event-details">
-                    <div>Time: ${event.time} (${event.duration})</div>
-                    <div>Students: ${event.students}</div>
-                </div>
-            `;
-        }
-    </script>
-    
-    <script type="module" src="/Scripts/dashboard.js"></script>
+    <!-- <script type="module" src="/Scripts/dashboard.js"></script> -->
     <script type="module" src="/Scripts/common.js"></script>
+    <script type="module" src="/Scripts/dashboardAdmin2.js"></script>
     <script>
+        // Pass the classes data to JavaScript
+        window.rosterClasses = <?php echo json_encode($calendarEvents); ?>;
+        
         // Override default event display for admin
         document.addEventListener('DOMContentLoaded', () => {
             // This assumes your dashboard.js has a way to customize event display
