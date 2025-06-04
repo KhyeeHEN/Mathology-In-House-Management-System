@@ -85,6 +85,6 @@
 
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="Scripts/common.js"></script>
 </body>
 </html>
