@@ -87,8 +87,7 @@ h1 {
     gap: 8px;
 }
 
-.filter-buttons button
-.add-entry-button {
+.filter-buttons button {
     height: 42px;
     padding: 0 20px;
     font-size: 1rem;
@@ -104,13 +103,11 @@ h1 {
     gap: 6px;
 }
 .filter-buttons button.active,
-.filter-buttons button:focus
-.add-entry-button button.active {
+.filter-buttons button:focus {
     background: #34495e;
     outline: none;
 }
-.filter-buttons button:hover
-.add-entry-button button.hover{
+.filter-buttons button:hover {
     background: #1a2330;
 }
 
