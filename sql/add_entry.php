@@ -324,6 +324,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 instructorForm.style.display = 'none';
             }
         }
+
+        function toggleWorkingDays() {
+            const employmentType = document.getElementById('instructor_employment_type').value;
+            const workingDaysField = document.getElementById('instructor_working_days');
+            if (employmentType === 'Full-Time') {
+                workingDaysField.disabled = true;
+                // Optionally, clear the selection if switching to Full-Time
+                for (let i = 0; i < workingDaysField.options.length; i++) {
+                    workingDaysField.options[i].selected = false;
+                }
+            } else {
+                workingDaysField.disabled = false;
+            }
+        }
+
+        // Ensure the correct state when the page loads (e.g. after validation error)
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('instructor-form').style.display === 'block') {
+                toggleWorkingDays();
+            }
+        });
+    </script>
     </script>
 </body>
 
