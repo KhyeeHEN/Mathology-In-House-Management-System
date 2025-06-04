@@ -28,7 +28,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* Button styling */
 /* USERS PAGE CONTROL ROWS & SEARCH BAR */
 
 .users-controls-row {
@@ -88,7 +87,8 @@ h1 {
     gap: 8px;
 }
 
-.filter-buttons button {
+.filter-buttons button
+.add-entry-button {
     height: 42px;
     padding: 0 20px;
     font-size: 1rem;
@@ -104,11 +104,13 @@ h1 {
     gap: 6px;
 }
 .filter-buttons button.active,
-.filter-buttons button:focus {
+.filter-buttons button:focus
+.add-entry-button button.active {
     background: #34495e;
     outline: none;
 }
-.filter-buttons button:hover {
+.filter-buttons button:hover
+.add-entry-button button.hover{
     background: #1a2330;
 }
 
@@ -127,11 +129,6 @@ h1 {
     background: #eee;
     color: #333;
     border: 1px solid #ccc;
-}
-.pagination a.active {
-    background: #3498db;
-    color: #fff;
-    border: 1px solid #3498db;
 }
 .pagination a.disabled {
     background: #eee;

@@ -61,13 +61,14 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                 </div>
 
                 <!-- Add Entry Button -->
-                <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                    <button type="submit" style="margin-left: 8px;">
-                        Add Entry
-                    </button>
-                </form>
-            </div>
-            
+                <div class="add-entry-button">
+                    <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
+                        <button type="submit" style="margin-left: 8px;">
+                            Add Entry
+                        </button>
+                    </form>
+                </div>
+            </div>        
 
             <!-- Display messages or errors -->
             <?php if ($message): ?>
