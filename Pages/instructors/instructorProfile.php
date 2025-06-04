@@ -58,7 +58,7 @@
     
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php require("../includes/Aside_Nav.php"); ?>
+        <?php require("../includes/Aside_Nav_Instructor.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
