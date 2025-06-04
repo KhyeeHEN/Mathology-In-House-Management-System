@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
         <main class="main-content">
             <!-- Top Navigation -->
             <?php require("../includes/Top_Nav_Bar_Student.php"); ?>
-            
+
             <div class="content-container">
                 <?php if (isset($_SESSION['message'])): ?>
                     <div class="alert alert-success"><?= $_SESSION['message'] ?></div>
@@ -310,5 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
         }
     });
     </script>
+    <script type="module" src="Scripts/common.js"></script>
+
 </body>
 </html>

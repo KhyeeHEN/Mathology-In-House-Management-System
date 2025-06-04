@@ -278,5 +278,7 @@ $leave_stmt->close();
         }
     </script>
     -->
+    <script type="module" src="/Scripts/common.js"></script>
+
 </body>
 </html>
