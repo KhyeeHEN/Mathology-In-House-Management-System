@@ -45,7 +45,7 @@ if (!$user_info || !isset($user_info['instructor_id'])) {
 $instructor_id = $user_info['instructor_id'];
 echo "<!-- Debugging: Retrieved instructor_id = $instructor_id -->";
 
-// Verify the instructor table exists and has the expected columns
+// Verify the instructor table exists
 $check_table = $conn->query("SHOW TABLES LIKE 'instructor'");
 if ($check_table->num_rows == 0) {
     echo "<p>Error: Table 'instructor' does not exist in the database.</p>";
@@ -73,7 +73,6 @@ $instructor = $result->fetch_assoc();
 echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
 
 if (!$instructor) {
-    // Additional debugging: Check if the instructor_id exists at all
     $check_id = $conn->query("SELECT instructor_id FROM instructor WHERE instructor_id = $instructor_id");
     echo "<!-- Debugging: Instructor ID $instructor_id exists = " . ($check_id->num_rows > 0 ? 'Yes' : 'No') . " -->";
 }
@@ -102,21 +101,25 @@ $stmt->close();
             margin-bottom: 20px;
             color: #333;
         }
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+        .instructor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .detail-item {
-            padding: 10px;
-            background-color: #fff;
+        .instructor-table th, .instructor-table td {
             border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 12px;
+            text-align: left;
         }
-        .detail-item strong {
-            display: block;
-            color: #555;
-            margin-bottom: 5px;
+        .instructor-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .instructor-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .instructor-table tr:hover {
+            background-color: #e6f7e6;
         }
     </style>
 </head>
@@ -133,28 +136,36 @@ $stmt->close();
                         <i class="fas fa-user-tie"></i> 
                         Instructor Details - <?= htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']) ?>
                     </h2>
-                    <div class="details-grid">
-                        <div class="detail-item">
-                            <strong>Highest Education</strong>
-                            <?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?>
-                        </div>
-                        <div class="detail-item">
-                            <strong>Training Status</strong>
-                            <?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?>
-                        </div>
-                        <div class="detail-item">
-                            <strong>Employment Type</strong>
-                            <?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?>
-                        </div>
-                        <div class="detail-item">
-                            <strong>Working Days</strong>
-                            <?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?>
-                        </div>
-                        <div class="detail-item">
-                            <strong>Worked Days</strong>
-                            <?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?>
-                        </div>
-                    </div>
+                    <table class="instructor-table">
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Highest Education</td>
+                                <td><?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?></td>
+                            </tr>
+                            <tr>
+                                <td>Training Status</td>
+                                <td><?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?></td>
+                            </tr>
+                            <tr>
+                                <td>Employment Type</td>
+                                <td><?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?></td>
+                            </tr>
+                            <tr>
+                                <td>Working Days</td>
+                                <td><?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?></td>
+                            </tr>
+                            <tr>
+                                <td>Worked Days</td>
+                                <td><?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 <?php else: ?>
                     <div style="padding: 20px; text-align: center; background-color: #f8f9fa; border-radius: 5px;">
                         <i class="fas fa-info-circle" style="font-size: 24px; color: #6c757d;"></i>
