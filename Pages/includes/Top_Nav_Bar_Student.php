@@ -37,13 +37,6 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         <h1>Student Dashboard</h1>
     </div>
     <div class="nav-right">
-        <div class="nav-links">
-            <a href="dashboard.php" class="nav-link">Dashboard</a>
-            <a href="my_courses.php" class="nav-link">My Courses</a>
-            <a href="assignments.php" class="nav-link">Assignments</a>
-            <a href="grades.php" class="nav-link">Grades</a>
-            <a href="student_resources.php" class="nav-link">Resources</a>
-        </div>
         
         <!-- Student Notifications -->
         <div class="notifications">

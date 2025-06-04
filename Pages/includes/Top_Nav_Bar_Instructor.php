@@ -53,12 +53,69 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         <h1>Instructor Dashboard</h1>
     </div>
     <div class="nav-right">
-        <div class="nav-links">
-            <a href="dashboard.php" class="nav-link">Dashboard</a>
-            <a href="my_courses.php" class="nav-link">My Courses</a>
-            <a href="gradebook.php" class="nav-link">Gradebook</a>
-            <a href="announcements.php" class="nav-link">Announcements</a>
-            <a href="instructor_resources.php" class="nav-link">Resources</a>
+        <!-- Instructor Notifications -->
+        <div class="notifications">
+            <button class="notification-btn" id="notification-toggle">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+            <div class="notification-popover" id="notification-popover">
+                <div class="notification-header">
+                    <h3>Instructor Notifications</h3>
+                    <button class="mark-all-read">Mark all as read</button>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item unread">
+                        <div class="notification-icon submission">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>New Assignment Submission</h4>
+                            <p>5 students submitted Math Assignment #3</p>
+                            <span class="notification-time">2 hours ago</span>
+                        </div>
+                        <div class="notification-dot"></div>
+                    </div>
+                    
+                    <div class="notification-item unread">
+                        <div class="notification-icon question">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Student Question</h4>
+                            <p>New question about Calculus lecture</p>
+                            <span class="notification-time">5 hours ago</span>
+                        </div>
+                        <div class="notification-dot"></div>
+                    </div>
+                    
+                    <div class="notification-item unread">
+                        <div class="notification-icon schedule">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Class Reminder</h4>
+                            <p>You have a class in 30 minutes</p>
+                            <span class="notification-time">30 minutes ago</span>
+                        </div>
+                        <div class="notification-dot"></div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon announcement">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>System Announcement</h4>
+                            <p>Maintenance scheduled for tomorrow</p>
+                            <span class="notification-time">1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <a href="instructor_notifications.php" class="view-all-link">View all notifications</a>
+                </div>
+            </div>
         </div>
         
         <div class="user-profile">
@@ -81,3 +138,56 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         </div>
     </div>
 </nav>
+
+<script>
+// Notification toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationBtn = document.getElementById('notification-toggle');
+    const notificationPopover = document.getElementById('notification-popover');
+    const markAllReadBtn = document.querySelector('.mark-all-read');
+    
+    // Toggle notification popover
+    notificationBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationPopover.classList.toggle('active');
+    });
+    
+    // Close popover when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!notificationBtn.contains(e.target) && !notificationPopover.contains(e.target)) {
+            notificationPopover.classList.remove('active');
+        }
+    });
+    
+    // Mark all as read functionality
+    markAllReadBtn.addEventListener('click', function() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        unreadItems.forEach(item => {
+            item.classList.remove('unread');
+        });
+        
+        // Update badge count
+        const badge = document.querySelector('.notification-badge');
+        badge.textContent = '0';
+        badge.style.display = 'none';
+    });
+    
+    // Individual notification click
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            this.classList.remove('unread');
+            updateBadgeCount();
+        });
+    });
+    
+    // Update badge count
+    function updateBadgeCount() {
+        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+        const badge = document.querySelector('.notification-badge');
+        badge.textContent = unreadCount;
+        if (unreadCount === 0) {
+            badge.style.display = 'none';
+        }
+    }
+});
+</script>

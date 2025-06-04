@@ -30,12 +30,57 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         <h1>Admin Dashboard</h1>
     </div>
     <div class="nav-right">
-        <div class="nav-links">
-            <a href="dashboard.php" class="nav-link">Dashboard</a>
-            <a href="manage_users.php" class="nav-link">Users</a>
-            <a href="manage_courses.php" class="nav-link">Courses</a>
-            <a href="system_settings.php" class="nav-link">Settings</a>
-            <a href="reports.php" class="nav-link">Reports</a>
+        <!-- Admin Notifications -->
+        <div class="notifications">
+            <button class="notification-btn" id="notification-toggle">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">2</span>
+            </button>
+            <div class="notification-popover" id="notification-popover">
+                <div class="notification-header">
+                    <h3>Admin Notifications</h3>
+                    <button class="mark-all-read">Mark all as read</button>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item unread">
+                        <div class="notification-icon system">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>System Update Available</h4>
+                            <p>New version 2.5.1 is ready to install</p>
+                            <span class="notification-time">1 hour ago</span>
+                        </div>
+                        <div class="notification-dot"></div>
+                    </div>
+                    
+                    <div class="notification-item unread">
+                        <div class="notification-icon user">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>New User Registration</h4>
+                            <p>3 new users need approval</p>
+                            <span class="notification-time">4 hours ago</span>
+                        </div>
+                        <div class="notification-dot"></div>
+                    </div>
+                    
+                    <div class="notification-item">
+                        <div class="notification-icon report">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="notification-content">
+                            <h4>Monthly Report Generated</h4>
+                            <p>June system report is ready</p>
+                            <span class="notification-time">1 day ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="notification-footer">
+                    <a href="admin_notifications.php" class="view-all-link">View all notifications</a>
+                </div>
+            </div>
         </div>
         
         <div class="user-profile">
@@ -58,3 +103,56 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         </div>
     </div>
 </nav>
+
+<script>
+// Notification toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationBtn = document.getElementById('notification-toggle');
+    const notificationPopover = document.getElementById('notification-popover');
+    const markAllReadBtn = document.querySelector('.mark-all-read');
+    
+    // Toggle notification popover
+    notificationBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationPopover.classList.toggle('active');
+    });
+    
+    // Close popover when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!notificationBtn.contains(e.target) && !notificationPopover.contains(e.target)) {
+            notificationPopover.classList.remove('active');
+        }
+    });
+    
+    // Mark all as read functionality
+    markAllReadBtn.addEventListener('click', function() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        unreadItems.forEach(item => {
+            item.classList.remove('unread');
+        });
+        
+        // Update badge count
+        const badge = document.querySelector('.notification-badge');
+        badge.textContent = '0';
+        badge.style.display = 'none';
+    });
+    
+    // Individual notification click
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            this.classList.remove('unread');
+            updateBadgeCount();
+        });
+    });
+    
+    // Update badge count
+    function updateBadgeCount() {
+        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+        const badge = document.querySelector('.notification-badge');
+        badge.textContent = unreadCount;
+        if (unreadCount === 0) {
+            badge.style.display = 'none';
+        }
+    }
+});
+</script>
