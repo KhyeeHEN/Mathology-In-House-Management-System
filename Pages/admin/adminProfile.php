@@ -51,18 +51,14 @@
             <!-- Profile Content -->
             <div class="profile-container">
                 <div class="profile-header">
-                    <h1>Profile Settings</h1>
-                    <p>Manage your personal information and account settings</p>
+                    <h1>My Profile</h1>
+                    <p>View your personal information and account settings</p>
                 </div>
 
                 <div class="profile-content">
                     <div class="profile-image-section">
                         <div class="image-container">
                             <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($name); ?>" alt="Profile" class="profile-image">
-                            <label for="profile-upload" class="image-upload-label">
-                                <i class="fas fa-camera"></i>
-                                <input type="file" id="profile-upload" accept="image/*" class="hidden">
-                            </label>
                         </div>
                     </div>
 
