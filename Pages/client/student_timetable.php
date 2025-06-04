@@ -147,7 +147,7 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Navigation -->
-            <?php require("../includes/Top_Nav_Bar.php"); ?>
+            <?php require("../includes/Top_Nav_Bar_Student.php"); ?>
 
             <!-- Page Content -->
             <div class="student-header">
@@ -198,6 +198,6 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
             </div>
         </main>
     </div>
-    <script type="module" src="../../scripts/common.js"></script>
+    <script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>
