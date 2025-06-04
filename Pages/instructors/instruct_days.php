@@ -2,6 +2,11 @@
 require_once '../setting.php';
 session_start();
 
+// Enable error reporting for debugging (disable in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Ensure instructor is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
     header("Location: ../login.php");
@@ -21,7 +26,7 @@ $user_result = $user_stmt->get_result();
 $user_info = $user_result->fetch_assoc();
 
 if (!$user_info || !isset($user_info['instructor_id'])) {
-    echo "<p>Error: Instructor ID not found for user ID $user_id.</p>";
+    echo "<p>Error: Instructor ID not found for user ID $user_id. Session data: " . print_r($_SESSION, true) . "</p>";
     exit();
 }
 
@@ -34,12 +39,14 @@ if (!$stmt) {
     die("Error preparing instructor query: " . $conn->error);
 }
 $stmt->bind_param("i", $instructor_id);
-$stmt->execute();
+if (!$stmt->execute()) {
+    die("Error executing instructor query: " . $stmt->error);
+}
 $result = $stmt->get_result();
 $instructor = $result->fetch_assoc();
 
 if (!$instructor) {
-    echo "<p>Error: Instructor details not found for ID $instructor_id.</p>";
+    echo "<p>Error: Instructor details not found for ID $instructor_id. Please check the database.</p>";
     exit();
 }
 
