@@ -326,15 +326,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // JavaScript to disable/enable Working_Days based on Employment_Type using the provided code and updated IDs
+        // JavaScript to disable/enable Working_Days based on Employment_Type
         document.getElementById('instructor_employment_type').addEventListener('change', function() {
             const workingDaysInput = document.getElementById('instructor_working_days');
             workingDaysInput.disabled = this.value === 'Full-Time';
             if (this.value === 'Full-Time') {
-                // Clear all selections if disabled
-                for (let i = 0; i < workingDaysInput.options.length; i++) {
-                    workingDaysInput.options[i].selected = false;
-                }
+                workingDaysInput.value = '';
             }
         });
 
