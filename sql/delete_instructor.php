@@ -22,7 +22,7 @@ if (isset($_GET['instructor_id'])) {
         }
 
         $deleteAttendanceQuery = "DELETE FROM attendance_records WHERE instructor_id = $instructor_id";
-        if (!$conn->query($deleteInstructorQuery)) {
+        if (!$conn->query($deleteAttendanceQuery)) {
             throw new Exception("Failed to delete associated attendance data: " . $conn->error);
         }
 
