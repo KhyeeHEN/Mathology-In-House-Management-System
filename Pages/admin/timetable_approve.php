@@ -1020,6 +1020,6 @@ if (!$viewing_id && !$show_search_results) {
             </div>
         </main>
     </div>
-    <script type="module" src="../../Scripts/common.js"></script>
+    <script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>
