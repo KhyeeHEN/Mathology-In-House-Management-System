@@ -25,8 +25,8 @@ if (isset($_GET['student_id'])) {
             }
         }
         // Delete the student from the database
-        $deleteStudentQuery = "DELETE FROM attendance_records WHERE student_id = $student_id";
-        if (!$conn->query($deleteStudentQuery)) {
+        $deleteAttendanceQuery = "DELETE FROM attendance_records WHERE student_id = $student_id";
+        if (!$conn->query($deleteAttendanceQuery)) {
             throw new Exception("Failed to delete student from attendance records: " . $conn->error);
         }
 
@@ -39,6 +39,13 @@ if (isset($_GET['student_id'])) {
         if (!$conn->query($deletePrimaryContactQuery)) {
             throw new Exception("Failed to delete student's secondary contact: " . $conn->error);
         }
+
+        
+        $deleteSecondaryContactQuery = "DELETE FROM payment WHERE student_id = $student_id";
+        if (!$conn->query($deletePrimaryContactQuery)) {
+            throw new Exception("Failed to delete student's payment records: " . $conn->error);
+        }
+
 
         // Delete dependent rows from student_courses
         $deleteCoursesQuery = "DELETE FROM student_courses WHERE student_id = $student_id";
