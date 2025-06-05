@@ -2,11 +2,6 @@
 require_once '../setting.php';
 session_start();
 
-// Enable error reporting for debugging (disable in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Ensure instructor is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'instructor') {
     header("Location: ../login.php");
@@ -18,11 +13,8 @@ if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-echo "<!-- Debugging: Database connection successful -->";
-
 // Fetch the actual instructor_id from the users table using the session's user_id
 $user_id = $_SESSION['user_id'];
-echo "<!-- Debugging: Session user_id = $user_id, role = " . ($_SESSION['role'] ?? 'N/A') . " -->";
 $user_sql = "SELECT instructor_id FROM users WHERE user_id = ? AND role = 'instructor'";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
@@ -43,15 +35,6 @@ if (!$user_info || !isset($user_info['instructor_id'])) {
 }
 
 $instructor_id = $user_info['instructor_id'];
-echo "<!-- Debugging: Retrieved instructor_id = $instructor_id -->";
-
-// Verify the instructor table exists and has the expected columns
-$check_table = $conn->query("SHOW TABLES LIKE 'instructor'");
-if ($check_table->num_rows == 0) {
-    echo "<p>Error: Table 'instructor' does not exist in the database.</p>";
-    exit();
-}
-echo "<!-- Debugging: Table 'instructor' exists -->";
 
 // Fetch instructor details
 $sql = "SELECT First_Name, Last_Name, Highest_Education, Training_Status, Employment_Type, Working_Days, Worked_Days 
@@ -67,18 +50,10 @@ if (!$stmt->execute()) {
     exit();
 }
 $result = $stmt->get_result();
-echo "<!-- Debugging: Number of rows returned = " . $result->num_rows . " -->";
 $instructor = $result->fetch_assoc();
 
 // Store the result in a variable to ensure it's not lost
 $instructor_data = $instructor ? $instructor : [];
-echo "<!-- Debugging: Stored instructor data = " . print_r($instructor_data, true) . " -->";
-
-if (empty($instructor_data)) {
-    // Additional debugging: Check if the instructor_id exists at all
-    $check_id = $conn->query("SELECT instructor_id FROM instructor WHERE instructor_id = $instructor_id");
-    echo "<!-- Debugging: Instructor ID $instructor_id exists = " . ($check_id->num_rows > 0 ? 'Yes' : 'No') . " -->";
-}
 
 $stmt->close();
 ?>
