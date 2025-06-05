@@ -292,11 +292,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" id="primary_relationship" name="primary_relationship" required><br>
             <label for="primary_phone">Phone:</label>
             <input type="text" id="primary_phone" name="primary_phone" required><br>
-            <label for="primary_email">Phone:</label>
+            <label for="primary_email">Email:</label>
             <input type="text" id="primary_email" name="primary_email" required><br>
-            <label for="primary_address">Phone:</label>
+            <label for="primary_address">Address:</label>
             <input type="text" id="primary_address" name="primary_address" required><br>
-            <label for="primary_postcode">Phone:</label>
+            <label for="primary_postcode">Postcode:</label>
             <input type="text" id="primary_postcode" name="primary_postcode" required><br>
         </fieldset>
         <!-- Add Secondary Contact Section -->
