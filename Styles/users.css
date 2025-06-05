@@ -26,7 +26,7 @@ h1 {
 
 .users-controls-row {
     display: flex;
-    align-items: center;
+    justify-content: center;
     gap: 16px;
     margin-bottom: 24px;
     flex-wrap: wrap;
