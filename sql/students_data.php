@@ -137,8 +137,8 @@ if ($result->num_rows > 0) {
                 <span class='contact-tooltip-popup'>
                     <strong>Name:</strong> {$row['primary_owner_first_name']} {$row['primary_owner_last_name']}<br>
                     <strong>Relationship:</strong> {$row['primary_relationship']}<br>
-                    <strong>Email:</strong>{$row['primary_email']}<br>
-                    <strong>Address:</strong>{$row['primary_address']} {$row['primary_postcode']}
+                    <strong>Email:</strong> {$row['primary_email']}<br>
+                    <strong>Address:</strong> {$row['primary_address']} {$row['primary_postcode']}
                 </span>
               </span>"
             : 'N/A'
