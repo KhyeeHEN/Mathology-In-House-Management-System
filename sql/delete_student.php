@@ -24,6 +24,11 @@ if (isset($_GET['student_id'])) {
                 throw new Exception("Failed to delete student timetable: " . $conn->error);
             }
         }
+        // Delete the student from the database
+        $deleteStudentQuery = "DELETE FROM attendance_records WHERE student_id = $student_id";
+        if (!$conn->query($deleteStudentQuery)) {
+            throw new Exception("Failed to delete student from attendance records: " . $conn->error);
+        }
 
         // Delete dependent rows from student_courses
         $deleteCoursesQuery = "DELETE FROM student_courses WHERE student_id = $student_id";

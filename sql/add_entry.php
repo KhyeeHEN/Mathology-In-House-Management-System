@@ -81,6 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
                 }
 
+                $insertPaymentQuery = "INSERT INTO payment (student_id)
+                                         VALUES ('$student_id')";
+                if (!$conn->query($insertPaymentQuery)) {
+                    throw new Exception("Error adding into payment table: " . $conn->error);
+                }
+
                 $insertPrimaryContactQuery = "INSERT INTO primary_contact_number 
     (student_id, Last_Name, First_Name, Relationship_with_Student, phone, email, address, postcode)
     VALUES ('$student_id', '$primary_owner_last_name', '$primary_owner_first_name', '$primary_relationship', '$primary_phone', '$primary_email', '$primary_address','$primary_postcode')";
