@@ -42,6 +42,9 @@ $sql = "
         pc.Last_Name AS primary_owner_last_name,
         pc.First_Name AS primary_owner_first_name,
         pc.Relationship_with_Student AS primary_relationship,
+        pc.Email AS primary_email,
+        pc.Address AS primary_address,
+        pc.Postcode AS primary_postcode
         sc.phone AS secondary_contact,
         sc.Last_Name AS secondary_owner_last_name,
         sc.First_Name AS secondary_owner_first_name,
@@ -133,7 +136,9 @@ if ($result->num_rows > 0) {
                 {$row['primary_contact']}
                 <span class='contact-tooltip-popup'>
                     <strong>Name:</strong> {$row['primary_owner_first_name']} {$row['primary_owner_last_name']}<br>
-                    <strong>Relationship:</strong> {$row['primary_relationship']}
+                    <strong>Relationship:</strong> {$row['primary_relationship']}<br>
+                    <strong>Email:</strong>{$row['primary_email']}<br>
+                    <strong>Address:</strong>{$row['primary_address']} {$row['primary_postcode']}
                 </span>
               </span>"
             : 'N/A'
