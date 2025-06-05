@@ -70,9 +70,11 @@ $result = $stmt->get_result();
 echo "<!-- Debugging: Number of rows returned = " . $result->num_rows . " -->";
 $instructor = $result->fetch_assoc();
 
-echo "<!-- Debugging: Retrieved instructor data = " . print_r($instructor, true) . " -->";
+// Store the result in a variable to ensure it's not lost
+$instructor_data = $instructor ? $instructor : [];
+echo "<!-- Debugging: Stored instructor data = " . print_r($instructor_data, true) . " -->";
 
-if (!$instructor) {
+if (empty($instructor_data)) {
     // Additional debugging: Check if the instructor_id exists at all
     $check_id = $conn->query("SELECT instructor_id FROM instructor WHERE instructor_id = $instructor_id");
     echo "<!-- Debugging: Instructor ID $instructor_id exists = " . ($check_id->num_rows > 0 ? 'Yes' : 'No') . " -->";
@@ -128,31 +130,31 @@ $stmt->close();
             <?php require("../includes/Top_Nav_Bar_Instructor.php"); ?>
 
             <div class="instructor-details">
-                <?php if ($instructor): ?>
+                <?php if (!empty($instructor_data)): ?>
                     <h2>
                         <i class="fas fa-user-tie"></i> 
-                        Instructor Details - <?= htmlspecialchars($instructor['First_Name'] . ' ' . $instructor['Last_Name']) ?>
+                        Instructor Details - <?= htmlspecialchars($instructor_data['First_Name'] . ' ' . $instructor_data['Last_Name']) ?>
                     </h2>
                     <div class="details-grid">
                         <div class="detail-item">
                             <strong>Highest Education</strong>
-                            <?= htmlspecialchars($instructor['Highest_Education'] ?? 'N/A') ?>
+                            <?= htmlspecialchars($instructor_data['Highest_Education'] ?? 'N/A') ?>
                         </div>
                         <div class="detail-item">
                             <strong>Training Status</strong>
-                            <?= htmlspecialchars($instructor['Training_Status'] ?? 'N/A') ?>
+                            <?= htmlspecialchars($instructor_data['Training_Status'] ?? 'N/A') ?>
                         </div>
                         <div class="detail-item">
                             <strong>Employment Type</strong>
-                            <?= htmlspecialchars($instructor['Employment_Type'] ?? 'N/A') ?>
+                            <?= htmlspecialchars($instructor_data['Employment_Type'] ?? 'N/A') ?>
                         </div>
                         <div class="detail-item">
                             <strong>Working Days</strong>
-                            <?= htmlspecialchars($instructor['Working_Days'] ?? 'N/A') ?>
+                            <?= htmlspecialchars($instructor_data['Working_Days'] ?? 'N/A') ?>
                         </div>
                         <div class="detail-item">
                             <strong>Worked Days</strong>
-                            <?= htmlspecialchars($instructor['Worked_Days']) ?> <!-- Removed ?? '0' -->
+                            <?= htmlspecialchars($instructor_data['Worked_Days'] ?? 'N/A') ?>
                         </div>
                     </div>
                 <?php else: ?>
