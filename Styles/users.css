@@ -32,16 +32,6 @@ h1 {
     flex-wrap: wrap;
 }
 
-.users-controls-row .search-bar {
-    flex: 1;
-    min-width: 250px;
-}
-
-.search-bar {
-    display: flex;
-    gap: 8px;
-}
-
 .search-bar input[type="text"],
 .search-bar input[type="search"] {
     flex: 1;
