@@ -290,8 +290,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" id="primary_owner_first_name" name="primary_owner_first_name" required><br>
             <label for="primary_relationship">Relationship with Student:</label>
             <input type="text" id="primary_relationship" name="primary_relationship" required><br>
-            <label for="primary_contact">Phone:</label>
-            <input type="text" id="primary_contact" name="primary_contact" required><br>
+            <label for="primary_phone">Phone:</label>
+            <input type="text" id="primary_phone" name="primary_phone" required><br>
+            <label for="primary_email">Phone:</label>
+            <input type="text" id="primary_email" name="primary_email" required><br>
+            <label for="primary_address">Phone:</label>
+            <input type="text" id="primary_address" name="primary_address" required><br>
+            <label for="primary_postcode">Phone:</label>
+            <input type="text" id="primary_postcode" name="primary_postcode" required><br>
         </fieldset>
         <!-- Add Secondary Contact Section -->
         <fieldset style="margin-top:10px;">
@@ -302,8 +308,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name"><br>
             <label for="secondary_relationship">Relationship with Student:</label>
             <input type="text" id="secondary_relationship" name="secondary_relationship"><br>
-            <label for="secondary_contact">Phone:</label>
-            <input type="text" id="secondary_contact" name="secondary_contact"><br>
+            <label for="secondary_phone">Phone:</label>
+            <input type="text" id="secondary_phone" name="secondary_contact"><br>
         </fieldset>
         <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
         <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100"><br>
