@@ -152,7 +152,7 @@ $stmt->close();
                         </div>
                         <div class="detail-item">
                             <strong>Worked Days</strong>
-                            <?= htmlspecialchars($instructor['Worked_Days'] ?? '0') ?>
+                            <?= htmlspecialchars($instructor['Worked_Days']) ?> <!-- Removed ?? '0' -->
                         </div>
                     </div>
                 <?php else: ?>
