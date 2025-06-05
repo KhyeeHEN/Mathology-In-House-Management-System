@@ -315,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="secondary_relationship">Relationship with Student:</label>
             <input type="text" id="secondary_relationship" name="secondary_relationship"><br>
             <label for="secondary_phone">Phone:</label>
-            <input type="text" id="secondary_phone" name="secondary_contact"><br>
+            <input type="text" id="secondary_phone" name="secondary_phone"><br>
         </fieldset>
         <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
         <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100"><br>

@@ -30,6 +30,16 @@ if (isset($_GET['student_id'])) {
             throw new Exception("Failed to delete student from attendance records: " . $conn->error);
         }
 
+        $deletePrimaryContactQuery = "DELETE FROM primary_contact_number WHERE student_id = $student_id";
+        if (!$conn->query($deletePrimaryContactQuery)) {
+            throw new Exception("Failed to delete student's primary contact: " . $conn->error);
+        }
+
+        $deleteSecondaryContactQuery = "DELETE FROM secondary_contact_number WHERE student_id = $student_id";
+        if (!$conn->query($deletePrimaryContactQuery)) {
+            throw new Exception("Failed to delete student's secondary contact: " . $conn->error);
+        }
+
         // Delete dependent rows from student_courses
         $deleteCoursesQuery = "DELETE FROM student_courses WHERE student_id = $student_id";
         if (!$conn->query($deleteCoursesQuery)) {
