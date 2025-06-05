@@ -44,7 +44,7 @@ $sql = "
         pc.Relationship_with_Student AS primary_relationship,
         pc.Email AS primary_email,
         pc.Address AS primary_address,
-        pc.Postcode AS primary_postcode
+        pc.Postcode AS primary_postcode,
         sc.phone AS secondary_contact,
         sc.Last_Name AS secondary_owner_last_name,
         sc.First_Name AS secondary_owner_first_name,
