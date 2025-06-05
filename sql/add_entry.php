@@ -35,6 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $start_time = $conn->real_escape_string($_POST['Start_Time']);
                 $end_time = $conn->real_escape_string($_POST['End_Time']);
                 $how_did_you_heard_about_us = $conn->real_escape_string($_POST['How_Did_You_Heard_About_Us']);
+                $primary_owner_last_name = $conn->real_escape_string($_POST['primary_owner_last_name']);
+                $primary_owner_first_name = $conn->real_escape_string($_POST['primary_owner_first_name']);
+                $primary_relationship = $conn->real_escape_string($_POST['primary_relationship']);
+                $primary_phone = $conn->real_escape_string($_POST['primary_phone']);
+                $primary_email = $conn->real_escape_string($_POST['primary_email']);
+                $primary_address = $conn->real_escape_string($_POST['primary_address']);
+                $primary_postcode = $conn->real_escape_string($_POST['primary_postcode']);
 
                 // Insert into students table
                 $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, School_Intake, Current_School_Grade, School, Mathology_Level, How_Did_You_Heard_About_Us)
@@ -72,6 +79,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                          VALUES ('$student_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
+                }
+
+                $insertPrimaryContactQuery = "INSERT INTO primary_contact_number 
+    (student_id, Last_Name, First_Name, Relationship_with_Student, phone, email, address, postcode)
+    VALUES ('$student_id', '$primary_owner_last_name', '$primary_owner_first_name', '$primary_relationship', '$primary_phone', '$primary_email', '$primary_address','$primary_postcode')";
+                if (!$conn->query($insertPrimaryContactQuery)) {
+                    throw new Exception("Error adding primary contact: " . $conn->error);
+                }
+
+                // Secondary contact (optional)
+                if (
+                    !empty($_POST['secondary_owner_last_name']) ||
+                    !empty($_POST['secondary_owner_first_name']) ||
+                    !empty($_POST['secondary_relationship']) ||
+                    !empty($_POST['secondary_phone'])
+                ) {
+                    $secondary_owner_last_name = $conn->real_escape_string($_POST['secondary_owner_last_name']);
+                    $secondary_owner_first_name = $conn->real_escape_string($_POST['secondary_owner_first_name']);
+                    $secondary_relationship = $conn->real_escape_string($_POST['secondary_relationship']);
+                    $secondary_phone = $conn->real_escape_string($_POST['secondary_phone']);
+
+                    $insertSecondaryContactQuery = "INSERT INTO secondary_contact_number 
+        (student_id, Last_Name, First_Name, Relationship_with_Student, phone)
+        VALUES ('$student_id', '$secondary_owner_last_name', '$secondary_owner_first_name', '$secondary_relationship', '$secondary_phone')";
+                    if (!$conn->query($insertSecondaryContactQuery)) {
+                        throw new Exception("Error adding secondary contact: " . $conn->error);
+                    }
                 }
 
                 // Commit the transaction
@@ -247,6 +281,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="time" id="student_start_time" name="Start_Time" required><br>
         <label for="student_end_time">End Time:</label>
         <input type="time" id="student_end_time" name="End_Time" required><br><br>
+
+        <fieldset style="margin-top:16px;">
+            <legend>Primary Contact</legend>
+            <label for="primary_owner_last_name">Last Name:</label>
+            <input type="text" id="primary_owner_last_name" name="primary_owner_last_name" required><br>
+            <label for="primary_owner_first_name">First Name:</label>
+            <input type="text" id="primary_owner_first_name" name="primary_owner_first_name" required><br>
+            <label for="primary_relationship">Relationship with Student:</label>
+            <input type="text" id="primary_relationship" name="primary_relationship" required><br>
+            <label for="primary_contact">Phone:</label>
+            <input type="text" id="primary_contact" name="primary_contact" required><br>
+        </fieldset>
+        <!-- Add Secondary Contact Section -->
+        <fieldset style="margin-top:10px;">
+            <legend>Secondary Contact</legend>
+            <label for="secondary_owner_last_name">Last Name:</label>
+            <input type="text" id="secondary_owner_last_name" name="secondary_owner_last_name"><br>
+            <label for="secondary_owner_first_name">First Name:</label>
+            <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name"><br>
+            <label for="secondary_relationship">Relationship with Student:</label>
+            <input type="text" id="secondary_relationship" name="secondary_relationship"><br>
+            <label for="secondary_contact">Phone:</label>
+            <input type="text" id="secondary_contact" name="secondary_contact"><br>
+        </fieldset>
         <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
         <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100"><br>
         <button type="submit">Add Student</button>
