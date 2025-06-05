@@ -5,7 +5,7 @@ table {
     margin-top: 20px 0;
 }
 
-table, th, td {
+table th, table td {
     padding: 12px;
     border: 1px solid #ddd;
     text-align: left;
@@ -17,14 +17,9 @@ th {
     position: relative;
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
 h1 {
     font-size: 24px;
     color: #333;
-    margin-bottom: 20px;
 }
 
 /* USERS PAGE CONTROL ROWS & SEARCH BAR */

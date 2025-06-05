@@ -40,8 +40,8 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-
-            <br><br>
+            <br>
+            <br>
 
             <div class="users-controls-row">
                 <!-- Search Bar -->
