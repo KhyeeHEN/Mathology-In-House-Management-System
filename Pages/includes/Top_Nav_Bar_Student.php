@@ -99,7 +99,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="dropdown-menu">
-                <a href="student_profile.php" class="dropdown-item">
+                <a href="profile.php" class="dropdown-item">
                     <i class="fas fa-user-graduate"></i>
                     <span>My Profile</span>
                 </a>
