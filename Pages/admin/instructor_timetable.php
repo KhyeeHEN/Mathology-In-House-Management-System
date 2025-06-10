@@ -21,13 +21,13 @@ $show_search_results = !empty($search_query);
 if ($show_search_results) {
     $search_term = "%" . $conn->real_escape_string($search_query) . "%";
     $instructors = $conn->query("
-        SELECT i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education, i.School,
+        SELECT i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education,
                COUNT(it.id) as timetable_count
         FROM instructor i
         LEFT JOIN instructor_courses ic ON i.instructor_id = ic.instructor_id
         LEFT JOIN instructor_timetable it ON ic.instructor_course_id = it.instructor_course_id
         WHERE (i.instructor_id LIKE '$search_term' OR i.First_Name LIKE '$search_term' OR i.Last_Name LIKE '$search_term')
-        GROUP BY i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education, i.School
+        GROUP BY i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education
         LIMIT $per_page OFFSET $offset
     ");
     $total_query = $conn->query("
@@ -37,12 +37,12 @@ if ($show_search_results) {
     ");
 } else {
     $instructors = $conn->query("
-        SELECT i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education, i.School,
+        SELECT i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education,
                COUNT(it.id) as timetable_count
         FROM instructor i
         LEFT JOIN instructor_courses ic ON i.instructor_id = ic.instructor_id
         LEFT JOIN instructor_timetable it ON ic.instructor_course_id = it.instructor_course_id
-        GROUP BY i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education, i.School
+        GROUP BY i.instructor_id, i.First_Name, i.Last_Name, i.Highest_Education
         LIMIT $per_page OFFSET $offset
     ");
     $total_query = $conn->query("SELECT COUNT(*) as total FROM instructor");
@@ -191,10 +191,6 @@ $total_pages = ceil($total / $per_page);
                             <div class="info-row">
                                 <div class="info-label">Education:</div>
                                 <div><?= htmlspecialchars($instructor['Highest_Education'] ?? 'Not specified') ?></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">School:</div>
-                                <div><?= htmlspecialchars($instructor['School'] ?? 'Not specified') ?></div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label">Scheduled Sessions:</div>
