@@ -22,16 +22,17 @@ $stmt->execute();
 $instructor = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Fetch available courses for the instructor using prepared statement
-$stmt = $conn->prepare("
-    SELECT ic.instructor_course_id, c.course_name
-    FROM instructor_courses ic
-    JOIN courses c ON ic.course_id = c.course_id
-    WHERE ic.instructor_id = ? AND ic.status = 'active'
-");
+// Fetch all courses from the courses table using prepared statement
+$stmt = $conn->prepare("SELECT course_id, course_name FROM courses");
+$stmt->execute();
+$all_courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// Fetch existing instructor courses to check for matches
+$stmt = $conn->prepare("SELECT course_id, instructor_course_id FROM instructor_courses WHERE instructor_id = ? AND status = 'active'");
 $stmt->bind_param("i", $instructor_id);
 $stmt->execute();
-$courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$instructor_courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 // Handle form submission
@@ -39,14 +40,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $day = $_POST['day'];
     $start_time = $_POST['start_time'];
     $end_time = $_POST['end_time'];
-    $instructor_course_id = $_POST['instructor_course_id'];
+    $course_id = $_POST['course_id'];
 
     if (strtotime($start_time) >= strtotime($end_time)) {
         $error = "Start time must be before end time.";
     } else {
-        // Fetch course name for the selected instructor_course_id
-        $stmt = $conn->prepare("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)");
-        $stmt->bind_param("i", $instructor_course_id);
+        // Check if the course is already linked to the instructor
+        $instructor_course_id = null;
+        foreach ($instructor_courses as $ic) {
+            if ($ic['course_id'] == $course_id) {
+                $instructor_course_id = $ic['instructor_course_id'];
+                break;
+            }
+        }
+
+        // If not linked, create a new instructor_course entry
+        if ($instructor_course_id === null) {
+            $stmt = $conn->prepare("INSERT INTO instructor_courses (instructor_id, course_id, status) VALUES (?, ?, 'active')");
+            $stmt->bind_param("ii", $instructor_id, $course_id);
+            $stmt->execute();
+            $instructor_course_id = $conn->insert_id;
+            $stmt->close();
+        }
+
+        // Fetch course name for the selected course_id
+        $stmt = $conn->prepare("SELECT course_name FROM courses WHERE course_id = ?");
+        $stmt->bind_param("i", $course_id);
         $stmt->execute();
         $course_result = $stmt->get_result()->fetch_assoc();
         $course_name = $course_result['course_name'];
@@ -158,10 +177,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="time" name="end_time" required>
                     </div>
                     <div class="form-group">
-                        <label for="instructor_course_id">Course:</label>
-                        <select name="instructor_course_id" required>
-                            <?php foreach ($courses as $course): ?>
-                                <option value="<?= $course['instructor_course_id'] ?>"><?= htmlspecialchars($course['course_name']) ?></option>
+                        <label for="course_id">Course:</label>
+                        <select name="course_id" required>
+                            <?php foreach ($all_courses as $course): ?>
+                                <option value="<?= $course['course_id'] ?>"><?= htmlspecialchars($course['course_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
