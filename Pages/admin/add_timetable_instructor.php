@@ -15,16 +15,24 @@ if (!$instructor_id) {
     exit();
 }
 
-// Fetch instructor details
-$instructor = $conn->query("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = ?", [$instructor_id], "i")->fetch_assoc();
+// Fetch instructor details using prepared statement
+$stmt = $conn->prepare("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = ?");
+$stmt->bind_param("i", $instructor_id);
+$stmt->execute();
+$instructor = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
-// Fetch available courses for the instructor
-$courses = $conn->query("
+// Fetch available courses for the instructor using prepared statement
+$stmt = $conn->prepare("
     SELECT ic.instructor_course_id, c.course_name
     FROM instructor_courses ic
     JOIN courses c ON ic.course_id = c.course_id
     WHERE ic.instructor_id = ? AND ic.status = 'active'
-", [$instructor_id], "i")->fetch_all(MYSQLI_ASSOC);
+");
+$stmt->bind_param("i", $instructor_id);
+$stmt->execute();
+$courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,18 +44,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strtotime($start_time) >= strtotime($end_time)) {
         $error = "Start time must be before end time.";
     } else {
-        $course_name = $conn->query("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)", [$instructor_course_id], "i")->fetch_assoc()['course_name'];
-        $insert_sql = "INSERT INTO instructor_timetable (day, start_time, end_time, instructor_course_id, course) 
-                       VALUES (?, ?, ?, ?, ?)";
-        $insert_stmt = $conn->prepare($insert_sql);
-        $insert_stmt->bind_param("sssii", $day, $start_time, $end_time, $instructor_course_id, $course_name);
-        if ($insert_stmt->execute()) {
+        // Fetch course name for the selected instructor_course_id
+        $stmt = $conn->prepare("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)");
+        $stmt->bind_param("i", $instructor_course_id);
+        $stmt->execute();
+        $course_result = $stmt->get_result()->fetch_assoc();
+        $course_name = $course_result['course_name'];
+        $stmt->close();
+
+        // Insert new timetable entry using prepared statement
+        $stmt = $conn->prepare("INSERT INTO instructor_timetable (day, start_time, end_time, instructor_course_id, course) 
+                               VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssii", $day, $start_time, $end_time, $instructor_course_id, $course_name);
+        if ($stmt->execute()) {
             header("Location: instructor_timetable.php?instructor_id=$instructor_id&message=Timetable entry added successfully");
             exit();
         } else {
-            $error = "Error adding timetable entry: " . $insert_stmt->error;
+            $error = "Error adding timetable entry: " . $conn->error;
         }
-        $insert_stmt->close();
+        $stmt->close();
     }
 }
 ?>
