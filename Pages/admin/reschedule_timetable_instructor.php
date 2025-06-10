@@ -16,14 +16,13 @@ if (!$instructor_id) {
 }
 
 // Fetch instructor details
-$instructor = $conn->query("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = $instructor_id")->fetch_assoc();
+$instructor = $conn->query("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = ?", [$instructor_id], "i")->fetch_assoc();
 
 // Fetch timetable for the instructor
 $timetable_sql = "SELECT it.id, it.day, TIME_FORMAT(it.start_time, '%h:%i %p') AS start_time, 
-                  TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, c.course_name, it.instructor_course_id
+                  TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, it.course, it.instructor_course_id
                   FROM instructor_timetable it
                   JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
-                  JOIN courses c ON ic.course_id = c.course_id
                   WHERE ic.instructor_id = ? AND it.status = 'active'
                   ORDER BY FIELD(it.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), it.start_time";
 $timetable_stmt = $conn->prepare($timetable_sql);
@@ -37,8 +36,8 @@ $courses = $conn->query("
     SELECT ic.instructor_course_id, c.course_name
     FROM instructor_courses ic
     JOIN courses c ON ic.course_id = c.course_id
-    WHERE ic.instructor_id = $instructor_id
-")->fetch_all(MYSQLI_ASSOC);
+    WHERE ic.instructor_id = ? AND ic.status = 'active'
+", [$instructor_id], "i")->fetch_all(MYSQLI_ASSOC);
 
 // Handle form submission for rescheduling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -51,12 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strtotime($start_time) >= strtotime($end_time)) {
         $error = "Start time must be before end time.";
     } else {
+        $course_name = $conn->query("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)", [$instructor_course_id], "i")->fetch_assoc()['course_name'];
         $update_sql = "UPDATE instructor_timetable 
-                       SET day = ?, start_time = ?, end_time = ?, instructor_course_id = ?, 
-                           course = (SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?))
+                       SET day = ?, start_time = ?, end_time = ?, instructor_course_id = ?, course = ?
                        WHERE id = ?";
         $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("sssiii", $day, $start_time, $end_time, $instructor_course_id, $instructor_course_id, $timetable_id);
+        $update_stmt->bind_param("sssisi", $day, $start_time, $end_time, $instructor_course_id, $course_name, $timetable_id);
         if ($update_stmt->execute()) {
             header("Location: instructor_timetable.php?instructor_id=$instructor_id&message=Timetable entry rescheduled successfully");
             exit();
@@ -192,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <td><?= htmlspecialchars($entry['day']) ?></td>
                                     <td><?= htmlspecialchars($entry['start_time']) ?></td>
                                     <td><?= htmlspecialchars($entry['end_time']) ?></td>
-                                    <td><?= htmlspecialchars($entry['course_name']) ?></td>
+                                    <td><?= htmlspecialchars($entry['course']) ?></td>
                                     <td>
                                         <button onclick="showEditForm(<?= $entry['id'] ?>)">Edit</button>
                                     </td>

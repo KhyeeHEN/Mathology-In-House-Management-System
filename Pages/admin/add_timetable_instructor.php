@@ -16,15 +16,15 @@ if (!$instructor_id) {
 }
 
 // Fetch instructor details
-$instructor = $conn->query("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = $instructor_id")->fetch_assoc();
+$instructor = $conn->query("SELECT First_Name, Last_Name FROM instructor WHERE instructor_id = ?", [$instructor_id], "i")->fetch_assoc();
 
 // Fetch available courses for the instructor
 $courses = $conn->query("
     SELECT ic.instructor_course_id, c.course_name
     FROM instructor_courses ic
     JOIN courses c ON ic.course_id = c.course_id
-    WHERE ic.instructor_id = $instructor_id
-")->fetch_all(MYSQLI_ASSOC);
+    WHERE ic.instructor_id = ? AND ic.status = 'active'
+", [$instructor_id], "i")->fetch_all(MYSQLI_ASSOC);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,10 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strtotime($start_time) >= strtotime($end_time)) {
         $error = "Start time must be before end time.";
     } else {
+        $course_name = $conn->query("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)", [$instructor_course_id], "i")->fetch_assoc()['course_name'];
         $insert_sql = "INSERT INTO instructor_timetable (day, start_time, end_time, instructor_course_id, course) 
-                       VALUES (?, ?, ?, ?, (SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)))";
+                       VALUES (?, ?, ?, ?, ?)";
         $insert_stmt = $conn->prepare($insert_sql);
-        $insert_stmt->bind_param("sssii", $day, $start_time, $end_time, $instructor_course_id, $instructor_course_id);
+        $insert_stmt->bind_param("sssii", $day, $start_time, $end_time, $instructor_course_id, $course_name);
         if ($insert_stmt->execute()) {
             header("Location: instructor_timetable.php?instructor_id=$instructor_id&message=Timetable entry added successfully");
             exit();
