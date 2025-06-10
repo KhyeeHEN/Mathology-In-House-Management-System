@@ -22,11 +22,13 @@ $stmt->execute();
 $instructor = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Fetch timetable for the instructor using prepared statement
+// Fetch timetable for the instructor with course details using prepared statement
 $stmt = $conn->prepare("SELECT it.id, it.day, TIME_FORMAT(it.start_time, '%h:%i %p') AS start_time, 
-                       TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, it.course, it.instructor_course_id
+                       TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, it.course, it.instructor_course_id,
+                       c.course_name AS course_from_courses
                        FROM instructor_timetable it
-                       JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
+                       LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
+                       LEFT JOIN courses c ON ic.course_id = c.course_id
                        WHERE ic.instructor_id = ? AND it.status = 'active'
                        ORDER BY FIELD(it.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), it.start_time");
 $stmt->bind_param("i", $instructor_id);
@@ -199,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <td><?= htmlspecialchars($entry['day']) ?></td>
                                     <td><?= htmlspecialchars($entry['start_time']) ?></td>
                                     <td><?= htmlspecialchars($entry['end_time']) ?></td>
-                                    <td><?= htmlspecialchars($entry['course']) ?></td>
+                                    <td><?= htmlspecialchars($entry['course'] ?: $entry['course_from_courses'] ?? 'Not specified') ?></td>
                                     <td>
                                         <button onclick="showEditForm(<?= $entry['id'] ?>)">Edit</button>
                                     </td>
@@ -231,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <label for="course_id">Course:</label>
                                                     <select name="course_id" required>
                                                         <?php foreach ($all_courses as $course): ?>
-                                                            <option value="<?= $course['course_id'] ?>" <?= $entry['course'] == $course['course_name'] ? 'selected' : '' ?>>
+                                                            <option value="<?= $course['course_id'] ?>" <?= ($entry['course'] == $course['course_name'] || $entry['course_from_courses'] == $course['course_name']) ? 'selected' : '' ?>>
                                                                 <?= htmlspecialchars($course['course_name']) ?>
                                                             </option>
                                                         <?php endforeach; ?>
