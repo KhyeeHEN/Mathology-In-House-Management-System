@@ -19,11 +19,11 @@
             <i class="fas fa-calendar-alt"></i>
             <span>Student Timetable</span>
         </a>
-        <!-- <a href="../admin/instructor_info.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'instructor_info.php' ? 'active' : ''; ?>">
+        <a href="../admin/instructor_timetable.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'instructor_timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
             <span>Instructor</span>
-        </a> -->
+        </a>
         <a href="../admin/users.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
             <i class="fas fa-users"></i>
