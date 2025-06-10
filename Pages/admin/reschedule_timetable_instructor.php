@@ -24,11 +24,9 @@ $stmt->close();
 
 // Fetch timetable for the instructor with course details using prepared statement
 $stmt = $conn->prepare("SELECT it.id, it.day, TIME_FORMAT(it.start_time, '%h:%i %p') AS start_time, 
-                       TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, it.course, it.instructor_course_id,
-                       c.course_name AS course_from_courses
+                       TIME_FORMAT(it.end_time, '%h:%i %p') AS end_time, it.course, it.instructor_course_id
                        FROM instructor_timetable it
-                       LEFT JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
-                       LEFT JOIN courses c ON ic.course_id = c.course_id
+                       JOIN instructor_courses ic ON it.instructor_course_id = ic.instructor_course_id
                        WHERE ic.instructor_id = ? AND it.status = 'active'
                        ORDER BY FIELD(it.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), it.start_time");
 $stmt->bind_param("i", $instructor_id);
@@ -36,10 +34,16 @@ $stmt->execute();
 $timetable = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Fetch all courses from the courses table using prepared statement
-$stmt = $conn->prepare("SELECT course_id, course_name FROM courses");
+// Fetch available courses for the instructor using prepared statement
+$stmt = $conn->prepare("
+    SELECT ic.instructor_course_id, c.course_name
+    FROM instructor_courses ic
+    JOIN courses c ON ic.course_id = c.course_id
+    WHERE ic.instructor_id = ? AND ic.status = 'active'
+");
+$stmt->bind_param("i", $instructor_id);
 $stmt->execute();
-$all_courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$courses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 // Handle form submission for rescheduling
@@ -48,24 +52,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $day = $_POST['day'];
     $start_time = date('H:i:s', strtotime($_POST['start_time']));
     $end_time = date('H:i:s', strtotime($_POST['end_time']));
-    $course_id = $_POST['course_id']; // Changed from instructor_course_id to course_id
+    $instructor_course_id = $_POST['instructor_course_id'];
 
     if (strtotime($start_time) >= strtotime($end_time)) {
         $error = "Start time must be before end time.";
     } else {
-        // Fetch course name for the selected course_id
-        $stmt = $conn->prepare("SELECT course_name FROM courses WHERE course_id = ?");
-        $stmt->bind_param("i", $course_id);
+        // Fetch course name for the selected instructor_course_id
+        $stmt = $conn->prepare("SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM instructor_courses WHERE instructor_course_id = ?)");
+        $stmt->bind_param("i", $instructor_course_id);
         $stmt->execute();
         $course_result = $stmt->get_result()->fetch_assoc();
         $course_name = $course_result['course_name'];
         $stmt->close();
 
-        // Update timetable entry using prepared statement, setting instructor_course_id to NULL
+        // Update timetable entry using prepared statement
         $stmt = $conn->prepare("UPDATE instructor_timetable 
-                               SET day = ?, start_time = ?, end_time = ?, course = ?, instructor_course_id = NULL
+                               SET day = ?, start_time = ?, end_time = ?, instructor_course_id = ?, course = ?
                                WHERE id = ?");
-        $stmt->bind_param("sssii", $day, $start_time, $end_time, $course_name, $timetable_id);
+        $stmt->bind_param("sssisi", $day, $start_time, $end_time, $instructor_course_id, $course_name, $timetable_id);
         if ($stmt->execute()) {
             header("Location: instructor_timetable.php?instructor_id=$instructor_id&message=Timetable entry rescheduled successfully");
             exit();
@@ -201,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <td><?= htmlspecialchars($entry['day']) ?></td>
                                     <td><?= htmlspecialchars($entry['start_time']) ?></td>
                                     <td><?= htmlspecialchars($entry['end_time']) ?></td>
-                                    <td><?= htmlspecialchars($entry['course'] ?: $entry['course_from_courses'] ?? 'Not specified') ?></td>
+                                    <td><?= htmlspecialchars($entry['course'] ?? 'Not specified') ?></td>
                                     <td>
                                         <button onclick="showEditForm(<?= $entry['id'] ?>)">Edit</button>
                                     </td>
@@ -230,10 +234,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="time" name="end_time" value="<?= date('H:i', strtotime($entry['end_time'])) ?>" required>
                                                 </div>
                                                 <div>
-                                                    <label for="course_id">Course:</label>
-                                                    <select name="course_id" required>
-                                                        <?php foreach ($all_courses as $course): ?>
-                                                            <option value="<?= $course['course_id'] ?>" <?= ($entry['course'] == $course['course_name'] || $entry['course_from_courses'] == $course['course_name']) ? 'selected' : '' ?>>
+                                                    <label for="instructor_course_id">Course:</label>
+                                                    <select name="instructor_course_id" required>
+                                                        <?php foreach ($courses as $course): ?>
+                                                            <option value="<?= $course['instructor_course_id'] ?>" <?= $entry['instructor_course_id'] == $course['instructor_course_id'] ? 'selected' : '' ?>>
                                                                 <?= htmlspecialchars($course['course_name']) ?>
                                                             </option>
                                                         <?php endforeach; ?>
