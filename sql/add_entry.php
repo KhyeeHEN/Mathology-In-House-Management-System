@@ -296,8 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             ?>
         </select><br>
-        <label for="course_level">Course Level:</label>
-        <input type="text" id="course_level" name="course_level" readonly><br>
         <label for="enrollment_date">Enrollment Date:</label>
         <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
         <label for="student_day">Day:</label>
@@ -434,7 +432,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-        
+
         function filterCoursesByLevel() {
             const selectedLevel = document.getElementById('course_level_select').value;
             const courseSelect = document.getElementById('student_course');
