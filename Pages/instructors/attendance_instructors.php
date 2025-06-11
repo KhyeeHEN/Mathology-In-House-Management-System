@@ -1,5 +1,22 @@
 <?php
 include '../setting.php';
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    echo "Unauthorized access.";
+    exit;
+}
+
+$instructor_id = intval($_SESSION['user_id']);
+
+$query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
+$result = $conn->query($query);
+if (!$result || $result->num_rows === 0) {
+    echo "Instructor not found or not authorized.";
+    exit;
+}
+$row = $result->fetch_assoc();
+$instructor_id = intval($row['instructor_id']);
 
 // Messages
 $message = isset($_GET['message']) ? $_GET['message'] : null;
@@ -67,7 +84,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
             <!-- Attendance Table -->
             <div class="table-container">
-                <?php include '../../sql/attendance_data.php'; ?>
+                <?php include '../../sql/attendance_data_instructor_view.php'; ?>
             </div>
         </main>
     </div>
