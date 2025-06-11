@@ -15,6 +15,9 @@ $query = "
 ";
 $result = $conn->query($query);
 
+$coursesSql = "SELECT course_id, course_name, level FROM courses ORDER BY course_name";
+$coursesResult = $conn->query($coursesSql);
+
 if ($result->num_rows === 0) {
     die("Attendance record not found.");
 }
@@ -175,7 +178,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
 
         <label for="course">Course:</label>
-        <input type="text" name="course" value="<?php echo htmlspecialchars($record['course']); ?>" required><br>
+        <select name="course" id="course" required>
+            <option value="">-- select course --</option>
+            <?php while ($c = $coursesResult->fetch_assoc()): ?>
+                <option
+                    value="<?= htmlspecialchars($c['course_name']) ?>"
+                    <?= ($c['course_name'] === $record['course']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($c['course_name'] . ' (' . $c['level'] . ')') ?>
+                </option>
+            <?php endwhile; ?>
+        </select><br>
 
         <button type="submit">Update</button>
         <a href="../Pages/admin/attendance.php">Cancel</a>
