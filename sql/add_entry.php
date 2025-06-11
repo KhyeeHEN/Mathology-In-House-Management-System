@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $start_time = $conn->real_escape_string($_POST['Start_Time']);
                 $end_time = $conn->real_escape_string($_POST['End_Time']);
                 $how_did_you_heard_about_us = $conn->real_escape_string($_POST['How_Did_You_Heard_About_Us']);
+
+                // Primary contact
                 $primary_owner_last_name = $conn->real_escape_string($_POST['primary_owner_last_name']);
                 $primary_owner_first_name = $conn->real_escape_string($_POST['primary_owner_first_name']);
                 $primary_relationship = $conn->real_escape_string($_POST['primary_relationship']);
@@ -264,21 +266,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             ?>
         </select><br>
-        <input type="text" id="student_mathology_level" name="Mathology_Level"><br>
         <label for="student_email">Email:</label>
         <input type="email" id="student_email" name="email" required><br>
         <label for="student_password">Password:</label>
         <input type="password" id="student_password" name="password" required><br><br>
         <label for="student_course">Course:</label>
-        <select id="student_course" name="course_id" required>
+        <select id="student_course" name="course_id" required onchange="updateCourseLevel()">
+            <option value="">Select Course</option>
             <?php
-            // Fetch available courses from the database
-            $courses = $conn->query("SELECT course_id, course_name FROM courses");
+            $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
             while ($course = $courses->fetch_assoc()) {
-                echo "<option value='{$course['course_id']}'>{$course['course_name']}</option>";
+                $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
+                $level = htmlspecialchars($course['level'], ENT_QUOTES);
+                echo "<option value='{$course['course_id']}' data-level='$level'>{$course_name}</option>";
             }
             ?>
         </select><br>
+        <label for="course_level">Course Level:</label>
+        <input type="text" id="course_level" name="course_level" readonly><br>
         <label for="enrollment_date">Enrollment Date:</label>
         <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
         <label for="student_day">Day:</label>
@@ -416,6 +421,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+        // JavaScript to show the Course Level when a course is selected
+        function updateCourseLevel() {
+            const select = document.getElementById('student_course');
+            const selected = select.options[select.selectedIndex];
+            document.getElementById('course_level').value = selected.getAttribute('data-level') || '';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            setWorkingDaysState();
+            updateCourseLevel();
+        });
 
         // JavaScript to disable/enable Working_Days based on Employment_Type using event and also on load
         document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
