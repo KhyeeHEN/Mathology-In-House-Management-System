@@ -1,7 +1,10 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-$student_id = isset($_GET['instructor_id']) ? intval($_GET['instructor_id']) : 0;
+if (!isset($_GET['instructor_id'])) {
+    header("Location: ../Pages/admin/users.php?active_tab=instructors");
+    exit();
+}
 
 $instructor_id = intval($_GET['id']);
 $error = null;
