@@ -1,8 +1,8 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-if (!isset($_SESSION['user_id'])) {
-    echo "Unauthorized access.";
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /login.php');
     exit;
 }
 
