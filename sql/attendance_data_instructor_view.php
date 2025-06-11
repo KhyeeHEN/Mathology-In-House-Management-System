@@ -64,7 +64,7 @@ $sql = "
        s.First_Name AS student_first_name,
        s.Last_Name AS student_last_name,
        i.First_Name AS instructor_first_name,
-       i.Last_Name AS instructor_last_name
+       i.Last_Name AS instructor_last_name,
        c.course_name AS course_name,
        c.level AS course_level
 FROM attendance_records ar
