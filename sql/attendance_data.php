@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 include '../setting.php';
 
 if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
