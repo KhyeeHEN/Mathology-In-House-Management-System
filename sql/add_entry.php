@@ -285,16 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
         <label for="student_course">Course:</label>
         <select id="student_course" name="course_id" required>
-            <option value="">Select Course</option>
-            <?php
-            // Output all courses as options with data-level attribute
-            $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
-            while ($course = $courses->fetch_assoc()) {
-                $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
-                $level = htmlspecialchars($course['level'], ENT_QUOTES);
-                echo "<option value='{$course['course_id']}' data-level=\"$level\">{$course_name}</option>";
-            }
-            ?>
+            <option value="">Select Level</option>
         </select><br>
         <label for="enrollment_date">Enrollment Date:</label>
         <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
@@ -398,7 +389,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="">Select Course</option>
             <!-- Options will be dynamically populated by JS -->
         </select><br>
-
         <div id="part-time-days-times" style="display:none;">
             <label for="instructor_working_days">Working Days:</label>
             <select id="instructor_working_days" name="Working_Days[]" multiple>
