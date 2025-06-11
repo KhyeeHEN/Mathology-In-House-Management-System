@@ -98,6 +98,7 @@ echo "<th>Student Name</th>";
 echo "<th>Attendance</th>";
 echo "<th>Hours Attended</th>";
 echo "<th>Course</th>";
+echo "<th>Status</th>";
 echo "<th>Action</th>";
 echo "  </tr>
         </thead>
@@ -123,6 +124,8 @@ if ($result && $result->num_rows > 0) {
             . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
             . "</td>";
 
+        echo "<td>"  . htmlspecialchars($row['status']) .  "</td>";
+
         // Edit button + show/hide details
         echo "<td>
         <button onclick=\"toggleDetails('details-{$row['record_id']}')\">Show More</button>
@@ -136,7 +139,6 @@ if ($result && $result->num_rows > 0) {
         echo "<tr id='details-{$row['record_id']}' class='details-row' style='display: none;'>";
         echo "<td colspan='6'>
         <div class='details-box'>
-            <p><strong>Status:</strong> " . htmlspecialchars($row['status']) . "</p>
             <p><strong>Timetable:</strong> " . htmlspecialchars($row['timetable_datetime']) . "</p>
             <p><strong>Hours Replacement:</strong> " . htmlspecialchars($row['hours_replacement']) . "</p>
             <p><strong>Hours Remaining:</strong> " . htmlspecialchars($row['hours_remaining']) . "</p>
