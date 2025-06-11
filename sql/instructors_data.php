@@ -162,37 +162,3 @@ if ($result->num_rows > 0) {
         }
     }
 </script>
-
-<!-- <style>
-    .details-box {
-        padding: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-    .action-btn {
-        padding: 5px 10px;
-        margin: 2px;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-    }
-    .action-btn.view { background-color: #2196F3; color: white; }
-    .action-btn.edit { background-color: #4CAF50; color: white; }
-    .action-btn.delete { background-color: #f44336; color: white; }
-    .pagination a {
-        padding: 5px 10px;
-        margin: 0 2px;
-        text-decoration: none;
-        color: #333;
-        background-color: #f1f1f1;
-    }
-    .pagination a.active {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .pagination a.disabled {
-        color: #999;
-        cursor: not-allowed;
-    }
-</style> -->
