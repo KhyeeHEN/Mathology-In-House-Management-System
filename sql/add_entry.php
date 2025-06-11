@@ -134,49 +134,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $working_days = isset($_POST['Working_Days']) ? $conn->real_escape_string(implode(',', (array) $_POST['Working_Days'])) : null;
                 $email = $conn->real_escape_string($_POST['email']);
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
-                $course_ids = $_POST['course_ids']; // Array of selected course IDs
-                $start_time = $conn->real_escape_string($_POST['Start_Time']);
-                $end_time = $conn->real_escape_string($_POST['End_Time']);
 
+                $course_level = $conn->real_escape_string($_POST['course_level']);
+                $course_id = intval($_POST['course_id']);
+
+                $working_days = null;
+                if ($employment_type === 'Part-Time' && isset($_POST['Working_Days'])) {
+                    $working_days_arr = array_map([$conn, 'real_escape_string'], (array) $_POST['Working_Days']);
+                    $working_days = implode(',', $working_days_arr); // Save as comma separated string
+                }
 
                 // Insert into instructor table
-                $insertInstructorQuery = "INSERT INTO instructor (Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status)
-                                          VALUES ('$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status')";
+                $insertInstructorQuery = "INSERT INTO instructor (
+            Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status, Employment_Type, Working_Days, Worked_Days
+        ) VALUES (
+            '$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status', '$employment_type', " . ($working_days ? "'$working_days'" : "NULL") . ", 0
+        )";
                 if (!$conn->query($insertInstructorQuery)) {
                     throw new Exception("Error adding instructor: " . $conn->error);
                 }
-
-                // Get the last inserted instructor ID
                 $instructor_id = $conn->insert_id;
 
                 // Insert into users table
                 $insertUserQuery = "INSERT INTO users (email, password, role, instructor_id)
-                                    VALUES ('$email', '$password', 'instructor', '$instructor_id')";
+                            VALUES ('$email', '$password', 'instructor', '$instructor_id')";
                 if (!$conn->query($insertUserQuery)) {
                     throw new Exception("Error adding user: " . $conn->error);
                 }
 
-                // Insert selected courses into instructor_courses table and create timetable entries
-                foreach ($course_ids as $course_id) {
-                    $course_id = intval($course_id); // Sanitize input
-                    $assigned_date = date('Y-m-d');
-                    $insertInstructorCourseQuery = "INSERT INTO instructor_courses (instructor_id, course_id, assigned_date)
-                                                    VALUES ('$instructor_id', '$course_id', '$assigned_date')";
-                    if (!$conn->query($insertInstructorCourseQuery)) {
-                        throw new Exception("Error adding instructor course: " . $conn->error);
-                    }
-                    $instructor_course_id = $conn->insert_id;
+                // Insert instructor_courses (associate instructor with course)
+                $assigned_date = date('Y-m-d');
+                $insertInstructorCourseQuery = "INSERT INTO instructor_courses (instructor_id, course_id, assigned_date)
+                                        VALUES ('$instructor_id', '$course_id', '$assigned_date')";
+                if (!$conn->query($insertInstructorCourseQuery)) {
+                    throw new Exception("Error adding instructor course: " . $conn->error);
+                }
+                $instructor_course_id = $conn->insert_id;
 
-                    // Optionally, get timetable info from form. For demo, insert a blank timetable entry per instructor_course.
+                // Insert instructor_timetable
+                if ($employment_type === 'Part-Time' && isset($_POST['Working_Days'])) {
+                    foreach ($_POST['Working_Days'] as $day) {
+                        $day = $conn->real_escape_string($day);
+                        $start_time = isset($_POST['start_time'][$day]) ? $conn->real_escape_string($_POST['start_time'][$day]) : '00:00:00';
+                        $end_time = isset($_POST['end_time'][$day]) ? $conn->real_escape_string($_POST['end_time'][$day]) : '00:00:00';
+                        $insertTimetableQuery = "INSERT INTO instructor_timetable (day, start_time, end_time, status, instructor_course_id, course)
+                                         VALUES ('$day', '$start_time', '$end_time', 'active', '$instructor_course_id', '')";
+                        if (!$conn->query($insertTimetableQuery)) {
+                            throw new Exception("Error adding instructor timetable: " . $conn->error);
+                        }
+                    }
+                } else {
+                    // For Full-Time, insert a blank timetable entry (or a default if needed)
                     $insertTimetableQuery = "INSERT INTO instructor_timetable (day, start_time, end_time, status, instructor_course_id, course)
-                                             VALUES ('Monday', '$start_time', '$end_time', 'active', '$instructor_course_id', $course_id)";
+                                     VALUES ('', '00:00:00', '00:00:00', 'active', '$instructor_course_id', '')";
                     if (!$conn->query($insertTimetableQuery)) {
-                        throw new Exception("Error adding instructor timetable: " . $conn->error);
+                        throw new Exception("Error adding blank instructor timetable: " . $conn->error);
                     }
                 }
 
+                // Insert a blank attendance record 
                 $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id)
-                                         VALUES ('$instructor_id')";
+                                 VALUES ('$instructor_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
                 }
