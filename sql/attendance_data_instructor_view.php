@@ -73,14 +73,14 @@ $sql = "
 ";
 
 if (!empty($search)) {
-    $sql .= " WHERE
+    $sql .= " AND (
         s.First_Name LIKE '%$search%' OR
         s.Last_Name LIKE '%$search%' OR
-        i.First_Name LIKE '%$search%' OR
-        i.Last_Name LIKE '%$search%' OR
         ar.course LIKE '%$search%' OR
-        ar.status LIKE '%$search%' ";
+        ar.status LIKE '%$search%'
+    )";
 }
+
 
 $sql .= " ORDER BY $sort_column $sort_direction";
 
