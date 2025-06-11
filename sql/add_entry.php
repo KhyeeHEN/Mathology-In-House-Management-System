@@ -198,8 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 // Insert a blank attendance record 
-                $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id)
-                                 VALUES ('$instructor_id')";
+                $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id, course)
+                                 VALUES ('$instructor_id', '$course_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
                 }
