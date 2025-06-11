@@ -34,19 +34,6 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar_Instructor.php"); ?>
 
-            <!-- Messages -->
-            <?php if ($message): ?>
-                <div style="color: green; font-weight: bold;"><?php echo htmlspecialchars($message); ?></div>
-            <?php endif; ?>
-            <?php if ($error): ?>
-                <div style="color: red; font-weight: bold;"><?php echo htmlspecialchars($error); ?></div>
-            <?php endif; ?>
-            <br>
-            <br>
-
-
-            <br><br>
-
             <!-- Search -->
             <div class="search-bar">
                 <form method="GET" action="attendance_instructors.php">
