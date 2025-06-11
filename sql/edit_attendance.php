@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hours_replacement = floatval($_POST['hours_replacement']);
     $hours_remaining = floatval($_POST['hours_remaining']);
     $status = $conn->real_escape_string($_POST['status']);
-    $course = $conn->real_escape_string($_POST['course']);
+    $course_id = intval($_POST['course_id']);
 
     $updateSql = "
         UPDATE attendance_records SET
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             hours_replacement = $hours_replacement,
             hours_remaining = $hours_remaining,
             status = '$status',
-            course = '$course',
+            course = '$course_id',
             updated_at = NOW()
         WHERE record_id = $record_id
     ";
@@ -196,13 +196,13 @@ if ($conn->query($updateSql)) {
             <option value="replacement_booked" <?php if ($record['status'] == 'replacement_booked') echo 'selected'; ?>>Replacement booked</option>
         </select><br>
 
-        <label for="course">Course:</label>
-        <select name="course" id="course" required>
+        <label for="course_id">Course:</label>
+        <select name="course_id" id="course_id" required>
             <option value="">-- select course --</option>
             <?php while ($c = $coursesResult->fetch_assoc()): ?>
                 <option
                     value="<?= htmlspecialchars($c['course_name']) ?>"
-                    <?= ($c['course_name'] === $record['course']) ? 'selected' : '' ?>>
+                    <?= ($c['course_id'] === $record['course']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($c['course_name'] . ' (' . $c['level'] . ')') ?>
                 </option>
             <?php endwhile; ?>
