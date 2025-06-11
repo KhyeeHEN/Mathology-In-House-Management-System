@@ -65,6 +65,8 @@ $sql = "
        s.Last_Name AS student_last_name,
        i.First_Name AS instructor_first_name,
        i.Last_Name AS instructor_last_name
+       c.course_name AS course_name,
+       c.level AS course_level
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
@@ -117,7 +119,9 @@ if ($result && $result->num_rows > 0) {
         echo "<td>" . htmlspecialchars($row['hours_attended']) . "</td>";
 
         // Show course
-        echo "<td>" . htmlspecialchars($row['course']) . "</td>";
+        echo "<td>"
+            . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
+            . "</td>";
 
         // Edit button + show/hide details
         echo "<td>
