@@ -169,9 +169,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <label for="status">Status:</label>
         <select name="status" required>
-            <option value="Present" <?php if ($record['status'] == 'Present') echo 'selected'; ?>>Present</option>
-            <option value="Absent" <?php if ($record['status'] == 'Absent') echo 'selected'; ?>>Absent</option>
-            <option value="Excused" <?php if ($record['status'] == 'Excused') echo 'selected'; ?>>Excused</option>
+            <option value="attended" <?php if ($record['status'] == 'attended') echo 'selected'; ?>>Attended</option>
+            <option value="missed" <?php if ($record['status'] == 'missed') echo 'selected'; ?>>Missed</option>
+            <option value="replacement_booked" <?php if ($record['status'] == 'replacement_booked') echo 'selected'; ?>>Replacement booked</option>
         </select><br>
 
         <label for="course">Course:</label>
