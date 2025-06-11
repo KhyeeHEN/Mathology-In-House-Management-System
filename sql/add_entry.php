@@ -271,6 +271,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="student_password">Password:</label>
         <input type="password" id="student_password" name="password" required><br><br>
         <label for="student_course">Course:</label>
+        <!-- Course selection with levels -->
+        <label for="student_course">Course:</label>
         <select id="student_course" name="course_id" required onchange="updateCourseLevel()">
             <option value="">Select Course</option>
             <?php
@@ -283,6 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ?>
         </select><br>
         <label for="course_level">Course Level:</label>
+        <input type="text" id="course_level" name="course_level" readonly><br>
         <input type="text" id="course_level" name="course_level" readonly><br>
         <label for="enrollment_date">Enrollment Date:</label>
         <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
@@ -318,7 +321,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="primary_postcode">Postcode:</label>
             <input type="text" id="primary_postcode" name="primary_postcode" required><br>
         </fieldset>
-        <!-- Add Secondary Contact Section -->
         <fieldset style="margin-top:10px;">
             <legend>Secondary Contact</legend>
             <label for="secondary_owner_last_name">Last Name:</label>
