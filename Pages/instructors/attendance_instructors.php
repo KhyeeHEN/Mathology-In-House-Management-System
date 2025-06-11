@@ -9,6 +9,15 @@ if (!isset($_SESSION['user_id'])) {
 
 $instructor_id = intval($_SESSION['user_id']);
 
+$query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
+$result = $conn->query($query);
+if (!$result || $result->num_rows === 0) {
+    echo "Instructor not found or not authorized.";
+    exit;
+}
+$row = $result->fetch_assoc();
+$instructor_id = intval($row['instructor_id']);
+
 // Messages
 $message = isset($_GET['message']) ? $_GET['message'] : null;
 $error = isset($_GET['error']) ? $_GET['error'] : null;
