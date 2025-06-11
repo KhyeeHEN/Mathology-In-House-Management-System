@@ -1,12 +1,12 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-if (!isset($_GET['student_id'])) {
+if (!isset($_GET['id'])) {
     header("Location: ../Pages/admin/users.php?active_tab=students");
     exit();
 }
 
-$student_id = intval($_GET['student_id']);
+$student_id = intval($_GET['id']);
 $error = null;
 
 // Fetch student data
@@ -62,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $school = $conn->real_escape_string($_POST['School']);
         $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
         $how_did_you_heard_about_us = $conn->real_escape_string($_POST['How_Did_You_Heard_About_Us']);
+        $primary_contact = $conn->real_escape_string($_POST['primary_contact']);
+        $secondary_contact = $conn->real_escape_string($_POST['secondary_contact']);
 
         $course_level = $conn->real_escape_string($_POST['course_level']);
         $course_id = intval($_POST['course_id']);
@@ -81,7 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Current_School_Grade='$current_grade',
             School='$school',
             Mathology_Level='$mathology_level',
-            How_Did_You_Heard_About_Us='$how_did_you_heard_about_us'
+            How_Did_You_Heard_About_Us='$how_did_you_heard_about_us',
+            primary_contact='$primary_contact',
+            secondary_contact='$secondary_contact'
             WHERE student_id = $student_id";
         if (!$conn->query($updateStudentQuery)) {
             throw new Exception("Error updating student: " . $conn->error);
@@ -157,6 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="student_mathology_level" name="Mathology_Level" value="<?=htmlspecialchars($student['Mathology_Level'])?>"><br>
         <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
         <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100" value="<?=htmlspecialchars($student['How_Did_You_Heard_About_Us'])?>"><br>
+        <label for="student_primary_contact">Primary Contact:</label>
+        <input type="text" id="student_primary_contact" name="primary_contact" pattern="[0-9]{10,12}" maxlength="12" value="<?=htmlspecialchars($student['primary_contact'])?>" required><br>
+        <label for="student_secondary_contact">Secondary Contact:</label>
+        <input type="text" id="student_secondary_contact" name="secondary_contact" pattern="[0-9]{10,12}" maxlength="12" value="<?=htmlspecialchars($student['secondary_contact'])?>"><br>
         
         <!-- Course Level and Name selection -->
         <label for="student_course_level">Course Level:</label>
