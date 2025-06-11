@@ -67,7 +67,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                     </select>
 
                     <button type="submit">Search/Sort</button>
-                    <button type="button" id="reset-button" onclick="window.location='attendance.php'">Reset</button>
+                    <button type="button" id="reset-button" onclick="window.location='attendance_instructors.php'">Reset</button>
                 </form>
             </div>
 
@@ -78,16 +78,13 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         </main>
     </div>
 
-    <script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script>
+    <!--<script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script> -->
     <script>
         function toggleDetails(id) {
             const row = document.getElementById(id);
             row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
         }
     </script>
-
-
-
 </body>
 
 </html>
