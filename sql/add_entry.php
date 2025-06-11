@@ -134,6 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $working_days = isset($_POST['Working_Days']) ? $conn->real_escape_string(implode(',', (array) $_POST['Working_Days'])) : null;
                 $email = $conn->real_escape_string($_POST['email']);
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
+                $contact = $conn->real_escape_string($_POST['contact']);
+                $hiring_status = $conn->real_escape_string($_POST['hiring_status']);
+                $total_hours = floatval($_POST['Total_Hours']);
 
                 $course_level = $conn->real_escape_string($_POST['course_level']);
                 $course_id = intval($_POST['course_id']);
@@ -146,9 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Insert into instructor table
                 $insertInstructorQuery = "INSERT INTO instructor (
-            Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status, Employment_Type, Working_Days, Worked_Days
+            Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status,
+            Employment_Type, Working_Days, Worked_Days, contact, hiring_status, Total_Hours
         ) VALUES (
-            '$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status', '$employment_type', " . ($working_days ? "'$working_days'" : "NULL") . ", 0
+            '$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status',
+            '$employment_type', " . ($working_days ? "'$working_days'" : "NULL") . ", 0, '$contact', '$hiring_status', $total_hours
         )";
                 if (!$conn->query($insertInstructorQuery)) {
                     throw new Exception("Error adding instructor: " . $conn->error);
@@ -377,6 +382,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea id="instructor_remark" name="Remark"></textarea><br>
         <label for="instructor_training_status">Training Status:</label>
         <input type="text" id="instructor_training_status" name="Training_Status"><br>
+        <label for="instructor_contact">Contact Number:</label>
+        <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" required><br>
+        <label for="instructor_hiring_status">Hiring Status:</label>
+        <select id="instructor_hiring_status" name="hiring_status" required>
+            <option value="true">Hired</option>
+            <option value="false">Not Hired</option>
+        </select><br>
+        <label for="instructor_total_hours">Total Hours:</label>
+        <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" required><br>
         <label for="instructor_employment_type">Employment Type:</label>
         <select id="instructor_employment_type" name="Employment_Type" required>
             <option value="Full-Time">Full-Time</option>
