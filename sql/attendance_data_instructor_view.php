@@ -7,15 +7,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = intval($_SESSION['user_id']);
-echo "User ID: $user_id<br>";
 
 // Fetch instructor_id from users table
 $query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
-echo "SQL Query: $query<br>";
 $result = $conn->query($query);
-echo "Query Result: ";
-var_dump($result);
-echo "<br>";
+
 
 if (!$result || $result->num_rows === 0) {
     echo "Instructor not found or unauthorized.";
@@ -23,11 +19,7 @@ if (!$result || $result->num_rows === 0) {
 }
 
 $row = $result->fetch_assoc();
-echo "Fetched Row: ";
-print_r($row);
-echo "<br>";
 $instructor_id = intval($row['instructor_id']);
-echo "Instructor ID: $instructor_id<br>";
 
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'timetable_datetime';
@@ -68,17 +60,17 @@ switch ($sort) {
 }
 
 $sql = "
-    SELECT ar.*,
-           s.First_Name AS student_first_name,
-           s.Last_Name AS student_last_name,
-           i.First_Name AS instructor_first_name,
-           i.Last_Name AS instructor_last_name
-    FROM attendance_records ar
-    LEFT JOIN students s ON ar.student_id = s.student_id
-    LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
-    LEFT JOIN courses c ON ar.course = c.course_name
-    LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
-    WHERE ic.instructor_id = $instructor_id AND ic.status = 'active'
+  SELECT ar.*,
+       s.First_Name AS student_first_name,
+       s.Last_Name AS student_last_name,
+       i.First_Name AS instructor_first_name,
+       i.Last_Name AS instructor_last_name
+FROM attendance_records ar
+LEFT JOIN students s ON ar.student_id = s.student_id
+LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+LEFT JOIN courses c ON ar.course = c.course_id
+LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
+WHERE ic.instructor_id = $instructor_id AND ic.status = 'active'
 ";
 
 if (!empty($search)) {
