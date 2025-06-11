@@ -1,4 +1,25 @@
 <?php
+
+
+if (!isset($_SESSION['user_id'])) {
+    echo "Unauthorized access.";
+    exit;
+}
+
+$user_id = intval($_SESSION['user_id']);
+
+// Fetch instructor_id from users table
+$query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
+$result = $conn->query($query);
+
+if (!$result || $result->num_rows === 0) {
+    echo "Instructor not found or unauthorized.";
+    exit;
+}
+
+$row = $result->fetch_assoc();
+$instructor_id = intval($row['instructor_id']);
+
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'timetable_datetime';
 $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
