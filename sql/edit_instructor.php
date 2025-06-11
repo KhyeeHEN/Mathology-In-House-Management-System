@@ -6,7 +6,7 @@ if (!isset($_GET['instructor_id'])) {
     exit();
 }
 
-$instructor_id = intval($_GET['id']);
+$instructor_id = intval($_GET['instructor_id']);
 $error = null;
 
 // Fetch instructor data
