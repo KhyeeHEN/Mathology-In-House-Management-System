@@ -373,97 +373,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="Full-Time">Full-Time</option>
             <option value="Part-Time">Part-Time</option>
         </select><br>
-        <label for="instructor_working_days">Working Days:</label>
-        <select id="instructor_working_days" name="Working_Days[]" multiple>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
+
+        <!-- Course Level and Name selection -->
+        <label for="instructor_course_level">Course Level:</label>
+        <select id="instructor_course_level" name="course_level" required>
+            <option value="">Select Level</option>
+            <?php
+            // Get enum values for level from courses table
+            $levelEnumRes = $conn->query("SHOW COLUMNS FROM courses LIKE 'level'");
+            $levelRow = $levelEnumRes->fetch_assoc();
+            preg_match("/^enum\((.*)\)$/", $levelRow['Type'], $matches);
+            $levels = [];
+            if (isset($matches[1])) {
+                foreach (explode(",", $matches[1]) as $level) {
+                    $val = trim($level, "'");
+                    $levels[] = $val;
+                    echo "<option value=\"$val\">$val</option>";
+                }
+            }
+            ?>
         </select><br>
+        <label for="instructor_course_name">Course Name:</label>
+        <select id="instructor_course_name" name="course_id" required>
+            <option value="">Select Course</option>
+            <!-- Options will be dynamically populated by JS -->
+        </select><br>
+
+        <div id="part-time-days-times" style="display:none;">
+            <label for="instructor_working_days">Working Days:</label>
+            <select id="instructor_working_days" name="Working_Days[]" multiple>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+            <div id="day-times-container"></div>
+        </div>
+        <br>
         <label for="instructor_email">Email:</label>
         <input type="email" id="instructor_email" name="email" required><br>
         <label for="instructor_password">Password:</label>
         <input type="password" id="instructor_password" name="password" required><br>
-        <label for="instructor_courses">Courses:</label>
-        <select id="instructor_courses" name="course_ids[]" multiple required>
-            <?php
-            // Fetch available courses from the database
-            $courses = $conn->query("SELECT course_id, course_name FROM courses");
-            while ($course = $courses->fetch_assoc()) {
-                echo "<option value='{$course['course_id']}'>{$course['course_name']}</option>";
-            }
-            ?>
-        </select><br><br>
         <button type="submit">Add Instructor</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
 
-
     <script>
+        const allCourses = <?php
+        $courses = [];
+        $res = $conn->query("SELECT course_id, course_name, level FROM courses");
+        while ($row = $res->fetch_assoc()) {
+            $courses[] = $row;
+        }
+        echo json_encode($courses);
+        ?>;
+
+        document.getElementById('instructor_course_level').addEventListener('change', function () {
+            const selectedLevel = this.value;
+            const nameSelect = document.getElementById('instructor_course_name');
+            nameSelect.innerHTML = '<option value="">Select Course</option>';
+            allCourses.forEach(function (course) {
+                if (course.level === selectedLevel) {
+                    const opt = document.createElement('option');
+                    opt.value = course.course_id;
+                    opt.textContent = course.course_name;
+                    nameSelect.appendChild(opt);
+                }
+            });
+        });
+
+        // --- Employment type logic: days, time ranges ---
+        function setWorkingDaysState() {
+            const employmentType = document.getElementById('instructor_employment_type');
+            const daysDiv = document.getElementById('part-time-days-times');
+            const workingDaysInput = document.getElementById('instructor_working_days');
+            const dayTimesContainer = document.getElementById('day-times-container');
+            if (employmentType.value === 'Part-Time') {
+                daysDiv.style.display = '';
+                workingDaysInput.disabled = false;
+                // Show/hide time pickers for each selected day
+                updateDayTimes();
+            } else {
+                daysDiv.style.display = 'none';
+                workingDaysInput.disabled = true;
+                dayTimesContainer.innerHTML = '';
+                // Deselect all
+                for (let i = 0; i < workingDaysInput.options.length; i++) {
+                    workingDaysInput.options[i].selected = false;
+                }
+            }
+        }
+        document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
+
+        // Show time pickers for each selected day (Part-Time only)
+        function updateDayTimes() {
+            const workingDaysInput = document.getElementById('instructor_working_days');
+            const dayTimesContainer = document.getElementById('day-times-container');
+            dayTimesContainer.innerHTML = '';
+            Array.from(workingDaysInput.selectedOptions).forEach(option => {
+                const day = option.value;
+                const div = document.createElement('div');
+                div.innerHTML = `
+                <label>${day} Start:</label>
+                <input type="time" name="start_time[${day}]" required>
+                <label>End:</label>
+                <input type="time" name="end_time[${day}]" required>
+            `;
+                dayTimesContainer.appendChild(div);
+            });
+        }
+        document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
+
+        // On page load or form show
+        document.addEventListener('DOMContentLoaded', function () {
+            setWorkingDaysState();
+        });
+
+        // When switching to instructor form (if your toggleForms is used)
         function toggleForms() {
             const userType = document.getElementById('user_type').value;
             const studentForm = document.getElementById('student-form');
             const instructorForm = document.getElementById('instructor-form');
-
             if (userType === 'student') {
                 studentForm.style.display = 'block';
                 instructorForm.style.display = 'none';
             } else if (userType === 'instructor') {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'block';
+                setWorkingDaysState();
             } else {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'none';
             }
         }
-
-        // JavaScript to disable/enable Working_Days based on Employment_Type
-        function setWorkingDaysState() {
-            const employmentType = document.getElementById('instructor_employment_type');
-            const workingDaysInput = document.getElementById('instructor_working_days');
-            workingDaysInput.disabled = employmentType.value === 'Full-Time';
-            if (employmentType.value === 'Full-Time') {
-                // Deselect all options
-                for (let i = 0; i < workingDaysInput.options.length; i++) {
-                    workingDaysInput.options[i].selected = false;
-                }
-            }
-        }
-
-        function filterCoursesByLevel() {
-            const selectedLevel = document.getElementById('course_level_select').value;
-            const courseSelect = document.getElementById('student_course');
-            for (let i = 0; i < courseSelect.options.length; i++) {
-                const option = courseSelect.options[i];
-                if (!option.value) { // keep the "Select Course" option always visible
-                    option.style.display = '';
-                    continue;
-                }
-                if (selectedLevel === '' || option.getAttribute('data-level') === selectedLevel) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            }
-            // Reset selection if currently selected course doesn't match
-            if (
-                courseSelect.selectedIndex !== 0 &&
-                courseSelect.options[courseSelect.selectedIndex].getAttribute('data-level') !== selectedLevel
-            ) {
-                courseSelect.selectedIndex = 0;
-            }
-        }
-
-    // JavaScript to disable/enable Working_Days based on Employment_Type using event and also on load
-    document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
-
-    // Ensure the correct state when the page loads (e.g. after validation error)
-    document.addEventListener('DOMContentLoaded', setWorkingDaysState);
-
-    document.addEventListener('DOMContentLoaded', filterCoursesByLevel);
     </script>
 </body>
 
