@@ -11,21 +11,11 @@ $error = null;
 
 // Fetch instructor data
 $instructorRes = $conn->query("SELECT * FROM instructor WHERE instructor_id = $instructor_id");
-$instructor = ($instructorRes && $instructorRes->num_rows > 0) ? $instructorRes->fetch_assoc() : [
-    // Provide default empty values so fields are always open
-    'Last_Name' => '',
-    'First_Name' => '',
-    'Gender' => '',
-    'DOB' => '',
-    'Highest_Education' => '',
-    'Remark' => '',
-    'Training_Status' => '',
-    'Employment_Type' => 'Full-Time',
-    'Working_Days' => '',
-    'contact' => '',
-    'hiring_status' => 'true',
-    'Total_Hours' => '',
-];
+if (!$instructorRes || $instructorRes->num_rows === 0) {
+    header("Location: ../Pages/admin/users.php?active_tab=instructors");
+    exit();
+}
+$instructor = $instructorRes->fetch_assoc();
 
 // Fetch courses for dropdowns
 $courses = [];
@@ -56,14 +46,6 @@ if ($instCourse) {
     $timetableRes = $conn->query("SELECT * FROM instructor_timetable WHERE instructor_course_id = {$instCourse['instructor_course_id']}");
     while ($row = $timetableRes->fetch_assoc()) {
         $instTimetable[] = $row;
-    }
-}
-
-// Set up defaults if timetable is empty
-$timetableDays = [];
-if (!empty($instTimetable)) {
-    foreach ($instTimetable as $row) {
-        if ($row['day']) $timetableDays[$row['day']] = $row;
     }
 }
 
@@ -201,18 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="instructor_course_level">Course Level:</label>
         <select id="instructor_course_level" name="course_level" required>
             <option value="">Select Level</option>
-            <?php
-            $selected_course_level = '';
-            if ($instCourse) {
-                foreach ($courses as $c) {
-                    if ($c['course_id'] == $instCourse['course_id']) {
-                        $selected_course_level = $c['level'];
-                        break;
-                    }
-                }
-            }
-            foreach ($levels as $level): ?>
-                <option value="<?=$level?>" <?=($selected_course_level == $level) ? 'selected' : ''?>><?=$level?></option>
+            <?php foreach ($levels as $level): ?>
+                <option value="<?=$level?>" <?=($instCourse && $courses[array_search($instCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : ''?>><?=$level?></option>
             <?php endforeach; ?>
         </select><br>
         <label for="instructor_course_name">Course Name:</label>
@@ -240,6 +212,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div id="day-times-container">
                 <?php
                 // Show time inputs for each selected day (from instructor_timetable)
+                $timetableDays = [];
+                foreach ($instTimetable as $row) {
+                    if ($row['day']) $timetableDays[$row['day']] = $row;
+                }
                 foreach ($selected_days as $day):
                     $start = isset($timetableDays[$day]) ? $timetableDays[$day]['start_time'] : '';
                     $end = isset($timetableDays[$day]) ? $timetableDays[$day]['end_time'] : '';
