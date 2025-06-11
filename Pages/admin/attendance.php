@@ -1,6 +1,11 @@
 <?php
+session_start();
 include '../setting.php';
 
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
+    exit;
+}
 // Messages
 $message = isset($_GET['message']) ? $_GET['message'] : null;
 $error = isset($_GET['error']) ? $_GET['error'] : null;
@@ -75,6 +80,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         </main>
     </div>
     <script type="module" src="/Scripts/common.js"></script>
+    <script src="/Scripts/dashboardInstructors.js"></script>
     <script src="/Scripts/attendance.js?v=<?php echo time(); ?>"></script>
     <script>
         function toggleDetails(id) {

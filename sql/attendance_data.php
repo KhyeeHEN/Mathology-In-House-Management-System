@@ -1,4 +1,11 @@
 <?php
+session_start();
+include '../setting.php';
+
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
+    exit;
+}
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'timetable_datetime';
 $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
@@ -38,13 +45,18 @@ switch ($sort) {
 }
 
 $sql = "
-    SELECT
-        ar.*,
-        s.First_Name AS student_first_name, s.Last_Name AS student_last_name,
-        i.First_Name AS instructor_first_name, i.Last_Name AS instructor_last_name
-    FROM attendance_records ar
-    LEFT JOIN students s ON ar.student_id = s.student_id
-    LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+  SELECT ar.*,
+       s.First_Name AS student_first_name,
+       s.Last_Name AS student_last_name,
+       i.First_Name AS instructor_first_name,
+       i.Last_Name AS instructor_last_name,
+       c.course_name AS course_name,
+       c.level AS course_level
+FROM attendance_records ar
+LEFT JOIN students s ON ar.student_id = s.student_id
+LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+LEFT JOIN courses c ON ar.course = c.course_id
+LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
 ";
 
 if (!empty($search)) {
@@ -70,6 +82,7 @@ echo "<th>Student Name</th>";
 echo "<th>Attendance</th>";
 echo "<th>Hours Attended</th>";
 echo "<th>Course</th>";
+echo "<th>Status</th>";
 echo "<th>Action</th>";
 echo "  </tr>
         </thead>
@@ -90,8 +103,12 @@ if ($result && $result->num_rows > 0) {
         // Show hours attended
         echo "<td>" . htmlspecialchars($row['hours_attended']) . "</td>";
 
-        // Show course
-        echo "<td>" . htmlspecialchars($row['course']) . "</td>";
+       // Show course
+        echo "<td>"
+            . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
+            . "</td>";
+
+        echo "<td>"  . htmlspecialchars($row['status']) .  "</td>";
 
         // Edit button + show/hide details
         echo "<td>
@@ -106,7 +123,6 @@ if ($result && $result->num_rows > 0) {
         echo "<tr id='details-{$row['record_id']}' class='details-row' style='display: none;'>";
         echo "<td colspan='6'>
         <div class='details-box'>
-            <p><strong>Status:</strong> " . htmlspecialchars($row['status']) . "</p>
             <p><strong>Timetable:</strong> " . htmlspecialchars($row['timetable_datetime']) . "</p>
             <p><strong>Hours Replacement:</strong> " . htmlspecialchars($row['hours_replacement']) . "</p>
             <p><strong>Hours Remaining:</strong> " . htmlspecialchars($row['hours_remaining']) . "</p>
