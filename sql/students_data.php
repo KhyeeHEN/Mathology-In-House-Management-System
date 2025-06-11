@@ -1,218 +1,198 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
+// Get parameters from the GET request
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$limit = 10; // Default limit per page
+$page = isset($_GET['students_page']) ? intval($_GET['students_page']) : 1; // Default page
+$offset = ($page - 1) * $limit;
 
-if (!isset($_GET['id'])) {
-    header("Location: ../Pages/admin/users.php?active_tab=students");
-    exit();
+// Get total rows for pagination
+$countQuery = "SELECT COUNT(*) AS total FROM students s LEFT JOIN users u ON s.student_id = u.student_id";
+if (!empty($search)) {
+    $countQuery .= " WHERE s.student_id LIKE '%$search%' OR s.Last_Name LIKE '%$search%' OR s.First_Name LIKE '%$search%' OR u.email LIKE '%$search%'";
+}
+$countResult = $conn->query($countQuery);
+$totalRows = $countResult->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $limit);
+
+// Cap the page number to the total pages
+if ($page > $totalPages) {
+    $page = $totalPages;
+}
+if ($page < 1) {
+    $page = 1;
 }
 
-$student_id = intval($_GET['id']);
-$error = null;
+// Base query for students
+$sql = "
+ SELECT 
+        s.student_id, 
+        s.Last_Name, 
+        s.First_Name, 
+        s.Gender, 
+        s.DOB, 
+        s.School_Syllabus, 
+        s.School_Intake, 
+        s.Current_School_Grade, 
+        s.School, 
+        s.Mathology_Level, 
+        s.How_Did_You_Heard_About_Us,
+        u.email, 
+        c.course_name,
+        c.level,
+        pc.phone AS primary_contact,
+        pc.Last_Name AS primary_owner_last_name,
+        pc.First_Name AS primary_owner_first_name,
+        pc.Relationship_with_Student AS primary_relationship,
+        pc.Email AS primary_email,
+        pc.Address AS primary_address,
+        pc.Postcode AS primary_postcode,
+        sc.phone AS secondary_contact,
+        sc.Last_Name AS secondary_owner_last_name,
+        sc.First_Name AS secondary_owner_first_name,
+        sc.Relationship_with_Student AS secondary_relationship,
+        GROUP_CONCAT(CONCAT(st.day, ' (', st.start_time, ' - ', st.end_time, ')') SEPARATOR '<br>') AS timetable
+    FROM 
+        students s
+    LEFT JOIN 
+        users u ON s.student_id = u.student_id
+    LEFT JOIN 
+        student_courses scs ON s.student_id = scs.student_id
+    LEFT JOIN 
+        courses c ON scs.course_id = c.course_id
+    LEFT JOIN 
+        student_timetable st ON scs.student_course_id = st.student_course_id
+    LEFT JOIN 
+        primary_contact_number pc ON s.student_id = pc.student_id
+    LEFT JOIN 
+        secondary_contact_number sc ON s.student_id = sc.student_id
+";
 
-// Fetch student data
-$studentRes = $conn->query("SELECT * FROM students WHERE student_id = $student_id");
-if (!$studentRes || $studentRes->num_rows === 0) {
-    header("Location: ../Pages/admin/users.php?active_tab=students");
-    exit();
+// If a search term is provided
+if (!empty($search)) {
+    $sql .= " WHERE 
+        s.student_id LIKE '%$search%' OR
+        s.Last_Name LIKE '%$search%' OR
+        s.First_Name LIKE '%$search%' OR
+        u.email LIKE '%$search%'";
 }
-$student = $studentRes->fetch_assoc();
 
-// Fetch courses for dropdowns
-$courses = [];
-$courseRes = $conn->query("SELECT course_id, course_name, level FROM courses");
-while ($row = $courseRes->fetch_assoc()) {
-    $courses[] = $row;
-}
+// Group by student to avoid duplicate rows
+$sql .= " GROUP BY s.student_id";
 
-// Get enum values for level
-$levelEnumRes = $conn->query("SHOW COLUMNS FROM courses LIKE 'level'");
-$levelRow = $levelEnumRes->fetch_assoc();
-preg_match("/^enum\((.*)\)$/", $levelRow['Type'], $matches);
-$levels = [];
-if (isset($matches[1])) {
-    foreach (explode(",", $matches[1]) as $level) {
-        $val = trim($level, "'");
-        $levels[] = $val;
+// Add pagination
+$sql .= " LIMIT $limit OFFSET $offset";
+
+// Execute the query
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Output the data as an HTML table
+    echo "<h1>Student Overview</h1>";
+    echo "<table border='1'>
+            <tr>
+                <th>Student ID</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Gender</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>";
+    while ($row = $result->fetch_assoc()) {
+        // Make the ID unique by prefixing with "student"
+        $detailsId = "details_student_" . $row['student_id'];
+        echo "<tr>
+            <td>" . $row['student_id'] . "</td>
+            <td>" . $row['Last_Name'] . "</td>
+            <td>" . $row['First_Name'] . "</td>
+            <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
+            <td>" . $row['email'] . "</td>
+            <td>
+                <button class='action-btn view' onclick=\"toggleDetails('$detailsId')\">View Details</button>
+                <form method='get' action='../../sql/edit_student.php' style='display:inline; margin:0; padding:0;'>
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn edit'>Edit</button>
+                </form>
+                <form method='get' action='../../sql/delete_student.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                    <input type='hidden' name='student_id' value='{$row['student_id']}'>
+                    <button type='submit' class='action-btn delete'>Delete</button>
+                </form>
+            </td>
+          </tr>";
+
+        // Hidden detailed information row
+        echo "<tr id='$detailsId' class='details-row' style='display: none;'>
+            <td colspan='6'>
+            <div class='details-box'>
+                <strong>Date of Birth:</strong> " . $row['DOB'] . "<br>
+                <strong>School Syllabus:</strong> " . $row['School_Syllabus'] . "<br>
+                <strong>School Intake:</strong> " . $row['School_Intake'] . "<br>
+                <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
+                <strong>School:</strong> " . $row['School'] . "<br>
+                <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
+                 <strong>Course Taken:</strong> " . $row['course_name'] .
+            (!empty($row['level']) ? ' (' . $row['level'] . ')' : '') . "<br>
+                <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
+                        <strong>Primary Contact:</strong> " . (
+            $row['primary_contact']
+            ? "<span class='contact-tooltip' tabindex='0'>
+                {$row['primary_contact']}
+                <span class='contact-tooltip-popup'>
+                    <strong>Name:</strong> {$row['primary_owner_first_name']} {$row['primary_owner_last_name']}<br>
+                    <strong>Relationship:</strong> {$row['primary_relationship']}<br>
+                    <strong>Email:</strong> {$row['primary_email']}<br>
+                    <strong>Address:</strong> {$row['primary_address']} {$row['primary_postcode']}
+                </span>
+              </span>"
+            : 'N/A'
+        ) . "<br>
+                 <strong>Secondary Contact:</strong> " . (
+            $row['secondary_contact']
+            ? "<span class='contact-tooltip' tabindex='0'>
+                {$row['secondary_contact']}
+                <span class='contact-tooltip-popup'>
+                    <strong>Name:</strong> {$row['secondary_owner_first_name']} {$row['secondary_owner_last_name']}<br>
+                    <strong>Relationship:</strong> {$row['secondary_relationship']}
+                </span>
+              </span>"
+            : 'N/A'
+        ) . "<br>
+                <strong>How did you hear about us:</strong> " . $row['How_Did_You_Heard_About_Us'] . "<br>
+            </div>
+            </td>
+          </tr>";
     }
-}
+    echo "</table>";
 
-// Fetch current student course and timetable (assuming one course per student for this UI)
-$stuCourseRes = $conn->query("SELECT * FROM student_courses WHERE student_id = $student_id ORDER BY enrollment_date DESC LIMIT 1");
-$stuCourse = $stuCourseRes && $stuCourseRes->num_rows > 0 ? $stuCourseRes->fetch_assoc() : null;
-
-// For timetable, fetch all entries for the latest student_course_id
-$stuTimetable = [];
-if ($stuCourse) {
-    $timetableRes = $conn->query("SELECT * FROM student_timetable WHERE student_course_id = {$stuCourse['student_course_id']}");
-    while ($row = $timetableRes->fetch_assoc()) {
-        $stuTimetable[] = $row;
+    // Pagination controls
+    echo "<div class='pagination'>";
+    if ($page > 1) {
+        echo "<a href='?students_page=" . ($page - 1) . "&active_tab=students&search=$search'>Previous</a>";
+    } else {
+        echo "<a class='disabled'>Previous</a>";
     }
-}
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $last_name = $conn->real_escape_string($_POST['Last_Name']);
-        $first_name = $conn->real_escape_string($_POST['First_Name']);
-        $gender = $conn->real_escape_string($_POST['Gender']);
-        $dob = $conn->real_escape_string($_POST['DOB']);
-        $school_syllabus = $conn->real_escape_string($_POST['School_Syllabus']);
-        $school_intake = $conn->real_escape_string($_POST['School_Intake']);
-        $current_grade = $conn->real_escape_string($_POST['Current_School_Grade']);
-        $school = $conn->real_escape_string($_POST['School']);
-        $mathology_level = $conn->real_escape_string($_POST['Mathology_Level']);
-        $how_did_you_heard_about_us = $conn->real_escape_string($_POST['How_Did_You_Heard_About_Us']);
-
-        $course_level = $conn->real_escape_string($_POST['course_level']);
-        $course_id = intval($_POST['course_id']);
-        $enrollment_date = $conn->real_escape_string($_POST['Enrollment_Date']);
-        $day = $conn->real_escape_string($_POST['Day']);
-        $start_time = $conn->real_escape_string($_POST['Start_Time']);
-        $end_time = $conn->real_escape_string($_POST['End_Time']);
-
-        // Update students table
-        $updateStudentQuery = "UPDATE students SET
-            Last_Name='$last_name',
-            First_Name='$first_name',
-            Gender='$gender',
-            DOB='$dob',
-            School_Syllabus='$school_syllabus',
-            School_Intake='$school_intake',
-            Current_School_Grade='$current_grade',
-            School='$school',
-            Mathology_Level='$mathology_level',
-            How_Did_You_Heard_About_Us='$how_did_you_heard_about_us'
-            WHERE student_id = $student_id";
-        if (!$conn->query($updateStudentQuery)) {
-            throw new Exception("Error updating student: " . $conn->error);
-        }
-
-        // Update/insert student_courses (only keep one for this UI)
-        if ($stuCourse) {
-            $updateCourseQuery = "UPDATE student_courses SET course_id='$course_id', enrollment_date='$enrollment_date' WHERE student_course_id={$stuCourse['student_course_id']}";
-            if (!$conn->query($updateCourseQuery)) throw new Exception("Error updating student course: " . $conn->error);
-            $student_course_id = $stuCourse['student_course_id'];
-        } else {
-            $insertCourseQuery = "INSERT INTO student_courses (student_id, course_id, enrollment_date)
-                                  VALUES ('$student_id', '$course_id', '$enrollment_date')";
-            if (!$conn->query($insertCourseQuery)) throw new Exception("Error adding student course: " . $conn->error);
-            $student_course_id = $conn->insert_id;
-        }
-
-        // Timetable: remove old, add new (for this student_course_id)
-        $conn->query("DELETE FROM student_timetable WHERE student_course_id = $student_course_id");
-        $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status)
-                                 VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active')";
-        if (!$conn->query($insertTimetableQuery)) {
-            throw new Exception("Error adding student timetable: " . $conn->error);
-        }
-
-        header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+updated+successfully");
-        exit();
-    } catch (Exception $e) {
-        $error = $e->getMessage();
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $activeClass = $i == $page ? 'active' : '';
+        echo "<a href='?students_page=$i&active_tab=students&search=$search' class='$activeClass'>$i</a>";
     }
+    if ($page < $totalPages) {
+        echo "<a href='?students_page=" . ($page + 1) . "&active_tab=students&search=$search'>Next</a>";
+    } else {
+        echo "<a class='disabled'>Next</a>";
+    }
+    echo "</div>";
+} else {
+    echo "No data found in the table.";
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Student</title>
-    <link rel="stylesheet" href="/Styles/common.css">
-    <link rel="stylesheet" href="/Styles/forms.css">
-</head>
-<body>
-    <h1>Edit Student</h1>
-    <?php if ($error) echo "<p class='error'>$error</p>"; ?>
-    <form id="student-form" method="POST">
-        <input type="hidden" name="user_type" value="student">
-        <label for="student_last_name">Last Name:</label>
-        <input type="text" id="student_last_name" name="Last_Name" value="<?=htmlspecialchars($student['Last_Name'])?>" required><br>
-        <label for="student_first_name">First Name:</label>
-        <input type="text" id="student_first_name" name="First_Name" value="<?=htmlspecialchars($student['First_Name'])?>" required><br>
-        <label for="student_gender">Gender:</label>
-        <select id="student_gender" name="Gender" required>
-            <option value="1" <?=$student['Gender'] == '1' ? 'selected' : ''?>>Male</option>
-            <option value="0" <?=$student['Gender'] == '0' ? 'selected' : ''?>>Female</option>
-        </select><br>
-        <label for="student_dob">Date of Birth:</label>
-        <input type="date" id="student_dob" name="DOB" value="<?=htmlspecialchars($student['DOB'])?>" required><br>
-        <label for="student_school_syllabus">School Syllabus:</label>
-        <input type="text" id="student_school_syllabus" name="School_Syllabus" value="<?=htmlspecialchars($student['School_Syllabus'])?>"><br>
-        <label for="student_school_intake">School Intake (Month):</label>
-        <select id="student_school_intake" name="School_Intake" required>
-            <?php
-            $months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-            foreach ($months as $month):
-            ?>
-                <option value="<?=$month?>" <?=$student['School_Intake'] == $month ? 'selected' : ''?>><?=$month?></option>
-            <?php endforeach; ?>
-        </select><br>
-        <label for="student_current_grade">Current School Grade:</label>
-        <input type="text" id="student_current_grade" name="Current_School_Grade" value="<?=htmlspecialchars($student['Current_School_Grade'])?>"><br>
-        <label for="student_school">School:</label>
-        <input type="text" id="student_school" name="School" value="<?=htmlspecialchars($student['School'])?>"><br>
-        <label for="student_mathology_level">Mathology Level:</label>
-        <input type="text" id="student_mathology_level" name="Mathology_Level" value="<?=htmlspecialchars($student['Mathology_Level'])?>"><br>
-        <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
-        <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100" value="<?=htmlspecialchars($student['How_Did_You_Heard_About_Us'])?>"><br>
-        
-        <!-- Course Level and Name selection -->
-        <label for="student_course_level">Course Level:</label>
-        <select id="student_course_level" name="course_level" required>
-            <option value="">Select Level</option>
-            <?php foreach ($levels as $level): ?>
-                <option value="<?=$level?>" <?=($stuCourse && $courses[array_search($stuCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : ''?>><?=$level?></option>
-            <?php endforeach; ?>
-        </select><br>
-        <label for="student_course_name">Course Name:</label>
-        <select id="student_course_name" name="course_id" required>
-            <option value="">Select Course</option>
-            <?php foreach ($courses as $course): ?>
-                <option value="<?=$course['course_id']?>"
-                    data-level="<?=$course['level']?>"
-                    <?=($stuCourse && $stuCourse['course_id'] == $course['course_id']) ? 'selected' : ''?>>
-                    <?=$course['course_name']?>
-                </option>
-            <?php endforeach; ?>
-        </select><br>
-        <label for="enrollment_date">Enrollment Date:</label>
-        <input type="date" id="enrollment_date" name="Enrollment_Date" value="<?=htmlspecialchars($stuCourse ? $stuCourse['enrollment_date'] : '')?>" required><br>
-        <label for="student_day">Day:</label>
-        <select id="student_day" name="Day" required>
-            <?php
-            $stuDay = $stuTimetable && count($stuTimetable) > 0 ? $stuTimetable[0]['day'] : '';
-            $daysOfWeek = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-            foreach ($daysOfWeek as $day):
-            ?>
-                <option value="<?=$day?>" <?=$stuDay == $day ? 'selected' : ''?>><?=$day?></option>
-            <?php endforeach; ?>
-        </select><br>
-        <label for="student_start_time">Start Time:</label>
-        <input type="time" id="student_start_time" name="Start_Time" value="<?=htmlspecialchars($stuTimetable && count($stuTimetable) > 0 ? $stuTimetable[0]['start_time'] : '')?>" required><br>
-        <label for="student_end_time">End Time:</label>
-        <input type="time" id="student_end_time" name="End_Time" value="<?=htmlspecialchars($stuTimetable && count($stuTimetable) > 0 ? $stuTimetable[0]['end_time'] : '')?>" required><br><br>
-        <button type="submit">Update Student</button>
-        <a href="../Pages/admin/users.php">Cancel</a>
-    </form>
-<script>
-const allCourses = <?=json_encode($courses)?>;
 
-document.getElementById('student_course_level').addEventListener('change', function() {
-    const selectedLevel = this.value;
-    const nameSelect = document.getElementById('student_course_name');
-    nameSelect.innerHTML = '<option value="">Select Course</option>';
-    allCourses.forEach(function(course) {
-        if (course.level === selectedLevel) {
-            const opt = document.createElement('option');
-            opt.value = course.course_id;
-            opt.textContent = course.course_name;
-            opt.setAttribute('data-level', course.level);
-            nameSelect.appendChild(opt);
+<script>
+    // JavaScript to toggle detailed information
+    function toggleDetails(detailsId) {
+        const detailsRow = document.getElementById(detailsId);
+        if (detailsRow.style.display === "none") {
+            detailsRow.style.display = "table-row";
+        } else {
+            detailsRow.style.display = "none";
         }
-    });
-});
+    }
 </script>
-</body>
-</html>
