@@ -2,7 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 if (!isset($_GET['student_id'])) {
-    header("Location: ../Pages/admin/users.php?active_tab=students");
     exit();
 }
 
