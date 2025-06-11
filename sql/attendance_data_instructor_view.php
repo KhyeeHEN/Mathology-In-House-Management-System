@@ -10,6 +10,7 @@ $user_id = intval($_SESSION['user_id']);
 
 // Fetch instructor_id from users table
 $query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
+echo $query;
 $result = $conn->query($query);
 
 if (!$result || $result->num_rows === 0) {
