@@ -38,17 +38,13 @@ switch ($sort) {
 }
 
 $sql = "
-    SELECT ar.*,
-           s.First_Name AS student_first_name,
-           s.Last_Name AS student_last_name,
-           i.First_Name AS instructor_first_name,
-           i.Last_Name AS instructor_last_name
+    SELECT
+        ar.*,
+        s.First_Name AS student_first_name, s.Last_Name AS student_last_name,
+        i.First_Name AS instructor_first_name, i.Last_Name AS instructor_last_name
     FROM attendance_records ar
     LEFT JOIN students s ON ar.student_id = s.student_id
     LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
-    LEFT JOIN courses c ON ar.course = c.course_name
-    LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
-    WHERE ic.instructor_id = $instructor_id AND ic.status = 'active'
 ";
 
 if (!empty($search)) {
