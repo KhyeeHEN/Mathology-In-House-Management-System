@@ -38,6 +38,7 @@ $sql = "
         s.How_Did_You_Heard_About_Us,
         u.email, 
         c.course_name,
+        c.level,
         pc.phone AS primary_contact,
         pc.Last_Name AS primary_owner_last_name,
         pc.First_Name AS primary_owner_first_name,
@@ -128,7 +129,8 @@ if ($result->num_rows > 0) {
                 <strong>Current School Grade:</strong> " . $row['Current_School_Grade'] . "<br>
                 <strong>School:</strong> " . $row['School'] . "<br>
                 <strong>Mathology Level:</strong> " . $row['Mathology_Level'] . "<br>
-                <strong>Course Taken:</strong> " . $row['course_name'] . "<br>
+                 <strong>Course Taken:</strong> " . $row['course_name'] .
+            (!empty($row['level']) ? ' (' . $row['level'] . ')' : '') . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "<br>
                         <strong>Primary Contact:</strong> " . (
             $row['primary_contact']
