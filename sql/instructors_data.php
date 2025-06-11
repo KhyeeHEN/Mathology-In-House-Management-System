@@ -36,6 +36,9 @@ $sql = "
         i.Employment_Type,
         i.Working_Days,
         i.Worked_Days,
+        i.Total_Hours,
+        i.contact,
+        i.hiring_status,
         u.email, 
         GROUP_CONCAT(DISTINCT c.course_name SEPARATOR ', ') AS courses,
         GROUP_CONCAT(
@@ -114,7 +117,8 @@ if ($result->num_rows > 0) {
                 <strong>Employment Type:</strong> " . ($row['Employment_Type'] ?? 'N/A') . "<br>
                 <strong>Working Days:</strong> " . ($row['Working_Days'] ?? 'N/A') . "<br>
                 <strong>Worked Days:</strong> " . ($row['Worked_Days'] ?? 'N/A') . "<br>
-                <strong>Remark:</strong> " . $row['Remark'] . "<br>
+                <strong>Total Hours:</strong> " . ($row['Total_Hours'] ?? 'N/A') . "<br>
+                <strong>Contact Number:</strong> " . ($row['contact'] ?? 'N/A') . "<br>
                 <strong>Training Status:</strong> " . $row['Training_Status'] . "<br>
                 <strong>Courses:</strong> " . (!empty($row['courses']) ? $row['courses'] : 'No courses assigned') . "<br>
                 <strong>Timetable:</strong> " . (!empty($row['timetable']) ? $row['timetable'] : 'No timetable') . "
