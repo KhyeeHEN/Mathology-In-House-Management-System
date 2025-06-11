@@ -1,7 +1,12 @@
 <?php
+session_start();
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-include '../setting.php';
 
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
+    exit;
+}
 // Messages
 $message = isset($_GET['message']) ? $_GET['message'] : null;
 $error = isset($_GET['error']) ? $_GET['error'] : null;
