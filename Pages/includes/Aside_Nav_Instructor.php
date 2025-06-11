@@ -14,5 +14,11 @@
             <i class="fas fa-home"></i>
             <span>My details</span>
         </a>
+        </a>
+                <a href="../instructors/attendance_instructors.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'attendance_instructors.php' ? 'active' : ''; ?>">
+            <i class="fas fa-home"></i>
+            <span>Attendance</span>
+        </a>
     </nav>
 </aside>
