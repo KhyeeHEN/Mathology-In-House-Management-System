@@ -270,15 +270,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="email" id="student_email" name="email" required><br>
         <label for="student_password">Password:</label>
         <input type="password" id="student_password" name="password" required><br><br>
+        <label for="course_level_select">Course Level:</label>
+        <select id="course_level_select" name="course_level" required onchange="filterCoursesByLevel()">
+            <option value="">Select Level</option>
+            <?php
+            // Get all unique course levels
+            $levels = [];
+            $courses_result = $conn->query("SELECT DISTINCT level FROM courses WHERE level IS NOT NULL");
+            while ($row = $courses_result->fetch_assoc()) {
+                $level = htmlspecialchars($row['level'], ENT_QUOTES);
+                echo "<option value=\"$level\">$level</option>";
+            }
+            ?>
+        </select><br>
         <label for="student_course">Course:</label>
-        <select id="student_course" name="course_id" required onchange="updateCourseLevel()">
+        <select id="student_course" name="course_id" required>
             <option value="">Select Course</option>
             <?php
+            // Output all courses as options with data-level attribute
             $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
             while ($course = $courses->fetch_assoc()) {
                 $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
                 $level = htmlspecialchars($course['level'], ENT_QUOTES);
-                echo "<option value='{$course['course_id']}' data-level='$level'>{$course_name}</option>";
+                echo "<option value='{$course['course_id']}' data-level=\"$level\">{$course_name}</option>";
             }
             ?>
         </select><br>
@@ -318,7 +332,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="primary_postcode">Postcode:</label>
             <input type="text" id="primary_postcode" name="primary_postcode" required><br>
         </fieldset>
-        <!-- Add Secondary Contact Section -->
         <fieldset style="margin-top:10px;">
             <legend>Secondary Contact</legend>
             <label for="secondary_owner_last_name">Last Name:</label>
@@ -421,22 +434,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
-        // JavaScript to show the Course Level when a course is selected
-        function updateCourseLevel() {
-            const select = document.getElementById('student_course');
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('course_level').value = selected.getAttribute('data-level') || '';
+        
+        function filterCoursesByLevel() {
+            const selectedLevel = document.getElementById('course_level_select').value;
+            const courseSelect = document.getElementById('student_course');
+            for (let i = 0; i < courseSelect.options.length; i++) {
+                const option = courseSelect.options[i];
+                if (!option.value) { // keep the "Select Course" option always visible
+                    option.style.display = '';
+                    continue;
+                }
+                if (selectedLevel === '' || option.getAttribute('data-level') === selectedLevel) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            // Reset selection if currently selected course doesn't match
+            if (
+                courseSelect.selectedIndex !== 0 &&
+                courseSelect.options[courseSelect.selectedIndex].getAttribute('data-level') !== selectedLevel
+            ) {
+                courseSelect.selectedIndex = 0;
+            }
         }
-        document.addEventListener('DOMContentLoaded', function() {
-            setWorkingDaysState();
-            updateCourseLevel();
-        });
 
-        // JavaScript to disable/enable Working_Days based on Employment_Type using event and also on load
-        document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
+    // JavaScript to disable/enable Working_Days based on Employment_Type using event and also on load
+    document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
 
-        // Ensure the correct state when the page loads (e.g. after validation error)
-        document.addEventListener('DOMContentLoaded', setWorkingDaysState);
+    // Ensure the correct state when the page loads (e.g. after validation error)
+    document.addEventListener('DOMContentLoaded', setWorkingDaysState);
+
+    document.addEventListener('DOMContentLoaded', filterCoursesByLevel);
     </script>
 </body>
 
