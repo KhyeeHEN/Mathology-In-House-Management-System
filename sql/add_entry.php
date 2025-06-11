@@ -256,6 +256,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="student_school">School:</label>
         <input type="text" id="student_school" name="School"><br>
         <label for="student_mathology_level">Mathology Level:</label>
+        <select id="student_mathology_level" name="Mathology_Level" required>
+            <option value="">Select Level</option>
+            <?php
+            for ($i = 1; $i <= 9; $i++) {
+                echo "<option value='$i'>Level $i</option>";
+            }
+            ?>
+        </select><br>
         <input type="text" id="student_mathology_level" name="Mathology_Level"><br>
         <label for="student_email">Email:</label>
         <input type="email" id="student_email" name="email" required><br>
