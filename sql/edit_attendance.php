@@ -1,6 +1,20 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
+if (!isset($_SESSION['user_id'])) {
+    echo "Unauthorized access.";
+    exit;
+}
+
+$user_id = intval($_SESSION['user_id']);
+$role    = $_SESSION['role'];           // 'admin' or 'instructor'
+
+// Determine cancel/redirect URLs
+$cancelUrl  = $role === 'admin'
+    ? '/Pages/admin/attendance.php'
+    : '/Pages/instructors/attendance_instructors.php';
+$redirectTo = $cancelUrl;
+
 // Get record_id from URL
 $record_id = isset($_GET['record_id']) ? intval($_GET['record_id']) : 0;
 
@@ -45,13 +59,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE record_id = $record_id
     ";
 
-    if ($conn->query($updateSql)) {
-        echo "Attendance updated successfully!";
-        header("Location: ../Pages/admin/attendance.php");
-        exit();
+if ($conn->query($updateSql)) {
+    // redirect based on role
+    if ($_SESSION['role'] === 'admin') {
+        header('Location: /Pages/admin/attendance.php');
     } else {
-        echo "Error updating: " . $conn->error;
+        header('Location: /Pages/instructors/attendance_instructors.php');
     }
+    exit;
+} else {
+    $error = 'Update failed: ' . $conn->error;
+}
 }
 ?>
 
@@ -190,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
 
         <button type="submit">Update</button>
-        <a href="../Pages/admin/attendance.php">Cancel</a>
+        <a href="<?= htmlspecialchars($cancelUrl) ?>">Cancel</a>
     </form>
 </body>
 
