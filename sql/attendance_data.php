@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {

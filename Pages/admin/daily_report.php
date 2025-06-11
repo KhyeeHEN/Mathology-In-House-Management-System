@@ -168,6 +168,9 @@ $result = $stmt->get_result();
                 <a href="../utils/export_pdf.php?date=<?php echo $_GET['date'] ?? date('Y-m-d'); ?>&download_pdf=1">
                     <button type="button">Download PDF</button>
                 </a>
+                <a href="../admin/attendance.php">
+                    <button type="button">Back</button>
+                </a>
             </form>
         </main>
     </div>
