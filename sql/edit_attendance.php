@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             hours_replacement = $hours_replacement,
             hours_remaining = $hours_remaining,
             status = '$status',
-            course = '$course_id',
+            course = $course_id,
             updated_at = NOW()
         WHERE record_id = $record_id
     ";
@@ -201,7 +201,7 @@ if ($conn->query($updateSql)) {
             <option value="">-- select course --</option>
             <?php while ($c = $coursesResult->fetch_assoc()): ?>
                 <option
-                    value="<?= htmlspecialchars($c['course_name']) ?>"
+                    value="<?= $c['course_id'] ?>"
                     <?= ($c['course_id'] === $record['course']) ? 'selected' : '' ?>>
                     <?= htmlspecialchars($c['course_name'] . ' (' . $c['level'] . ')') ?>
                 </option>
