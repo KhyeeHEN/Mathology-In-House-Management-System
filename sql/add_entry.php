@@ -421,6 +421,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($courses);
         ?>;
 
+        document.getElementById('course_level_select').addEventListener('change', function () {
+            const selectedLevel = this.value;
+            const nameSelect = document.getElementById('student_course');
+            nameSelect.innerHTML = '<option value="">Select Course</option>';
+            allCourses.forEach(function (course) {
+                if (course.level === selectedLevel) {
+                    const opt = document.createElement('option');
+                    opt.value = course.course_id;
+                    opt.textContent = course.course_name;
+                    nameSelect.appendChild(opt);
+                }
+            });
+        });
+
         document.getElementById('instructor_course_level').addEventListener('change', function () {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('instructor_course_name');
