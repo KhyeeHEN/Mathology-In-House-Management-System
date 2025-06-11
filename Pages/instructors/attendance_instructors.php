@@ -19,12 +19,12 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Attendance</title>
-    <link rel="stylesheet" href="../../Styles/common.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard</title>
+    <link rel="stylesheet" href="../../Styles/common.css">
     <link rel="stylesheet" href="../../Styles/attendance.css?v=<?php echo time(); ?>" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -34,7 +34,6 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         <main class="main-content">
             <?php require("../includes/Top_Nav_Bar_Instructor.php"); ?>
 
-            <!-- Search -->
             <div class="search-bar">
                 <form method="GET" action="attendance_instructors.php">
                     <input type="text" name="search" placeholder="Search attendance..." value="<?php echo htmlspecialchars($search); ?>">
@@ -65,13 +64,15 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
         </main>
     </div>
 
-    <!--<script src="../../Scripts/attendance.js?v=<?php echo time(); ?>"></script> -->
+
     <script>
         function toggleDetails(id) {
             const row = document.getElementById(id);
             row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
         }
     </script>
+    <script src="/Scripts/common.js"></script>
+    <script src="/Scripts/dashboardInstructors.js"></script>
 </body>
 
 </html>

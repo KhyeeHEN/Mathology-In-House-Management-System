@@ -10,7 +10,9 @@ $user_id = intval($_SESSION['user_id']);
 
 // Fetch instructor_id from users table
 $query = "SELECT instructor_id FROM users WHERE user_id = $user_id AND role = 'instructor'";
+echo $query;
 $result = $conn->query($query);
+echo $result;
 
 if (!$result || $result->num_rows === 0) {
     echo "Instructor not found or unauthorized.";
@@ -18,7 +20,9 @@ if (!$result || $result->num_rows === 0) {
 }
 
 $row = $result->fetch_assoc();
+echo $row;
 $instructor_id = intval($row['instructor_id']);
+echo $instructor_id;
 
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'timetable_datetime';
