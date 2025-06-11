@@ -1,6 +1,12 @@
 <?php
 include '../setting.php';
 
+if (!isset($_SESSION['instructor_id'])) {
+    echo "Unauthorized access.";
+    exit;
+}
+$instructor_id = intval($_SESSION['instructor_id']);
+
 // Messages
 $message = isset($_GET['message']) ? $_GET['message'] : null;
 $error = isset($_GET['error']) ? $_GET['error'] : null;
