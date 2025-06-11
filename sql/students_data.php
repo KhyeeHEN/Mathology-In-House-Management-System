@@ -1,14 +1,12 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-if (!isset($_GET['student_id'])) {
+if (!isset($_GET['id'])) {
+    header("Location: ../Pages/admin/users.php?active_tab=students");
     exit();
 }
 
-$student_id = intval($_GET['student_id']);
+$student_id = intval($_GET['id']);
 $error = null;
 
 // Fetch student data
