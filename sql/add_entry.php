@@ -209,8 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+and+associated+user+added+successfully");
                 exit();
             } elseif ($user_type === 'admin') {
-                $email = $conn->real_escape_string($_POST['admin_email']);
-                $password = password_hash($conn->real_escape_string($_POST['admin_email']), PASSWORD_BCRYPT);
+                $email = $conn->real_escape_string($_POST['email']);
+                $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
                 $insertUserQuery = "INSERT INTO users (email, password, role)
                                     VALUES ('$email', '$password', 'admin')";
                 if (!$conn->query($insertUserQuery)) {
