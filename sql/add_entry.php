@@ -458,6 +458,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="email" id="admin_email" name="email" required><br>
         <label for="admin_password">Password:</label>
         <input type="password" id="admin_password" name="password" required><br><br>
+        <button type="submit">Add Admin</button>
+        <a href="../Pages/admin/users.php">Cancel</a>
     </form>
 
     <script>
