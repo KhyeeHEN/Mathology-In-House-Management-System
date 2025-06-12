@@ -216,6 +216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$conn->query($insertUserQuery)) {
                     throw new Exception("Error adding user: " . $conn->error);
                 }
+                  $conn->commit();
+                header("Location: ../Pages/admin/users.php?active_tab=admins&message=Admin+added+successfully");
+                exit();
             }
         } catch (Exception $e) {
             // Rollback the transaction on error
