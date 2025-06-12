@@ -454,6 +454,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Admin Form -->
     <form id="admin-form" method="POST" style="display: none;">
+        <input type="hidden" name="user_type" value="student">
+        <h2>Admin Details</h2>
         <label for="admin_email">Email:</label>
         <input type="email" id="admin_email" name="email" required><br>
         <label for="admin_password">Password:</label>
