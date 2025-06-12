@@ -53,14 +53,12 @@ if ($result->num_rows > 0) {
             <tr>
                 <th>User ID</th>
                 <th>Email</th>
-                <th>Role</th>
                 <th>Created At</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
                 <td>" . $row['user_id'] . "</td>
                 <td>" . $row['email'] . "</td>
-                <td>" . $row['role'] . "</td>
                 <td>" . $row['created_at'] . "</td>
               </tr>";
     }
