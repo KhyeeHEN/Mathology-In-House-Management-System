@@ -208,6 +208,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+and+associated+user+added+successfully");
                 exit();
+            } elseif ($user_type === 'admin') {
+                $email = $conn->real_escape_string($_POST['admin_email']);
+                $password = password_hash($conn->real_escape_string($_POST['admin_email']), PASSWORD_BCRYPT);
+                $insertUserQuery = "INSERT INTO users (email, password, role)
+                                    VALUES ('$email', '$password', 'admin')";
+                if (!$conn->query($insertUserQuery)) {
+                    throw new Exception("Error adding user: " . $conn->error);
+                }
             }
         } catch (Exception $e) {
             // Rollback the transaction on error
@@ -443,6 +451,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
 
+    <!-- Admin Form -->
+    <form id="admin-form" method="POST" style="display: none;">
+        <label for="admin_email">Email:</label>
+        <input type="email" id="admin_email" name="email" required><br>
+        <label for="admin_password">Password:</label>
+        <input type="password" id="admin_password" name="password" required><br><br>
+    </form>
+
     <script>
         const allCourses = <?php
         $courses = [];
@@ -533,13 +549,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const userType = document.getElementById('user_type').value;
             const studentForm = document.getElementById('student-form');
             const instructorForm = document.getElementById('instructor-form');
+            const adminForm = document.getElementById('admin-form');
             if (userType === 'student') {
                 studentForm.style.display = 'block';
                 instructorForm.style.display = 'none';
+                adminForm.style.display = 'none';
             } else if (userType === 'instructor') {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'block';
+                adminForm.style.display = 'none';
                 setWorkingDaysState();
+            } else if (userType === 'admin') {
+                studentForm.style.display = 'none';
+                instructorForm.style.display = 'none';
+                adminForm.style.display = 'block';
             } else {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'none';
