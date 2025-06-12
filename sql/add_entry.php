@@ -248,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="">Select User Type</option>
             <option value="student">Student</option>
             <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
         </select><br><br>
     </form>
 
