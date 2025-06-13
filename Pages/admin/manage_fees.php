@@ -138,7 +138,7 @@ $result = $conn->query($sql);
                                     <td><?= number_format($row['fee_amount'] ?? 0, 2) ?></td>
                                     <td><?= number_format($row['package_hours']) ?></td>
                                     <td><?= htmlspecialchars($row['time']) ?></td>
-                                    <td><a href='../../sql/edit_fees.php?id=$id'>Edit</a></td>
+                                    <td><a href='../../sql/edit_fee.php'>Edit</a></td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>
