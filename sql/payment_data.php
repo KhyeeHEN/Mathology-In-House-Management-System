@@ -77,7 +77,8 @@ if ($result && $result->num_rows > 0) {
         echo "<td>$deposit</td>";
         echo "<td>$status</td>";
         echo "<td><button onclick=\"toggleDetails('details-$id')\">Show More</button>
-        <a href='../../sql/edit_payment.php?id=$id'>Edit</a></td>";
+        <a href='../../sql/edit_payment.php?id=$id'>Edit</a></td>
+          <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a>";
         echo "</tr>";
 
         // Hidden details row
