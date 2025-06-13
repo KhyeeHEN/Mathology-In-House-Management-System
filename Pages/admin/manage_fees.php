@@ -46,7 +46,7 @@ if (!in_array($sort_direction, ['ASC', 'DESC'])) {
 
 // Build SQL query
 $sql = "
-    SELECT c.course_id, c.course_name, c.level, f.fee_amount
+    SELECT c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
     FROM courses c
     LEFT JOIN course_fees f ON c.course_id = f.course_id
 ";
@@ -125,7 +125,9 @@ $result = $conn->query($sql);
                                 <th>Course Name</th>
                                 <th>Level</th>
                                 <th>Current Fee (RM)</th>
-                                <th>Update Fee</th>
+                                <th>Package Hours</th>
+                                <th>Time</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,14 +136,9 @@ $result = $conn->query($sql);
                                     <td><?= htmlspecialchars($row['course_name']) ?></td>
                                     <td><?= htmlspecialchars($row['level']) ?></td>
                                     <td><?= number_format($row['fee_amount'] ?? 0, 2) ?></td>
-                                    <td>
-                                        <form method="POST">
-                                            <input type="hidden" name="course_id" value="<?= $row['course_id'] ?>">
-                                            <input type="number" name="fee_amount" step="0.01" min="0" required
-                                                value="<?= htmlspecialchars($row['fee_amount'] ?? '') ?>">
-                                            <button type="submit">Update</button>
-                                        </form>
-                                    </td>
+                                    <td><?= number_format($row['package_hours']) ?></td>
+                                    <td><?= htmlspecialchars($row['time']) ?></td>
+                                    <td><a href='../../sql/edit_fees.php?id=$id'>Edit</a></td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>
