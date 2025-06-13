@@ -117,32 +117,8 @@ $result = $conn->query($sql);
                     </form>
                 </div>
 
-                <!-- Payment Table -->
                 <div class="table-container">
-                    <table class = "payment-table">
-                        <thead>
-                            <tr>
-                                <th>Course Name</th>
-                                <th>Level</th>
-                                <th>Current Fee (RM)</th>
-                                <th>Package Hours</th>
-                                <th>Time</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($row['course_name']) ?></td>
-                                    <td><?= htmlspecialchars($row['level']) ?></td>
-                                    <td><?= number_format($row['fee_amount'] ?? 0, 2) ?></td>
-                                    <td><?= number_format($row['package_hours']) ?></td>
-                                    <td><?= htmlspecialchars($row['time']) ?></td>
-                                    <td><a href='../../sql/edit_fee.php?id=<?= $row['fee_id'] ?>'>Edit</a></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
+                    <?php include '../../sql/course_data.php'; ?>
                 </div>
             </main>
         </div>
