@@ -28,13 +28,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['course_id'], $_POST['
     $message = "Fee updated successfully.";
 }
 
-// Fetch courses and fees
+// Sanitize and fetch search & sort values
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+$sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'course_name';
+$sort_direction = isset($_GET['direction']) ? strtoupper($_GET['direction']) : 'ASC';
+
+// Whitelist of sortable columns
+$allowed_columns = ['course_name', 'level', 'fee_amount'];
+
+// Validate sort column and direction
+if (!in_array($sort_column, $allowed_columns)) {
+    $sort_column = 'course_name';
+}
+if (!in_array($sort_direction, ['ASC', 'DESC'])) {
+    $sort_direction = 'ASC';
+}
+
+// Build SQL query
 $sql = "
     SELECT c.course_id, c.course_name, c.level, f.fee_amount
     FROM courses c
     LEFT JOIN course_fees f ON c.course_id = f.course_id
-    ORDER BY c.course_name
 ";
+
+// Add search filtering
+if (!empty($search)) {
+    $sql .= " WHERE c.course_name LIKE '%$search%' OR c.level LIKE '%$search%'";
+}
+
+// Add sorting
+$sql .= " ORDER BY $sort_column $sort_direction";
+
+// Execute
 $result = $conn->query($sql);
 ?>
 
@@ -46,61 +71,6 @@ $result = $conn->query($sql);
     <title>Manage Course Fees</title>
     <link rel="stylesheet" href="../../Styles/common.css">
     <link rel="stylesheet" href="../../Styles/payment.css?v=<?php echo time(); ?>">
-    <!-- <style>
-        body {
-            font-family: Arial;
-            background: #f4f4f4;
-            padding: 30px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        table {
-            width: 100%;
-            background: white;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        form {
-            margin: 0;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        input[type="number"] {
-            width: 100px;
-            padding: 5px;
-        }
-
-        button {
-            padding: 6px 12px;
-            background: #1f2937;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #374151;
-        }
-
-        .message {
-            color: green;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style> -->
 </head>
 
 <body>
