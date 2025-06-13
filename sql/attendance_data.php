@@ -112,10 +112,12 @@ if ($result && $result->num_rows > 0) {
         $record_id = (int)$row['record_id'];
         // Edit button + show/hide details
         echo "<td>
-    <button onclick=\"toggleDetails('details-$record_id')\">Show More</button> &nbsp;
-    <a href='../../sql/edit_attendance.php?record_id=$record_id'>Edit</a> &nbsp;
+        <div class='action-buttons'>
+    <button onclick=\"toggleDetails('details-$record_id')\">Show More</button>
+    <a href='../../sql/edit_attendance.php?record_id=$record_id'>Edit</a>
     <a href='../../sql/delete_attendance.php?id=$record_id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\">Delete</a>
-</td>";
+        </div>
+    </td>";
 
         echo "</tr>";
 

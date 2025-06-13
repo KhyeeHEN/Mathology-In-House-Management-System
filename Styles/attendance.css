@@ -120,6 +120,12 @@ table.attendence button:focus {
     outline: none;
     box-shadow: 0 0 5px rgb(71, 82, 95);
 }
+table.attendence td .action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap; /* optional: wraps nicely on smaller screens */
+    align-items: center;
+}
  /*Show Details part*/
 .details-box {
     background-color: #f9f9f9;
