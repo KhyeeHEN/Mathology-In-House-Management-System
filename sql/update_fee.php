@@ -2,20 +2,17 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $course_id = intval($_POST['course_id']);
+    $fee_id = intval($_POST['fee_id']);
     $fee_amount = floatval($_POST['fee_amount']);
     $package_hours = intval($_POST['package_hours']);
     $time = trim($_POST['time']);
 
     $stmt = $conn->prepare("
-        INSERT INTO course_fees (course_id, fee_amount, package_hours, time)
-        VALUES (?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            fee_amount = VALUES(fee_amount),
-            package_hours = VALUES(package_hours),
-            time = VALUES(time)
+        UPDATE course_fees
+        SET fee_amount = ?, package_hours = ?, time = ?
+        WHERE fee_id = ?
     ");
-    $stmt->bind_param("iids", $course_id, $fee_amount, $package_hours, $time);
+    $stmt->bind_param("disi", $fee_amount, $package_hours, $time, $fee_id);
 
     if ($stmt->execute()) {
         header("Location: ../Pages/admin/manage_fees.php?message=Fee updated successfully");

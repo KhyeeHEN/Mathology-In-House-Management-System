@@ -46,9 +46,9 @@ if (!in_array($sort_direction, ['ASC', 'DESC'])) {
 
 // Build SQL query
 $sql = "
-    SELECT c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
-    FROM courses c
-    LEFT JOIN course_fees f ON c.course_id = f.course_id
+    SELECT f.fee_id, c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
+    FROM course_fees f
+    JOIN courses c ON c.course_id = f.course_id
 ";
 
 // Add search filtering

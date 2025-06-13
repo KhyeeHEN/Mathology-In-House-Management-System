@@ -16,9 +16,9 @@ if (!in_array($sort_direction, ['ASC', 'DESC'])) {
 
 // SQL query
 $sql = "
-    SELECT c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
-    FROM courses c
-    LEFT JOIN course_fees f ON c.course_id = f.course_id
+    SELECT f.fee_id, c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
+    FROM course_fees f
+    JOIN courses c ON c.course_id = f.course_id
 ";
 
 if (!empty($search)) {
@@ -44,7 +44,7 @@ echo "<table class='payment-table'>
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $id = (int)$row['course_id'];
+        $id = (int)$row['fee_id'];
         $name = htmlspecialchars($row['course_name']);
         $level = htmlspecialchars($row['level']);
         $fee = number_format($row['fee_amount'] ?? 0, 2);
@@ -57,7 +57,7 @@ if ($result && $result->num_rows > 0) {
                 <td>RM $fee</td>
                 <td>$hours</td>
                 <td>$time</td>
-                <td><a href='../../sql/edit_fee.php?id=$id'>Edit</a></td>
+                <td><a href='../../sql/edit_fee.php?id=<?= $id ?>'>Edit</a></td>
               </tr>";
     }
 } else {
