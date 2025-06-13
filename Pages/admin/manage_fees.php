@@ -1,6 +1,12 @@
 <?php
 session_start();
-require_once '../setting.php'; // update path as needed
+require_once '../setting.php';
+
+$message = isset($_GET['message']) ? $_GET['message'] : null;
+$error = isset($_GET['error']) ? $_GET['error'] : null;
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'payment_date';
+$direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
 if ($_SESSION['role'] !== 'admin') {
     die("Unauthorized access");
