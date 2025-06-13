@@ -8,7 +8,7 @@ if (!isset($_GET['id'])) {
 
 $attendance_id = intval($_GET['id']);
 
-$stmt = $conn->prepare("DELETE FROM attendance_records WHERE attendance_id = ?");
+$stmt = $conn->prepare("DELETE FROM attendance_records WHERE record_id = ?");
 $stmt->bind_param("i", $attendance_id);
 
 if ($stmt->execute()) {
