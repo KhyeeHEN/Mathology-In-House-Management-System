@@ -34,51 +34,101 @@ $result = $conn->query($sql);
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Manage Course Fees</title>
-  <style>
-    body { font-family: Arial; background: #f4f4f4; padding: 30px; }
-    h1 { text-align: center; }
-    table { width: 100%; background: white; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border: 1px solid #ccc; text-align: left; }
-    form { margin: 0; display: flex; gap: 10px; align-items: center; }
-    input[type="number"] { width: 100px; padding: 5px; }
-    button { padding: 6px 12px; background: #1f2937; color: white; border: none; cursor: pointer; }
-    button:hover { background: #374151; }
-    .message { color: green; text-align: center; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1>Manage Course Fees</h1>
-  <?php if (!empty($message)) echo "<div class='message'>$message</div>"; ?>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Course Name</th>
-        <th>Level</th>
-        <th>Current Fee (RM)</th>
-        <th>Update Fee</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php while($row = $result->fetch_assoc()): ?>
-        <tr>
-          <td><?= htmlspecialchars($row['course_name']) ?></td>
-          <td><?= htmlspecialchars($row['level']) ?></td>
-          <td><?= number_format($row['fee_amount'] ?? 0, 2) ?></td>
-          <td>
-            <form method="POST">
-              <input type="hidden" name="course_id" value="<?= $row['course_id'] ?>">
-              <input type="number" name="fee_amount" step="0.01" min="0" required
-                     value="<?= htmlspecialchars($row['fee_amount'] ?? '') ?>">
-              <button type="submit">Update</button>
-            </form>
-          </td>
-        </tr>
-      <?php endwhile; ?>
-    </tbody>
-  </table>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Course Fees</title>
+    <link rel="stylesheet" href="../../Styles/common.css">
+    <link rel="stylesheet" href="../../Styles/payment.css?v=<?php echo time(); ?>">
+    <!-- <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        form {
+            margin: 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 6px 12px;
+            background: #1f2937;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #374151;
+        }
+
+        .message {
+            color: green;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style> -->
+</head>
+
+<body>
+    <h1>Manage Course Fees</h1>
+    <?php if (!empty($message)) echo "<div class='message'>$message</div>"; ?>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Level</th>
+                <th>Current Fee (RM)</th>
+                <th>Update Fee</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['course_name']) ?></td>
+                    <td><?= htmlspecialchars($row['level']) ?></td>
+                    <td><?= number_format($row['fee_amount'] ?? 0, 2) ?></td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="course_id" value="<?= $row['course_id'] ?>">
+                            <input type="number" name="fee_amount" step="0.01" min="0" required
+                                value="<?= htmlspecialchars($row['fee_amount'] ?? '') ?>">
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+    <button type="button" onclick="window.location='manage_fees.php'">Back</button>
 </body>
+
 </html>
