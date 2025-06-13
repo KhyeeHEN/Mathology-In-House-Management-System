@@ -57,7 +57,10 @@ if ($result && $result->num_rows > 0) {
                 <td>RM $fee</td>
                 <td>$hours</td>
                 <td>$time</td>
-                <td><a href='../../sql/edit_fee.php?id=$id'>Edit</a><br>
+                <td><a href='../../sql/edit_fee.php?id=$id'>Edit</a>
+                <br>
+                <br>
+                <br>
                     <a href='../../sql/delete_fee.php?fee_id=$id' onclick=\"return confirm('Are you sure you want to delete this fee?');\">Delete</a>
                 </td>
               </tr>";
