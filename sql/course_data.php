@@ -57,7 +57,7 @@ if ($result && $result->num_rows > 0) {
                 <td>RM $fee</td>
                 <td>$hours</td>
                 <td>$time</td>
-                <td><a href='../../sql/edit_fee.php?fee_id=$id'>Edit</a></td>
+                <td><a href='../../sql/edit_fee.php?id=$id'>Edit</a></td>
               </tr>";
     }
 } else {
