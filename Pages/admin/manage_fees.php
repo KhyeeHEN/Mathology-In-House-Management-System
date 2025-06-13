@@ -124,12 +124,13 @@ $result = $conn->query($sql);
                 <br>
                 <!-- Search + Sort -->
                 <div class="search-bar">
-                    <form method="GET" action="payment.php">
-                        <input type="text" name="search" placeholder="Search payments..." value="<?php echo htmlspecialchars($search); ?>">
+                    <form method="GET" action="manage_fees.php">
+                        <input type="text" name="search" placeholder="Search Course..." value="<?php echo htmlspecialchars($search); ?>">
 
                         <label for="sort">Sort by:</label>
                         <select id="sort" name="sort">
-                            <option value="course_name'" <?php if ($sort === 'course_name') echo 'selected'; ?>>Course Name</option>
+                            <option value="course_name" <?php if ($sort === 'course_name') echo 'selected'; ?>>Course Name</option>
+                            <option value="level" <?php if ($sort === 'level') echo 'selected'; ?>>Level</option>
                             <option value="fee_amount" <?php if ($sort === 'fee_amount') echo 'selected'; ?>>Fee Amount</option>
                             <option value="package_hours" <?php if ($sort === 'package_hours') echo 'selected'; ?>>Package Hours</option>
                             <option value="time" <?php if ($sort === 'time') echo 'selected'; ?>>Time</option>
