@@ -76,10 +76,12 @@ if ($result && $result->num_rows > 0) {
         echo "<td>RM $amount</td>";
         echo "<td>$deposit</td>";
         echo "<td>$status</td>";
-        echo "<td><button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
+        echo "<td>
+        <div class='action-buttons'>
+        <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
         <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
-          <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a> </td>";
-        echo "</tr>";
+          <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a> </td></div>";
+          echo "</tr>";
 
         // Hidden details row
         echo "<tr id='details-$id' class='details-row' style='display: none; background-color: #f9f9f9;'>";
