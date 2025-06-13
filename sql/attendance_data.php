@@ -112,9 +112,9 @@ if ($result && $result->num_rows > 0) {
 
         // Edit button + show/hide details
         echo "<td>
-        <button onclick=\"toggleDetails('details-{$row['record_id']}')\">Show More</button>
-                <a href='../../sql/edit_attendance.php?record_id={$row['record_id']}'>Edit</a>
-
+        <button onclick=\"toggleDetails('details-{$row['record_id']}')\">Show More</button><br><br>
+                <a href='../../sql/edit_attendance.php?record_id={$row['record_id']}'>Edit</a> <br><br>
+<a href='../../sql/delete_attendance.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\">Delete</a>
               </td>";
 
         echo "</tr>";
