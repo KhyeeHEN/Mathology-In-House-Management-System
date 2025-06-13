@@ -76,8 +76,8 @@ if ($result && $result->num_rows > 0) {
         echo "<td>RM $amount</td>";
         echo "<td>$deposit</td>";
         echo "<td>$status</td>";
-        echo "<td><button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br><br>
-        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br><br>
+        echo "<td><button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
+        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
           <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a> </td>";
         echo "</tr>";
 
