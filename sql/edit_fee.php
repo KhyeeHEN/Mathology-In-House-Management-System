@@ -132,7 +132,7 @@ $course = $result->fetch_assoc();
                 value="<?= htmlspecialchars($course['package_hours']) ?>">
         </label>
 
-        <label>Time:
+        <label>Time (e.g., Monthly, Quarterly):
             <input type="text" name="time" required
                 value="<?= htmlspecialchars($course['time']) ?>">
         </label>

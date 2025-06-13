@@ -113,7 +113,7 @@ $result = $conn->query($sql);
 
                         <button type="submit">Search/Sort</button>
                         <button type="button" onclick="window.location='manage_fees.php'">Reset</button>
-                        <button type="button" onclick="window.location='../../sql/add_fee.php'">New</button>
+                        <button type="button" onclick="window.location='../../sql/add_course_with_fee.php'">New</button>
                         <button type="button" onclick="window.location='payment.php'">Back</button>
                     </form>
                 </div>
