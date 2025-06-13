@@ -148,9 +148,7 @@ $result = $conn->query($sql);
 
                 <!-- Payment Table -->
                 <div class="table-container">
-                    <h1>Manage Course Fees</h1>
-
-                    <table>
+                    <table class = "payment-table">
                         <thead>
                             <tr>
                                 <th>Course Name</th>
