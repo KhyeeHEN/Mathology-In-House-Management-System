@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-if (!isset($_GET['fee_id'])) {
+if (!isset($_GET['id'])) {
     die("Fee ID is required.");
 }
 
