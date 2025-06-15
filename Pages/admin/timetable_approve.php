@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Request not found or already processed");
             }
     
-            // Get full request details
+            // Get full request details with course name and level
             $stmt = $conn->prepare("
-                SELECT r.*, c.course_name, sc.course_id
+                SELECT r.*, c.course_name, c.level
                 FROM {$cfg['request_table']} r
                 JOIN {$cfg['courses_table']} sc ON r.{$cfg['request_course_id']} = sc.{$cfg['courses_pk']}
                 JOIN courses c ON sc.course_id = c.course_id
@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Course details not found for this request");
             }
     
-            // Insert into timetable
+            // Insert into timetable with combined course info
+            $course_display = $fullRequest['course_name'] . ' - ' . $fullRequest['level'];
             $stmt = $conn->prepare("
                 INSERT INTO {$cfg['timetable_table']} 
                 ({$cfg['request_course_id']}, day, start_time, end_time, approved_at, course)
@@ -72,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fullRequest['day'],
                 $fullRequest['start_time'],
                 $fullRequest['end_time'],
-                $fullRequest['course_name']
+                $course_display
             );
             
             if (!$stmt->execute()) {
@@ -163,7 +164,7 @@ if ($viewing_id) {
     $id_field = 'student_id';
     
     $details = $conn->query("
-        SELECT t.*, GROUP_CONCAT(c.course_name SEPARATOR ', ') as enrolled_courses
+        SELECT t.*, GROUP_CONCAT(CONCAT(c.course_name, ' - ', c.level) SEPARATOR ', ') as enrolled_courses
         FROM $table t
         LEFT JOIN student_courses sc ON t.{$id_field} = sc.{$id_field}
         LEFT JOIN courses c ON sc.course_id = c.course_id
@@ -171,9 +172,9 @@ if ($viewing_id) {
         GROUP BY t.{$id_field}
     ")->fetch_assoc();
     
-    // Get current timetable with course names
+    // Get current timetable with course names and levels
     $timetable = $conn->query("
-        SELECT tt.*, c.course_name as course
+        SELECT tt.*, CONCAT(c.course_name, ' - ', c.level) as course
         FROM student_timetable tt
         JOIN student_courses sc ON tt.student_course_id = sc.student_course_id
         JOIN courses c ON sc.course_id = c.course_id
@@ -208,7 +209,7 @@ if ($show_search_results) {
             r.day,
             r.start_time,
             r.end_time,
-            c.course_name as course,
+            CONCAT(c.course_name, ' - ', c.level) as course,
             p.payment_status,
             NULL as timetable_count
         FROM student_timetable_requests r
@@ -259,7 +260,7 @@ if ($show_search_results) {
                 r.day,
                 r.start_time,
                 r.end_time,
-                c.course_name as course,
+                CONCAT(c.course_name, ' - ', c.level) as course,
                 p.payment_status,
                 NULL as timetable_count
             FROM student_timetable_requests r
@@ -281,7 +282,7 @@ if ($show_search_results) {
                 t.day,
                 t.start_time,
                 t.end_time,
-                c.course_name as course,
+                CONCAT(c.course_name, ' - ', c.level) as course,
                 p.payment_status,
                 COUNT(t.id) as timetable_count
             FROM students s
@@ -304,7 +305,7 @@ if (!$viewing_id && !$show_search_results) {
     $pending = $conn->query("
         SELECT r.*, s.student_id, s.Last_Name, s.First_Name, 
                s.Current_School_Grade, s.School, s.Mathology_Level,
-               c.course_name as course
+               CONCAT(c.course_name, ' - ', c.level) as course
         FROM student_timetable_requests r
         JOIN student_courses sc ON r.student_course_id = sc.student_course_id
         JOIN students s ON sc.student_id = s.student_id
