@@ -10,7 +10,7 @@ $is_new = $_POST['is_new'];
 
 // Insert payment
 $stmt = $conn->prepare("INSERT INTO payment (student_id, payment_method, payment_mode, payment_amount, deposit_status, payment_status)
-                        VALUES (?, ?, ?, ?, ?, ?, 'pending')");
+                        VALUES (?, ?, ?, ?, ?, 'pending')");
 $deposit_status = $is_new ? 'yes' : 'no';
 $stmt->bind_param("iissds", $student_id, $method, $mode, $amount, $deposit_status);
 $stmt->execute();
