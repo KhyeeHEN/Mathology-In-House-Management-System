@@ -10,10 +10,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 $user_id = $_SESSION['user_id'];
 
 // Get student_id from users table
-$stmt = $conn->prepare("SELECT s.student_id FROM users u JOIN students s ON u.student_id = s.student_id WHERE u.user_id = ?");
+$user_id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT s.student_id, s.is_new_student FROM users u JOIN students s ON u.student_id = s.student_id WHERE u.user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($student_id);
+$stmt->bind_result($student_id, $is_new);
 $stmt->fetch();
 $stmt->close();
 
