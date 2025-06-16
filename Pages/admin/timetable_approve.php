@@ -570,7 +570,18 @@ if (!$viewing_id && !$show_search_results) {
                         </div>
                         <div class="info-row">
                             <div class="info-label">Enrolled Courses:</div>
-                            <div><?= htmlspecialchars($details['enrolled_courses'] ?? 'None') ?></div>
+                            <div>
+                                <?php
+                                if ($details['enrolled_courses']) {
+                                    $courses = explode(', ', $details['enrolled_courses']);
+                                    foreach ($courses as $course) {
+                                        echo htmlspecialchars($course) . "<br>";
+                                    }
+                                } else {
+                                    echo 'None';
+                                }
+                                ?>
+                            </div>
                         </div>
                     </div>
 
