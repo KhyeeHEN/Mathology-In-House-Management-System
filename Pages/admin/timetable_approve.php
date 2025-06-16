@@ -575,7 +575,10 @@ if (!$viewing_id && !$show_search_results) {
                                 if ($details['enrolled_courses']) {
                                     $courses = explode(', ', $details['enrolled_courses']);
                                     foreach ($courses as $course) {
-                                        echo htmlspecialchars(trim($course)) . "<br>";
+                                        $parts = explode(', ', $course);
+                                        if (count($parts) == 2) {
+                                            echo '"' . htmlspecialchars(trim($parts[0])) . '", "' . htmlspecialchars(trim($parts[1])) . '"<br>';
+                                        }
                                     }
                                 } else {
                                     echo 'None';
