@@ -7,20 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalMsg = document.getElementById("modal-message");
     const closeModalBtn = document.getElementById("close-modal");
 
+    // Show/hide details based on payment method
     paymentOptions.forEach(option => {
         option.addEventListener("change", () => {
-            if (option.value === "ewallet") {
-                ewalletDetails.style.display = "block";
-                bankingDetails.style.display = "none";
-            } else if (option.value === "onlinebanking") {
-                bankingDetails.style.display = "block";
-                ewalletDetails.style.display = "none";
-            }
+            ewalletDetails.style.display = option.value === "ewallet" ? "block" : "none";
+            bankingDetails.style.display = option.value === "onlinebanking" ? "block" : "none";
         });
     });
 
+    // Handle form submit
     paymentForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+        e.preventDefault(); // prevent default submission
 
         const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
         if (!selectedMethod) {
@@ -47,15 +44,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (valid) {
-            const isSuccess = Math.random() > 0.2;
-            if (isSuccess) {
-                showModal("✅ Payment successful! Thank you.");
+            const formData = new FormData(paymentForm);
+
+            fetch(paymentForm.action, {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.ok ? res.text() : Promise.reject("Server error"))
+            .then(response => {
+                showModal("✅ Payment submitted successfully!");
                 paymentForm.reset();
                 ewalletDetails.style.display = "none";
                 bankingDetails.style.display = "none";
-            } else {
-                showModal("❌ Payment failed. Please try again.");
-            }
+            })
+            .catch(err => {
+                showModal("❌ Submission failed. Please try again.");
+            });
         }
     });
 
@@ -70,23 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-function searchTable() {
-const input = document.getElementById("searchInput");
-const filter = input.value.toLowerCase();
-const table = document.querySelector(".payment-table");
-const rows = table.querySelectorAll("tbody tr");
+// function searchTable() {
+// const input = document.getElementById("searchInput");
+// const filter = input.value.toLowerCase();
+// const table = document.querySelector(".payment-table");
+// const rows = table.querySelectorAll("tbody tr");
 
-rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    let matchFound = false;
+// rows.forEach(row => {
+//     const cells = row.querySelectorAll("td");
+//     let matchFound = false;
 
-    cells.forEach(cell => {
-        if (cell.textContent.toLowerCase().includes(filter)) {
-            matchFound = true;
-        }
-    });
+//     cells.forEach(cell => {
+//         if (cell.textContent.toLowerCase().includes(filter)) {
+//             matchFound = true;
+//         }
+//     });
 
-    row.style.display = matchFound ? "" : "none";
-    });
-}
+//     row.style.display = matchFound ? "" : "none";
+//     });
+// }
 
