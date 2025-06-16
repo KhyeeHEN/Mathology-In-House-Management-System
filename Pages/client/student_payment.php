@@ -20,9 +20,10 @@ $stmt->close();
 
 // Get the student’s enrolled course info
 $sql = "
-    SELECT sc.course_id, sc.is_new_student, c.course_name, c.level
+     SELECT sc.course_id, c.course_name, c.level, s.is_new_student
     FROM student_courses sc
     JOIN courses c ON sc.course_id = c.course_id
+    JOIN students s ON sc.student_id = s.student_id
     WHERE sc.student_id = ? AND sc.status = 'active'
     LIMIT 1
 ";
