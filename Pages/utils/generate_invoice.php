@@ -83,14 +83,14 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $pdf->Output($filePath, 'F');
 
 
-    $relPath = 'invoices/' . $fileName;
+    $relPath = '../../Pages/invoice/' . $fileName;
     $update = $conn->prepare("UPDATE payment SET invoice_path = ? WHERE payment_id = ?");
     $update->bind_param("si", $relPath, $payment_id);
     $update->execute();
     $update->close();
 
 
-    header("Location: ../$relPath");
+    header("Location: $relPath");
     exit;
 }
 ?>

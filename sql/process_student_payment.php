@@ -38,6 +38,6 @@ $stmt->execute();
 $stmt->close();
 
 $new_payment_id = $conn->insert_id;
-header("Location: ../Pages/invoice/generate_invoice.php?generate_invoice=1&payment_id=$new_payment_id");
+header("Location: ../../Pages/invoice/generate_invoice.php?generate_invoice=1&payment_id=$new_payment_id");
 exit;
 
