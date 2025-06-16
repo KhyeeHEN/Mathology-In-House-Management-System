@@ -61,7 +61,7 @@ $total = $base_fee + $one_time_fee;
     <form method="POST" action="../../sql/process_student_payment.php">
         <p><strong>Course:</strong> <?php echo "$course_name ($level)"; ?></p>
 
-        <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
+        <input type="hidden" name="is_first_payment" value="<?php echo $has_paid ? 0 : 1; ?>">
         <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
         <input type="hidden" name="is_new" value="<?php echo $is_new; ?>">
 

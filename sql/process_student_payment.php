@@ -27,9 +27,22 @@ $stmt->bind_param("issds", $student_id, $method, $mode, $amount, $deposit_status
 $stmt->execute();
 $stmt->close();
 
-// ✅ Mark student as not new
-if ($is_new) {
-    $conn->query("UPDATE students SET is_new_student = 0 WHERE student_id = $student_id");
+
+$has_paid = false;
+$paid_check = $conn->prepare("SELECT COUNT(*) FROM payment WHERE student_id = ?");
+$paid_check->bind_param("i", $student_id);
+$paid_check->execute();
+$paid_check->bind_result($payment_count);
+$paid_check->fetch();
+$paid_check->close();
+
+$has_paid = $payment_count > 0;
+
+// Only include one-time fees if it's their first payment
+$one_time_fee = 0;
+if (!$has_paid) {
+    $fee_q = $conn->query("SELECT SUM(amount) AS total FROM one_time_fees");
+    $one_time_fee = $fee_q->fetch_assoc()['total'];
 }
 
 header("Location: ../Pages/client/student_payment.php?message=Payment submitted successfully");
