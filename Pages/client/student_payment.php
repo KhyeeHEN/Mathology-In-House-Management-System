@@ -19,17 +19,16 @@ $stmt->close();
 
 // Get course and new status
 $sql = "
-    SELECT sc.course_id, c.course_name, c.level, s.is_new_student
+    SELECT sc.course_id, c.course_name, c.level
     FROM student_courses sc
     JOIN courses c ON sc.course_id = c.course_id
-    JOIN students s ON sc.student_id = s.student_id
     WHERE sc.student_id = ? AND sc.status = 'active'
     LIMIT 1
 ";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
-$stmt->bind_result($course_id, $course_name, $level, $is_new);
+$stmt->bind_result($course_id, $course_name, $level);
 $stmt->fetch();
 $stmt->close();
 
