@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 $student_id = $_POST['student_id'];
 $course_id = $_POST['course_id'];
