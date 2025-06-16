@@ -2,7 +2,7 @@
 session_start();
 include '../setting.php';
 
-$student_id = $_SESSION['student_id'];
+$student_id = $_POST['student_id'];
 $course_id = $_POST['course_id'];
 $mode = $_POST['payment_mode'];
 $method = $_POST['payment_method'];

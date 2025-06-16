@@ -7,9 +7,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
     exit();
 }
 
-$student_id = $_SESSION['student_id'];
+$user_id = $_SESSION['user_id'];
 
-// Get the active course and its fee level
+// Get student_id from users table
+$stmt = $conn->prepare("SELECT student_id FROM students WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$stmt->bind_result($student_id);
+$stmt->fetch();
+$stmt->close();
+
+// Get the student’s enrolled course info
 $sql = "
     SELECT sc.course_id, sc.is_new_student, c.course_name, c.level
     FROM student_courses sc
@@ -24,10 +32,7 @@ $stmt->bind_result($course_id, $is_new, $course_name, $level);
 $stmt->fetch();
 $stmt->close();
 
-// Default mode
 $payment_mode = 'monthly';
-
-// Get base fee
 $fee_stmt = $conn->prepare("SELECT fee_amount FROM course_fees WHERE course_id = ? AND time = ?");
 $fee_stmt->bind_param("is", $course_id, $payment_mode);
 $fee_stmt->execute();
@@ -35,7 +40,6 @@ $fee_stmt->bind_result($base_fee);
 $fee_stmt->fetch();
 $fee_stmt->close();
 
-// One-time fees
 $one_time_fee = 0;
 if ($is_new) {
     $fee_q = $conn->query("SELECT SUM(amount) AS total FROM one_time_fees");
@@ -55,6 +59,7 @@ $total = $base_fee + $one_time_fee;
     <form method="POST" action="process_student_payment.php">
         <p><strong>Course:</strong> <?php echo "$course_name ($level)"; ?></p>
 
+        <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
         <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
         <input type="hidden" name="is_new" value="<?php echo $is_new; ?>">
 
