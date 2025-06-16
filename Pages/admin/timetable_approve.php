@@ -579,15 +579,9 @@ if (!$viewing_id && !$show_search_results) {
                                     $courses = explode(', ', $details['enrolled_courses']);
                                     error_log("Split courses: " . var_export($courses, true));
                                     $formatted_courses = [];
-                                    foreach ($courses as $course) {
-                                        if (trim($course) !== '') {
-                                            $parts = explode(', ', $course, 2); // Split into course_name and level
-                                            error_log("Course parts for '$course': " . var_export($parts, true));
-                                            if (count($parts) == 2) {
-                                                $formatted_courses[] = '(' . htmlspecialchars(trim($parts[0])) . ', ' . htmlspecialchars(trim($parts[1])) . ')';
-                                            } else {
-                                                $formatted_courses[] = '(' . htmlspecialchars(trim($course)) . ')'; // Fallback
-                                            }
+                                    for ($i = 0; $i < count($courses); $i += 2) {
+                                        if (isset($courses[$i]) && isset($courses[$i + 1]) && trim($courses[$i]) !== '' && trim($courses[$i + 1]) !== '') {
+                                            $formatted_courses[] = '(' . htmlspecialchars(trim($courses[$i])) . ', ' . htmlspecialchars(trim($courses[$i + 1])) . ')';
                                         }
                                     }
                                     echo implode(', ', $formatted_courses);
