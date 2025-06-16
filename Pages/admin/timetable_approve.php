@@ -160,6 +160,7 @@ $current_tab = 'students'; // Only students now
 
 if ($viewing_id) {
     // Get details with enrolled courses
+    // Data for enrolled courses is extracted from student_courses and courses tables
     $table = 'students';
     $id_field = 'student_id';
     
@@ -175,6 +176,7 @@ if ($viewing_id) {
     error_log("enrolled_courses raw: " . var_export($details['enrolled_courses'], true));
     
     // Get current timetable with course names and levels
+    // Data for timetable is extracted from student_timetable, joined with student_courses and courses
     $timetable = $conn->query("
         SELECT tt.*, CONCAT(c.course_name, ', ', c.level) as course
         FROM student_timetable tt
