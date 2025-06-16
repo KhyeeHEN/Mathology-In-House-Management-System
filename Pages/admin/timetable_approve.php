@@ -172,6 +172,8 @@ if ($viewing_id) {
         GROUP BY t.{$id_field}
     ")->fetch_assoc();
     
+    error_log("enrolled_courses raw: " . var_export($details['enrolled_courses'], true));
+    
     // Get current timetable with course names and levels
     $timetable = $conn->query("
         SELECT tt.*, CONCAT(c.course_name, ', ', c.level) as course
@@ -572,12 +574,19 @@ if (!$viewing_id && !$show_search_results) {
                             <div class="info-label">Enrolled Courses:</div>
                             <div>
                                 <?php
-                                if ($details['enrolled_courses']) {
+                                if ($details['enrolled_courses'] && $details['enrolled_courses'] !== '') {
+                                    error_log("Processing enrolled_courses: " . $details['enrolled_courses']);
                                     $courses = explode(', ', $details['enrolled_courses']);
+                                    error_log("Split courses: " . var_export($courses, true));
                                     foreach ($courses as $course) {
-                                        $parts = explode(', ', $course);
-                                        if (count($parts) == 2) {
-                                            echo '"' . htmlspecialchars(trim($parts[0])) . '", "' . htmlspecialchars(trim($parts[1])) . '"<br>';
+                                        if (trim($course) !== '') {
+                                            $parts = explode(', ', $course, 2); // Limit to 2 parts to avoid over-splitting
+                                            error_log("Course parts for '$course': " . var_export($parts, true));
+                                            if (count($parts) == 2) {
+                                                echo '"' . htmlspecialchars(trim($parts[0])) . '", "' . htmlspecialchars(trim($parts[1])) . '"<br>';
+                                            } else {
+                                                echo '"' . htmlspecialchars(trim($course)) . '"<br>'; // Fallback if split fails
+                                            }
                                         }
                                     }
                                 } else {
@@ -653,7 +662,7 @@ if (!$viewing_id && !$show_search_results) {
                                 $timetableData[$timeSlot][$day] = [
                                     'course' => $entry['course'],
                                     'display_time' => $displayTime,
-                                    'entry_id' => $entry['id']
+                                    'entry_id' => $entry['entry_id']
                                 ];
                                 
                                 if (!in_array($timeSlot, $allTimes)) {
