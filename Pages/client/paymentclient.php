@@ -69,7 +69,7 @@ $total = $base_fee + $one_time_fee;
     <link rel="stylesheet" href="../../Styles/common.css">
     <link rel="stylesheet" href="../../Styles/payment.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../../Scripts/payment.js" defer></script>
+    <!-- <script src="../../Scripts/payment.js" defer></script> -->
 </head>
 <body>
 <div class="dashboard-container">
