@@ -1041,3 +1041,8 @@ if (!$viewing_id && !$show_search_results) {
     <script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>
+
+nvm, make it back to original like: 
+Enrolled Courses: (Regular, Pre-Primary and Primary), (Regular,Secondary), (Regular, Upper Secondary) 
+
+but add the bracket
