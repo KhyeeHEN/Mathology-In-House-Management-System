@@ -575,7 +575,7 @@ if (!$viewing_id && !$show_search_results) {
                                 if ($details['enrolled_courses']) {
                                     $courses = explode(', ', $details['enrolled_courses']);
                                     foreach ($courses as $course) {
-                                        echo htmlspecialchars($course) . "<br>";
+                                        echo htmlspecialchars(trim($course)) . "<br>";
                                     }
                                 } else {
                                     echo 'None';
