@@ -26,7 +26,8 @@ $paid_check->fetch();
 $paid_check->close();
 
 $is_first_payment = $payment_count === 0;
-$deposit_status = $is_first_payment ? 'yes' : 'no';
+$is_first_payment ? 'yes' : 'no';
+$deposit_status = 'yes';
 
 // Insert the payment record
 $stmt = $conn->prepare("INSERT INTO payment (
@@ -37,5 +38,5 @@ $stmt->execute();
 $stmt->close();
 
 // Redirect back to payment page with success message
-header("Location: ../Pages/client/student_payment.php?message=Payment submitted successfully");
+header("Location: ../Pages/client/paymentclient.php?message=Payment submitted successfully");
 exit;
