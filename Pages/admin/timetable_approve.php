@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle approval
     if (isset($_POST['approve'])) {
         $id = (int)$_POST['id'];
-        $type = 'student'; // Only student now
+        $type = 'student'; 
         
         $tables = [
             'student' => [
@@ -164,19 +164,29 @@ if ($viewing_id) {
     $table = 'students';
     $id_field = 'student_id';
     
+    // Updated query to fetch enrolled courses directly from student_courses
+    $enrolled_courses_query = $conn->query("
+        SELECT c.course_name, c.level
+        FROM student_courses sc
+        JOIN courses c ON sc.course_id = c.course_id
+        WHERE sc.student_id = $viewing_id AND sc.status = 'active'
+    ");
+    $enrolled_courses = [];
+    while ($row = $enrolled_courses_query->fetch_assoc()) {
+        $enrolled_courses[] = '(' . htmlspecialchars($row['course_name']) . ', ' . htmlspecialchars($row['level']) . ')';
+    }
+    $formatted_enrolled_courses = implode(', ', $enrolled_courses);
+    
     $details = $conn->query("
-        SELECT t.*, GROUP_CONCAT(DISTINCT CONCAT(c.course_name, ', ', c.level) SEPARATOR ', ') as enrolled_courses
+        SELECT t.*, '$formatted_enrolled_courses' as enrolled_courses
         FROM $table t
-        LEFT JOIN student_courses sc ON t.{$id_field} = sc.{$id_field}
-        LEFT JOIN courses c ON sc.course_id = c.course_id
         WHERE t.{$id_field} = $viewing_id
-        GROUP BY t.{$id_field}
+        LIMIT 1
     ")->fetch_assoc();
     
     error_log("enrolled_courses raw: " . var_export($details['enrolled_courses'], true));
     
     // Get current timetable with course names and levels
-    // Data for timetable is extracted from student_timetable, joined with student_courses and courses
     $timetable = $conn->query("
         SELECT tt.*, CONCAT(c.course_name, ', ', c.level) as course
         FROM student_timetable tt
@@ -575,22 +585,7 @@ if (!$viewing_id && !$show_search_results) {
                         <div class="info-row">
                             <div class="info-label">Enrolled Courses:</div>
                             <div>
-                                <?php
-                                if ($details['enrolled_courses'] && $details['enrolled_courses'] !== '') {
-                                    error_log("Processing enrolled_courses: " . $details['enrolled_courses']);
-                                    $courses = explode(', ', $details['enrolled_courses']);
-                                    error_log("Split courses: " . var_export($courses, true));
-                                    $formatted_courses = [];
-                                    for ($i = 0; $i < count($courses); $i += 2) {
-                                        if (isset($courses[$i]) && isset($courses[$i + 1]) && trim($courses[$i]) !== '' && trim($courses[$i + 1]) !== '') {
-                                            $formatted_courses[] = '(' . htmlspecialchars(trim($courses[$i])) . ', ' . htmlspecialchars(trim($courses[$i + 1])) . ')';
-                                        }
-                                    }
-                                    echo implode(', ', $formatted_courses);
-                                } else {
-                                    echo 'None';
-                                }
-                                ?>
+                                <?= $details['enrolled_courses'] ?: 'None' ?>
                             </div>
                         </div>
                     </div>
