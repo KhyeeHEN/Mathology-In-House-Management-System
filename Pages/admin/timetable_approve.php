@@ -578,11 +578,19 @@ if (!$viewing_id && !$show_search_results) {
                                     error_log("Processing enrolled_courses: " . $details['enrolled_courses']);
                                     $courses = explode(', ', $details['enrolled_courses']);
                                     error_log("Split courses: " . var_export($courses, true));
+                                    $formatted_courses = [];
                                     foreach ($courses as $course) {
                                         if (trim($course) !== '') {
-                                            echo htmlspecialchars(trim($course)) . '<br>';
+                                            $parts = explode(', ', $course, 2); // Split into course_name and level
+                                            error_log("Course parts for '$course': " . var_export($parts, true));
+                                            if (count($parts) == 2) {
+                                                $formatted_courses[] = '(' . htmlspecialchars(trim($parts[0])) . ', ' . htmlspecialchars(trim($parts[1])) . ')';
+                                            } else {
+                                                $formatted_courses[] = '(' . htmlspecialchars(trim($course)) . ')'; // Fallback
+                                            }
                                         }
                                     }
+                                    echo implode(', ', $formatted_courses);
                                 } else {
                                     echo 'None';
                                 }
@@ -1041,8 +1049,3 @@ if (!$viewing_id && !$show_search_results) {
     <script type="module" src="/Scripts/common.js"></script>
 </body>
 </html>
-
-nvm, make it back to original like: 
-Enrolled Courses: (Regular, Pre-Primary and Primary), (Regular,Secondary), (Regular, Upper Secondary) 
-
-but add the bracket
