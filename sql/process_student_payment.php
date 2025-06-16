@@ -32,11 +32,12 @@ $deposit_status = 'yes';
 // Insert the payment record
 $stmt = $conn->prepare("INSERT INTO payment (
     student_id, payment_method, payment_mode, payment_amount, deposit_status, payment_status
-) VALUES (?, ?, ?, ?, ?, 'pending')");
+) VALUES (?, ?, ?, ?, ?, 'paid')");
 $stmt->bind_param("issds", $student_id, $method, $mode, $amount, $deposit_status);
 $stmt->execute();
 $stmt->close();
 
-// Redirect back to payment page with success message
-header("Location: ../Pages/client/paymentclient.php?message=Payment submitted successfully");
+$new_payment_id = $conn->insert_id;
+header("Location: ../Pages/invoice/generate_invoice.php?generate_invoice=1&payment_id=$new_payment_id");
 exit;
+
