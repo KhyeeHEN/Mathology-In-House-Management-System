@@ -9,18 +9,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 
 $user_id = $_SESSION['user_id'];
 
-// Get student_id from users table
-$user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT s.student_id, s.is_new_student FROM users u JOIN students s ON u.student_id = s.student_id WHERE u.user_id = ?");
+// Get student_id from users → students
+$stmt = $conn->prepare("SELECT s.student_id FROM users u JOIN students s ON u.student_id = s.student_id WHERE u.user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($student_id, $is_new);
+$stmt->bind_result($student_id);
 $stmt->fetch();
 $stmt->close();
 
-// Get the student’s enrolled course info
+// Get course and new status
 $sql = "
-     SELECT sc.course_id, c.course_name, c.level, s.is_new_student
+    SELECT sc.course_id, c.course_name, c.level, s.is_new_student
     FROM student_courses sc
     JOIN courses c ON sc.course_id = c.course_id
     JOIN students s ON sc.student_id = s.student_id
@@ -30,10 +29,11 @@ $sql = "
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
-$stmt->bind_result($course_id, $is_new, $course_name, $level);
+$stmt->bind_result($course_id, $course_name, $level, $is_new);
 $stmt->fetch();
 $stmt->close();
 
+//  Default payment mode: monthly
 $payment_mode = 'monthly';
 $fee_stmt = $conn->prepare("SELECT fee_amount FROM course_fees WHERE course_id = ? AND time = ?");
 $fee_stmt->bind_param("is", $course_id, $payment_mode);
@@ -42,8 +42,19 @@ $fee_stmt->bind_result($base_fee);
 $fee_stmt->fetch();
 $fee_stmt->close();
 
+//  Check if student has paid before
+$has_paid = false;
+$paid_check = $conn->prepare("SELECT COUNT(*) FROM payment WHERE student_id = ?");
+$paid_check->bind_param("i", $student_id);
+$paid_check->execute();
+$paid_check->bind_result($payment_count);
+$paid_check->fetch();
+$paid_check->close();
+$has_paid = $payment_count > 0;
+
+// Only include one-time fees if it's their first payment
 $one_time_fee = 0;
-if ($is_new) {
+if (!$has_paid) {
     $fee_q = $conn->query("SELECT SUM(amount) AS total FROM one_time_fees");
     $one_time_fee = $fee_q->fetch_assoc()['total'];
 }
@@ -58,12 +69,16 @@ $total = $base_fee + $one_time_fee;
 </head>
 <body>
     <h2>Student Payment</h2>
+
+    <?php if (isset($_GET['message'])): ?>
+        <p style="color: green;"><?php echo htmlspecialchars($_GET['message']); ?></p>
+    <?php endif; ?>
+
     <form method="POST" action="../../sql/process_student_payment.php">
         <p><strong>Course:</strong> <?php echo "$course_name ($level)"; ?></p>
 
         <input type="hidden" name="is_first_payment" value="<?php echo $has_paid ? 0 : 1; ?>">
         <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
-        <input type="hidden" name="is_new" value="<?php echo $is_new; ?>">
 
         <label>Payment Mode:
             <select name="payment_mode" id="payment_mode">
