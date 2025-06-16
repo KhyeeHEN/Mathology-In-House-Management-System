@@ -580,13 +580,7 @@ if (!$viewing_id && !$show_search_results) {
                                     error_log("Split courses: " . var_export($courses, true));
                                     foreach ($courses as $course) {
                                         if (trim($course) !== '') {
-                                            $parts = explode(', ', $course, 2); // Limit to 2 parts to avoid over-splitting
-                                            error_log("Course parts for '$course': " . var_export($parts, true));
-                                            if (count($parts) == 2) {
-                                                echo '"' . htmlspecialchars(trim($parts[0])) . '", "' . htmlspecialchars(trim($parts[1])) . '"<br>';
-                                            } else {
-                                                echo '"' . htmlspecialchars(trim($course)) . '"<br>'; // Fallback if split fails
-                                            }
+                                            echo htmlspecialchars(trim($course)) . '<br>';
                                         }
                                     }
                                 } else {
@@ -662,7 +656,7 @@ if (!$viewing_id && !$show_search_results) {
                                 $timetableData[$timeSlot][$day] = [
                                     'course' => $entry['course'],
                                     'display_time' => $displayTime,
-                                    'entry_id' => $entry['entry_id']
+                                    'entry_id' => $entry['id']
                                 ];
                                 
                                 if (!in_array($timeSlot, $allTimes)) {
