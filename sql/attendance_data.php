@@ -85,6 +85,15 @@ $countResult = $conn->query($countSql);
 $totalRows = $countResult->fetch_assoc()['total'];
 $totalPages = ceil($totalRows / $recordsPerPage);
 
+if (!empty($search)) {
+    $sql .= " WHERE
+        s.First_Name LIKE '%$search%' OR
+        s.Last_Name LIKE '%$search%' OR
+        i.First_Name LIKE '%$search%' OR
+        i.Last_Name LIKE '%$search%' OR
+        ar.course LIKE '%$search%' OR
+        ar.status LIKE '%$search%' ";
+}
 
 $sql .= " ORDER BY $sort_column $sort_direction LIMIT $recordsPerPage OFFSET $offset";
 
@@ -158,25 +167,32 @@ if ($result && $result->num_rows > 0) {
 
 echo "</tbody></table>";
 
-// Pagination links
+// Safely encode parameters
+$encodedSearch = urlencode($search);
+$encodedSort = urlencode($sort_column);
+$encodedDir = urlencode($sort_direction);
+
+// Pagination controls
 if ($totalPages > 1) {
     echo "<div class='pagination'>";
+
     if ($page > 1) {
-        echo "<a href='?page=" . ($page - 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Previous</a>";
+        echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
 
     for ($i = 1; $i <= $totalPages; $i++) {
-        $active = ($i == $page) ? 'class="active"' : '';
-        echo "<a href='?page=$i&search=$search&sort=$sort_column&direction=$sort_direction' $active>$i</a>";
+        $activeClass = ($i == $page) ? 'active' : '';
+        echo "<a href='?page=$i&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir' class='$activeClass'>$i</a>";
     }
 
     if ($page < $totalPages) {
-        echo "<a href='?page=" . ($page + 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Next</a>";
+        echo "<a href='?page=" . ($page + 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Next</a>";
     } else {
         echo "<a class='disabled'>Next</a>";
     }
+
     echo "</div>";
 }
 
