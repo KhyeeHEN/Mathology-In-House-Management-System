@@ -123,7 +123,7 @@ $payment = $result->fetch_assoc();
         <main class="main-content">
             <h2>Edit Payment - ID #<?php echo $payment['payment_id']; ?></h2>
 
-            <form action="../sql/update_payment.php" method="POST">
+            <form action="../sql/update_payment.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="payment_id" value="<?php echo $payment['payment_id']; ?>">
 
                 <p><strong>Student:</strong> <?php echo htmlspecialchars($payment['student_name']); ?></p>
@@ -138,6 +138,7 @@ $payment = $result->fetch_assoc();
                         <option value="credit_card" <?php if ($payment['payment_method'] === 'credit_card') echo 'selected'; ?>>Credit Card</option>
                         <option value="cash" <?php if ($payment['payment_method'] === 'cash') echo 'selected'; ?>>Cash</option>
                         <option value="bank_transfer" <?php if ($payment['payment_method'] === 'bank_transfer') echo 'selected'; ?>>Bank Transfer</option>
+                        <option value="ewallet" <?php if ($payment['payment_method'] === 'ewallet') echo 'selected'; ?>>E-wallet</option>
                     </select>
                 </label><br><br>
 
@@ -163,6 +164,23 @@ $payment = $result->fetch_assoc();
                         <option value="unpaid" <?php if ($payment['payment_status'] === 'unpaid') echo 'selected'; ?>>Unpaid</option>
                         <option value="pending" <?php if ($payment['payment_status'] === 'pending') echo 'selected'; ?>>Pending</option>
                     </select>
+                </label><br><br>
+
+                <p><strong>Current Invoice:</strong>
+                    <?php if (!empty($payment['invoice_path']) && file_exists("../../" . $payment['invoice_path'])): ?>
+                        <a href="../../<?php echo $payment['invoice_path']; ?>" target="_blank">View Invoice</a>
+                    <?php else: ?>
+                        <span style="color:gray;">No invoice uploaded</span>
+                    <?php endif; ?>
+                </p>
+
+                <label>Replace Invoice (PDF only):
+                    <input type="file" name="invoice_file" accept=".pdf">
+                </label>
+
+                <label>
+                    <input type="checkbox" name="remove_invoice" value="1">
+                    Remove Existing Invoice
                 </label><br><br>
 
 

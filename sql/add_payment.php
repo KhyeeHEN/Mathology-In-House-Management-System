@@ -75,7 +75,7 @@ $students = $conn->query("SELECT student_id, CONCAT(First_Name, ' ', Last_Name) 
     </style>
 </head>
 <body>
-    <form action="../../sql/process_admin_add_payment.php" method="POST">
+    <form action="../../sql/process_admin_add_payment.php" method="POST"  enctype="multipart/form-data">
         <h2>Add New Payment Record</h2>
 
         <label for="student_id">Student Name:</label>
@@ -118,6 +118,9 @@ $students = $conn->query("SELECT student_id, CONCAT(First_Name, ' ', Last_Name) 
             <option value="pending">Pending</option>
             <option value="unpaid">Unpaid</option>
         </select>
+
+        <label for="invoice_file">Upload Invoice (PDF):</label>
+        <input type="file" name="invoice_file" id="invoice_file" accept=".pdf">
 
         <button type="submit">Add Payment</button>
         <a href="payment.php">Cancel</a>
