@@ -4,8 +4,14 @@ $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'payment_date';
 $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
 $allowed_columns = [
-    'payment_id', 'payment_method', 'payment_mode', 'payment_amount',
-    'deposit_status', 'payment_status', 'payment_date', 'student_name'
+    'payment_id',
+    'payment_method',
+    'payment_mode',
+    'payment_amount',
+    'deposit_status',
+    'payment_status',
+    'payment_date',
+    'student_name'
 ];
 
 if (!in_array($sort_column, $allowed_columns)) {
@@ -18,7 +24,7 @@ $sort_sql = match ($sort_column) {
 };
 
 $sql = "
-    SELECT
+   SELECT
         p.payment_id,
         CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
         p.payment_method,
@@ -26,7 +32,8 @@ $sql = "
         p.payment_amount,
         p.deposit_status,
         p.payment_status,
-        p.payment_date
+        p.payment_date,
+        p.invoice_path
     FROM payment p
     LEFT JOIN students s ON p.student_id = s.student_id
 ";
@@ -53,6 +60,7 @@ echo "<table class='payment-table'>
                 <th>Amount</th>
                 <th>Deposit</th>
                 <th>Status</th>
+                <th>Invoice</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -68,6 +76,9 @@ if ($result && $result->num_rows > 0) {
         $method = ucfirst($row['payment_method']);
         $mode = ucfirst($row['payment_mode']);
         $date = date('Y-m-d H:i', strtotime($row['payment_date']));
+        $invoice = !empty($row['invoice_path']) && file_exists('../../' . $row['invoice_path'])
+            ? "<a href='../../{$row['invoice_path']}' target='_blank'>Download</a>"
+            : "<span style='color:gray;'>Not available</span>";
 
         // Main row
         echo "<tr>";
@@ -76,12 +87,13 @@ if ($result && $result->num_rows > 0) {
         echo "<td>RM $amount</td>";
         echo "<td>$deposit</td>";
         echo "<td>$status</td>";
+        echo "<td>$invoice</td>";
         echo "<td>
         <div class='action-buttons'>
         <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
         <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
           <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a> </td></div>";
-          echo "</tr>";
+        echo "</tr>";
 
         // Hidden details row
         echo "<tr id='details-$id' class='details-row' style='display: none; background-color: #f9f9f9;'>";
