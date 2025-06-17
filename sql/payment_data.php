@@ -125,11 +125,16 @@ if ($result && $result->num_rows > 0) {
     }
     echo "</tbody></table>";
 
-    // Pagination controls
+} else {
+    echo "<tr><td colspan='7'>No payment records found.</td></tr></tbody></table>";
+}
+
+ // Pagination controls
     $encodedSearch = urlencode($search);
     $encodedSort = urlencode($sort_column);
     $encodedDir = urlencode($sort_direction);
 
+    if ($totalPages >= 1) {
     echo "<div class='pagination'>";
     if ($page > 1) {
         echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
@@ -148,9 +153,6 @@ if ($result && $result->num_rows > 0) {
         echo "<a class='disabled'>Next</a>";
     }
     echo "</div>";
-} else {
-    echo "<tr><td colspan='7'>No payment records found.</td></tr></tbody></table>";
 }
-
 $conn->close();
 ?>
