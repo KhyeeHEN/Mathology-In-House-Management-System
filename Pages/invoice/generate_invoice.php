@@ -37,11 +37,12 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $time = date('h:i A', strtotime($data['payment_date']));
     $amount = number_format($data['payment_amount'], 2);
     $invoiceNo = 'INV-' . date('Ymd') . '-' . $data['payment_id'];
+    $fileName = 'Invoice_' . $invoiceNo . '.pdf';
     $serverDir = $_SERVER['DOCUMENT_ROOT'] . '/invoice/';
     if (!file_exists($serverDir)) {
         mkdir($serverDir, 0755, true);
     }
-    $filePath = $serverDir . $fileName;         // ✅ absolute for saving
+    $filePath = $serverDir . $fileName;
     $relPath = 'invoice/' . $fileName;
 
     $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
