@@ -24,6 +24,29 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
     <title>Attendance</title>
     <link rel="stylesheet" href="../../Styles/common.css" />
     <link rel="stylesheet" href="../../Styles/attendance.css?v=<?php echo time(); ?>" />
+    <style>
+        /* Hover effect for buttons */
+        .pagination a:hover {
+            background-color: rgb(71, 82, 95);
+            color: #FFFFFF;
+        }
+
+        /* Disabled button state */
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #CCCCCC;
+            border-color: #CCCCCC;
+            background-color: #F5F5F5;
+        }
+
+        /* Active page button */
+        .pagination a.active {
+            background-color: #1f2937;
+            color: #FFFFFF;
+            border-color: #1f2937;
+            cursor: default;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 
