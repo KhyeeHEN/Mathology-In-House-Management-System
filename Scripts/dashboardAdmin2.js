@@ -424,9 +424,6 @@ class ScheduleCalendar {
                     ${studentList.map(student => `
                         <li class="student-item">
                             <span class="student-name">${student}</span>
-                            <button class="view-details-btn" onclick="viewStudentDetails('${student}', '${classInfo.course}')">
-                                View Details
-                            </button>
                         </li>
                     `).join('')}
                 </ul>
