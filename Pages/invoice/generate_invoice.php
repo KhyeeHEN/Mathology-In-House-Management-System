@@ -107,7 +107,7 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
 
     $details = "Course: {$data['course_name']} ({$data['level']})\n" .
         "Duration: {$data['program_start']} - {$data['program_end']}\n" .
-        "Hours/Week: {$data['hours_per_week']}\n" .
+        "Hours per Week: {$data['hours_per_week']}\n" .
         "Package: {$data['package_hours']} Hours - {$data['time']}";
 
     $fee = number_format($data['fee_amount'], 2);
