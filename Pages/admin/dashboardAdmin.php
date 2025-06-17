@@ -259,10 +259,6 @@ $attendanceData = $attendanceResult->fetch_assoc();
                     ?>
                     <p><?php echo $totalCourses; ?></p>
                 </div>
-                <div class="summary-card">
-                    <h3>Hours Attended</h3>
-                    <p><?php echo $attendanceData['total_hours_attended'] ?? '0'; ?></p>
-                </div>
             </div>
 
             <!--Analysis-->
