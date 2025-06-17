@@ -105,7 +105,7 @@ $total = $base_fee + $one_time_fee;
                 <fieldset>
                     <legend>Select Payment Method</legend>
                     <label><input type="radio" name="payment_method" value="ewallet" required> E-Wallet</label>
-                    <label><input type="radio" name="payment_method" value="onlinebanking"> Online Banking</label>
+                    <label><input type="radio" name="payment_method" value="banking_transfer"> Online Banking</label>
                 </fieldset>
 
                 <!-- E-Wallet Details -->

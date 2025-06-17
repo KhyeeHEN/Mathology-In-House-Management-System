@@ -1,5 +1,6 @@
 <?php
 ob_start();
+date_default_timezone_set('Asia/Kuala_Lumpur');
 require_once('../../vendor/tecnickcom/tcpdf/tcpdf.php');
 include '../setting.php';
 
