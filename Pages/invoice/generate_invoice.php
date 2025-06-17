@@ -52,7 +52,7 @@ LIMIT 1";
 
     // Header
     $pdf->Image('../../Pages/invoice/LogoTransparent.png', 10, 10, 40);
-    $pdf->Ln(20);  // move cursor down after logo
+    $pdf->Ln(10);  // move cursor down after logo
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Cell(0, 10, 'Official Invoice', 0, 1, 'L');
     $pdf->SetFont('helvetica', '', 10);
