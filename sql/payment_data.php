@@ -23,6 +23,10 @@ $sort_sql = match ($sort_column) {
     default => "p.$sort_column"
 };
 
+$recordsPerPage = 10;
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $recordsPerPage;
+
 $sql = "
    SELECT
         p.payment_id,
@@ -38,17 +42,27 @@ $sql = "
     LEFT JOIN students s ON p.student_id = s.student_id
 ";
 
+$countSql = "
+   SELECT COUNT(*) AS total
+   FROM payment p
+   LEFT JOIN students s ON p.student_id = s.student_id
+";
+
 if (!empty($search)) {
-    $sql .= " WHERE
+    $countSql .= " WHERE
         s.First_Name LIKE '%$search%' OR
         s.Last_Name LIKE '%$search%' OR
         p.payment_method LIKE '%$search%' OR
         p.payment_status LIKE '%$search%' OR
-        p.payment_mode LIKE '%$search%'
-    ";
+        p.payment_mode LIKE '%$search%'";
 }
 
+$countResult = $conn->query($countSql);
+$totalRows = $countResult->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $recordsPerPage);
+
 $sql .= " ORDER BY $sort_sql $sort_direction";
+$sql .= " LIMIT $recordsPerPage OFFSET $offset";
 
 $result = $conn->query($sql);
 
@@ -111,5 +125,27 @@ if ($result && $result->num_rows > 0) {
 
 echo "</tbody></table>";
 
+if ($totalPages > 1) {
+    echo "<div class='pagination'>";
+
+    if ($page > 1) {
+        echo "<a href='?page=" . ($page - 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Previous</a>";
+    } else {
+        echo "<a class='disabled'>Previous</a>";
+    }
+
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $active = ($i == $page) ? 'class="active"' : '';
+        echo "<a href='?page=$i&search=$search&sort=$sort_column&direction=$sort_direction' $active>$i</a>";
+    }
+
+    if ($page < $totalPages) {
+        echo "<a href='?page=" . ($page + 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Next</a>";
+    } else {
+        echo "<a class='disabled'>Next</a>";
+    }
+
+    echo "</div>";
+}
 
 $conn->close();
