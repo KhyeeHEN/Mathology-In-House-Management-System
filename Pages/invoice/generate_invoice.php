@@ -8,25 +8,29 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $payment_id = intval($_GET['payment_id']);
 
     $sql = "SELECT
-    p.payment_id,
-    p.payment_date,
-    p.payment_amount,
-    CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
-    s.address AS student_address,
-    CONCAT(pc.First_Name, ' ', pc.Last_Name) AS guardian_name,
-    c.course_name,
-    c.level,
-    sc.program_start,
-    sc.program_end,
-    sc.hours_per_week
-FROM payment p
-JOIN students s ON p.student_id = s.student_id
-LEFT JOIN primary_contact_number pc ON s.student_id = pc.student_id
-LEFT JOIN student_courses sc ON s.student_id = sc.student_id
-LEFT JOIN courses c ON sc.course_id = c.course_id
-LEFT JOIN course_fees cf ON cf.course_id = c.course_id
-WHERE p.payment_id = ?
-LIMIT 1";
+            p.payment_id,
+            p.payment_date,
+            p.payment_amount,
+            p.payment_mode,
+            CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
+            s.address AS student_address,
+            CONCAT(pc.First_Name, ' ', pc.Last_Name) AS guardian_name,
+            c.course_name,
+            c.level,
+            sc.program_start,
+            sc.program_end,
+            sc.hours_per_week,
+            cf.fee_amount,
+            cf.package_hours,
+            cf.time
+        FROM payment p
+        JOIN students s ON p.student_id = s.student_id
+        LEFT JOIN primary_contact_number pc ON s.student_id = pc.student_id
+        LEFT JOIN student_courses sc ON s.student_id = sc.student_id
+        LEFT JOIN courses c ON sc.course_id = c.course_id
+        LEFT JOIN course_fees cf ON c.course_id = cf.course_id AND cf.time = p.payment_mode
+        WHERE p.payment_id = ?
+        LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $payment_id);
     $stmt->execute();
@@ -67,7 +71,8 @@ LIMIT 1";
     }
     $date = date('d/m/Y (l)', strtotime($data['payment_date']));
     $time = date('h:i A', strtotime($data['payment_date']));
-    $amount = number_format($data['payment_amount'], 2);
+    $amount = number_format((float)$data['payment_amount'], 2);
+    $fee_amount = isset($data['fee_amount']) ? number_format($data['fee_amount'], 2) : '0.00';
     $invoiceNo = 'INV-' . date('Ymd') . '-' . $data['payment_id'];
     $fileName = 'Invoice_' . $invoiceNo . '.pdf';
 
@@ -107,7 +112,7 @@ LIMIT 1";
             "   Hours Per Week: {$data['hours_per_week']}\n" .
             "   Package Hours: {$data['package_hours']}\n" .
             "   Package Time: {$data['time']}\n" .
-            "   Fee Amount: RM " . number_format($data['fee_amount'], 2) . "\n" .
+            "   Fee Amount: RM {$fee_amount}\n" .
             ($is_first_payment ? "   \n2. One-Time Fees:\n" . $one_time_details : ''),
         0,
         'L'
@@ -117,7 +122,7 @@ LIMIT 1";
     // Total
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(140, 6, 'Total Amount:', 1);
-    $grand_total = $data['payment_amount'] + $one_time_fee;
+    $grand_total = $data['payment_amount'];
     $pdf->Cell(0, 6, 'RM ' . number_format($grand_total, 2), 1, 1, 'R');
 
     // Notes
