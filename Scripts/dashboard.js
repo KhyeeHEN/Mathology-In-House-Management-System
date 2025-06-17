@@ -216,11 +216,6 @@ class Calendar {
                         </div>
                     </div>
                 </div>
-                <div class="student-actions">
-                    <button class="view-student-btn" onclick="viewStudentDetails('${studentClass.student}')">
-                        <i class="fas fa-eye"></i> View Student
-                    </button>
-                </div>
             </div>
         `).join('');
     }
