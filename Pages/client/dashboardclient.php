@@ -10,20 +10,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 
 $studentId = $_SESSION['user_id']; 
 
-// First get the student_id from users table
-$query = "SELECT student_id FROM users WHERE user_id = ?";
+// First get the student_id and name from users and students tables
+$query = "SELECT s.student_id, CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name 
+          FROM users u 
+          JOIN students s ON u.student_id = s.student_id 
+          WHERE u.user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $studentId);
 $stmt->execute();
 $result = $stmt->get_result();
 $userData = $result->fetch_assoc();
 $actualStudentId = $userData['student_id'];
+$studentName = $userData['student_name'];
 
 // Fetch student's timetable
-$query = "SELECT st.id, c.course_name, st.day, st.start_time, st.end_time, st.status 
+$query = "SELECT st.id, c.course_name, st.day, st.start_time, st.end_time, st.status, 
+                 i.First_Name AS instructor_first, i.Last_Name AS instructor_last
           FROM student_timetable st
           JOIN student_courses sc ON st.student_course_id = sc.student_course_id
           JOIN courses c ON sc.course_id = c.course_id
+          LEFT JOIN instructor i ON st.instructor_id = i.instructor_id
           WHERE sc.student_id = ? AND st.status = 'active'";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $actualStudentId);
@@ -58,15 +64,19 @@ function getNextDateForDay($dayName) {
 // Format for calendar.js
 $calendarEvents = [];
 foreach ($events as $event) {
+    $instructorName = $event['instructor_first'] 
+        ? $event['instructor_first'] . ' ' . $event['instructor_last'] 
+        : 'TBD';
+    
     $calendarEvents[] = [
-        'title' => $event['course_name'],
+        'title' => $event['course_name'] . ' - ' . $instructorName,
         'date' => getNextDateForDay($event['day']),
         'type' => '1',
         'time' => date('h:i A', strtotime($event['start_time'])),
         'duration' => calculateDuration($event['start_time'], $event['end_time']),
-        'venue' => 'TBD', // Optional placeholder
-        'lecturer' => 'TBD', // Optional placeholder
-        'description' => ''
+        'students' => $studentName, // Include the student's name
+        'venue' => 'TBD',
+        'description' => 'Your scheduled class'
     ];
 }
 ?>
