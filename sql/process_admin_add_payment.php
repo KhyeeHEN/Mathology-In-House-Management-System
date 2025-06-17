@@ -1,6 +1,11 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = $_POST['student_id'];
     $method = $_POST['payment_method'];

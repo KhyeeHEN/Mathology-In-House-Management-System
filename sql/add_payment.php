@@ -1,6 +1,11 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
+    exit;
+}
+
 // Get all students
 $students = $conn->query("SELECT student_id, CONCAT(First_Name, ' ', Last_Name) AS full_name FROM students ORDER BY First_Name ASC");
 ?>
