@@ -58,7 +58,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                     <button type="submit">Search/Sort</button>
                     <button type="button" onclick="window.location='payment.php'">Reset</button>
                     <button type="button" onclick="window.location='manage_fees.php'">Course Fee</button>
-                    <button type="button" onclick="window.location='../../sql/process_admin_add_payment.php'">Add</button>
+                    <button type="button" onclick="window.location='../../sql/add_payment.php'">Add</button>
                 </form>
             </div>
 
