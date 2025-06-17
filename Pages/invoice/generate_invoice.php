@@ -38,12 +38,10 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $amount = number_format($data['payment_amount'], 2);
     $invoiceNo = 'INV-' . date('Ymd') . '-' . $data['payment_id'];
     $fileName = 'Invoice_' . $invoiceNo . '.pdf';
-    $serverDir = $_SERVER['DOCUMENT_ROOT'] . '/invoice/';
-    if (!file_exists($serverDir)) {
-        mkdir($serverDir, 0755, true);
-    }
+
+    $serverDir = __DIR__ . '/'; // Absolute server path to /Pages/invoice/
     $filePath = $serverDir . $fileName;
-    $relPath = 'invoice/' . $fileName;
+    $relPath = 'Pages/invoice/' . $fileName; // Relative for download
 
     $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     $pdf->SetTitle('Official Invoice');
