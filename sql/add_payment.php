@@ -129,7 +129,9 @@ $students = $conn->query("SELECT student_id, CONCAT(First_Name, ' ', Last_Name) 
         <input type="file" name="invoice_file" id="invoice_file" accept=".pdf">
 
         <button type="submit">Add Payment</button>
-        <a href="payment.php">Cancel</a>
+        <a href="../Pages/admin/payment.php" style="margin-left: 10px;">
+            <button type="button" style="background: #ccc; color: #000;">Cancel</button>
+        </a>
     </form>
 </body>
 </html>
