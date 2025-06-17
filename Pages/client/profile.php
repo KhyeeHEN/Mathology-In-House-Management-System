@@ -11,7 +11,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-       <?php require("../includes/Aside_Nav.php"); ?>
+       <?php require("../includes/Aside_Nav_Student.php"); ?>
 
         <!-- Main Content -->
         <main class="main-content">
