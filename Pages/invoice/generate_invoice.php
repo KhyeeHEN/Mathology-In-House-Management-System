@@ -50,7 +50,7 @@ LIMIT 1";
     $pdf->AddPage();
 
     // Header
-    $pdf->Image('../../Pages/invoice/LogoTransparent.png"', 10, 10, 40);
+    $pdf->Image('../../Pages/invoice/LogoTransparent.png', 10, 10, 40);
     $pdf->Ln(20);  // move cursor down after logo
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Cell(0, 10, 'Official Invoice', 0, 1, 'L');
@@ -83,7 +83,8 @@ LIMIT 1";
     $pdf->MultiCell( 0,5,
         "1. All registration, diagnostic test and program fees paid are non-refundable.\n" .
             "2. Cancellation requires 1 month advance notice.\n" .
-            "3. No signature required. This is a computer-generated document."
+            "3. No signature required. This is a computer-generated document.",
+            0,'L'
     );
     // Footer
     $pdf->Ln(6);
