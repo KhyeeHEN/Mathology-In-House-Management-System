@@ -23,6 +23,7 @@ JOIN students s ON p.student_id = s.student_id
 LEFT JOIN primary_contact_number pc ON s.student_id = pc.student_id
 LEFT JOIN student_courses sc ON s.student_id = sc.student_id
 LEFT JOIN courses c ON sc.course_id = c.course_id
+LEFT JOIN course_fees cf ON cf.course_id = c.course_id
 WHERE p.payment_id = ?
 LIMIT 1";
     $stmt = $conn->prepare($sql);
@@ -35,6 +36,34 @@ LIMIT 1";
     }
 
     $data = $result->fetch_assoc();
+    // Check if this is the first payment for the student
+    $student_id_check = $conn->prepare("SELECT student_id FROM payment WHERE payment_id = ?");
+    $student_id_check->bind_param("i", $payment_id);
+    $student_id_check->execute();
+    $student_id_check->bind_result($student_id);
+    $student_id_check->fetch();
+    $student_id_check->close();
+
+    $count_check = $conn->prepare("SELECT COUNT(*) FROM payment WHERE student_id = ?");
+    $count_check->bind_param("i", $student_id);
+    $count_check->execute();
+    $count_check->bind_result($total_payments);
+    $count_check->fetch();
+    $count_check->close();
+
+    $is_first_payment = $total_payments === 1;
+    $one_time_fee = 0;
+    $one_time_details = '';
+
+    if ($is_first_payment) {
+        $res = $conn->query("SELECT name, amount FROM one_time_fees");
+        $index = 1;
+        while ($fee = $res->fetch_assoc()) {
+            $one_time_fee += $fee['amount'];
+            $one_time_details .= "   2.$index. {$fee['name']}: RM " . number_format($fee['amount'], 2) . "\n";
+            $index++;
+        }
+    }
     $date = date('d/m/Y (l)', strtotime($data['payment_date']));
     $time = date('h:i A', strtotime($data['payment_date']));
     $amount = number_format($data['payment_amount'], 2);
@@ -69,17 +98,26 @@ LIMIT 1";
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(0, 7, 'Particulars:', 0, 1);
     $pdf->SetFont('helvetica', '', 10);
-    $pdf->MultiCell(0,6,
+    $pdf->MultiCell(
+        0,
+        6,
         "1. {$data['course_name']} ({$data['level']})\n" .
             "   Programme Duration: {$data['program_start']} - {$data['program_end']}\n" .
-            "   Hours Per Week: {$data['hours_per_week']}"
+            "   Hours Per Week: {$data['hours_per_week']}\n" .
+            "   Package Hours: {$data['package_hours']}\n" .
+            "   Package Time: {$data['time']}\n" .
+            "   Fee Amount: RM " . number_format($data['fee_amount'], 2) . "\n" .
+            ($is_first_payment ? "   \n2. One-Time Fees:\n" . $one_time_details : ''),
+        0,
+        'L'
     );
     $pdf->Ln(2);
 
     // Total
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(140, 6, 'Total Amount:', 1);
-    $pdf->Cell(0, 6, 'RM ' . $amount, 1, 1, 'R');
+    $grand_total = $data['payment_amount'] + $one_time_fee;
+    $pdf->Cell(0, 6, 'RM ' . number_format($grand_total, 2), 1, 1, 'R');
 
     // Notes
     $pdf->Ln(4);
