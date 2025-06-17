@@ -1,5 +1,5 @@
 <?php
-require_once '../../Pages/setting.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Fetch all students
 $students = $conn->query("SELECT student_id, CONCAT(First_Name, ' ', Last_Name) AS name FROM students ORDER BY First_Name ASC");
