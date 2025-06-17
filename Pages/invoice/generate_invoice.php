@@ -38,7 +38,7 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $amount = number_format($data['payment_amount'], 2);
     $invoiceNo = 'INV-' . date('Ymd') . '-' . $data['payment_id'];
     $fileName = 'Invoice_' . $invoiceNo . '.pdf';
-    $filePath = '../../invoices/' . $fileName;
+    $filePath = '../../invoice/' . $fileName;
 
     $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     $pdf->SetTitle('Official Invoice');

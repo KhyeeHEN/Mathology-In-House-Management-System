@@ -31,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
                 $course_id = intval($_POST['course_id']);
                 $enrollment_date = $conn->real_escape_string($_POST['Enrollment_Date']);
+                $program_start = $conn->real_escape_string($_POST['program_start']);
+                $program_end = $conn->real_escape_string($_POST['program_end']);
+                $hours_per_week = floatval($_POST['hours_per_week']);
                 $day = $conn->real_escape_string($_POST['Day']);
                 $start_time = $conn->real_escape_string($_POST['Start_Time']);
                 $end_time = $conn->real_escape_string($_POST['End_Time']);
@@ -63,8 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 // Insert into student_courses table
-                $insertStudentCourseQuery = "INSERT INTO student_courses (student_id, course_id, enrollment_date)
-                                             VALUES ('$student_id', '$course_id', '$enrollment_date')";
+                $insertStudentCourseQuery = "INSERT INTO student_courses (student_id, course_id, enrollment_date, program_start, program_end, hours_per_week)
+                             VALUES ('$student_id', '$course_id', '$enrollment_date', '$program_start', '$program_end', '$hours_per_week')";
+
                 if (!$conn->query($insertStudentCourseQuery)) {
                     throw new Exception("Error adding student course: " . $conn->error);
                 }
@@ -89,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding into payment table: " . $conn->error);
                 }
 
-                $insertPrimaryContactQuery = "INSERT INTO primary_contact_number 
+                $insertPrimaryContactQuery = "INSERT INTO primary_contact_number
     (student_id, Last_Name, First_Name, Relationship_with_Student, phone, email, address, postcode)
     VALUES ('$student_id', '$primary_owner_last_name', '$primary_owner_first_name', '$primary_relationship', '$primary_phone', '$primary_email', '$primary_address','$primary_postcode')";
                 if (!$conn->query($insertPrimaryContactQuery)) {
@@ -108,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $secondary_relationship = $conn->real_escape_string($_POST['secondary_relationship']);
                     $secondary_phone = $conn->real_escape_string($_POST['secondary_phone']);
 
-                    $insertSecondaryContactQuery = "INSERT INTO secondary_contact_number 
+                    $insertSecondaryContactQuery = "INSERT INTO secondary_contact_number
         (student_id, Last_Name, First_Name, Relationship_with_Student, phone)
         VALUES ('$student_id', '$secondary_owner_last_name', '$secondary_owner_first_name', '$secondary_relationship', '$secondary_phone')";
                     if (!$conn->query($insertSecondaryContactQuery)) {
@@ -120,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+and+associated+user+added+successfully");
                 exit();
-
             } elseif ($user_type === 'instructor') {
                 // Instructor form submission
                 $last_name = $conn->real_escape_string($_POST['Last_Name']);
@@ -197,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                // Insert a blank attendance record 
+                // Insert a blank attendance record
                 $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id, course)
                                  VALUES ('$instructor_id', '$course_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
@@ -216,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$conn->query($insertUserQuery)) {
                     throw new Exception("Error adding user: " . $conn->error);
                 }
-                  $conn->commit();
+                $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=admins&message=Admin+added+successfully");
                 exit();
             }
@@ -324,6 +327,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </select><br>
         <label for="enrollment_date">Enrollment Date:</label>
         <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
+        <label for="program_start">Program Start:</label>
+        <input type="date" id="program_start" name="program_start" required><br>
+
+        <label for="program_end">Program End:</label>
+        <input type="date" id="program_end" name="program_end" required><br>
+
+        <label for="hours_per_week">Hours per Week:</label>
+        <input type="number" step="0.1" id="hours_per_week" name="hours_per_week" required><br>
         <label for="student_day">Day:</label>
         <select id="student_day" name="Day" required>
             <option value="Monday">Monday</option>
@@ -469,19 +480,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         const allCourses = <?php
-        $courses = [];
-        $res = $conn->query("SELECT course_id, course_name, level FROM courses");
-        while ($row = $res->fetch_assoc()) {
-            $courses[] = $row;
-        }
-        echo json_encode($courses);
-        ?>;
+                            $courses = [];
+                            $res = $conn->query("SELECT course_id, course_name, level FROM courses");
+                            while ($row = $res->fetch_assoc()) {
+                                $courses[] = $row;
+                            }
+                            echo json_encode($courses);
+                            ?>;
 
-        document.getElementById('course_level_select').addEventListener('change', function () {
+        document.getElementById('course_level_select').addEventListener('change', function() {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('student_course');
             nameSelect.innerHTML = '<option value="">Select Course</option>';
-            allCourses.forEach(function (course) {
+            allCourses.forEach(function(course) {
                 if (course.level === selectedLevel) {
                     const opt = document.createElement('option');
                     opt.value = course.course_id;
@@ -491,11 +502,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
 
-        document.getElementById('instructor_course_level').addEventListener('change', function () {
+        document.getElementById('instructor_course_level').addEventListener('change', function() {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('instructor_course_name');
             nameSelect.innerHTML = '<option value="">Select Course</option>';
-            allCourses.forEach(function (course) {
+            allCourses.forEach(function(course) {
                 if (course.level === selectedLevel) {
                     const opt = document.createElement('option');
                     opt.value = course.course_id;
@@ -548,7 +559,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
 
         // On page load or form show
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             setWorkingDaysState();
         });
 
