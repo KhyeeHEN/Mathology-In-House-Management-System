@@ -125,27 +125,34 @@ if ($result && $result->num_rows > 0) {
 
 echo "</tbody></table>";
 
+// Encode URL params
+$encodedSearch = urlencode($search);
+$encodedSort = urlencode($sort_column);
+$encodedDir = urlencode($sort_direction);
+
+// Pagination controls
 if ($totalPages > 1) {
     echo "<div class='pagination'>";
 
     if ($page > 1) {
-        echo "<a href='?page=" . ($page - 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Previous</a>";
+        echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
 
     for ($i = 1; $i <= $totalPages; $i++) {
-        $active = ($i == $page) ? 'class="active"' : '';
-        echo "<a href='?page=$i&search=$search&sort=$sort_column&direction=$sort_direction' $active>$i</a>";
+        $active = ($i == $page) ? 'class=\"active\"' : '';
+        echo "<a href='?page=$i&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir' $active>$i</a>";
     }
 
     if ($page < $totalPages) {
-        echo "<a href='?page=" . ($page + 1) . "&search=$search&sort=$sort_column&direction=$sort_direction'>Next</a>";
+        echo "<a href='?page=" . ($page + 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Next</a>";
     } else {
         echo "<a class='disabled'>Next</a>";
     }
 
     echo "</div>";
 }
+
 
 $conn->close();
