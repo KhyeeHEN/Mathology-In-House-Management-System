@@ -7,22 +7,24 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $payment_id = intval($_GET['payment_id']);
 
     $sql = "SELECT
-                p.payment_id,
-                p.payment_date,
-                p.payment_amount,
-                CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
-                s.address,
-                c.course_name,
-                c.level,
-                sc.program_start,
-                sc.program_end,
-                sc.hours_per_week
-            FROM payment p
-            JOIN students s ON p.student_id = s.student_id
-            JOIN student_courses sc ON sc.student_id = s.student_id
-            JOIN courses c ON sc.course_id = c.course_id
-            WHERE p.payment_id = ?
-            LIMIT 1";
+    p.payment_id,
+    p.payment_date,
+    p.payment_amount,
+    CONCAT(s.First_Name, ' ', s.Last_Name) AS student_name,
+    s.address AS student_address,
+    CONCAT(pc.First_Name, ' ', pc.Last_Name) AS guardian_name,
+    c.course_name,
+    c.level,
+    sc.program_start,
+    sc.program_end,
+    sc.hours_per_week
+FROM payment p
+JOIN students s ON p.student_id = s.student_id
+LEFT JOIN primary_contact_number pc ON s.student_id = pc.student_id
+LEFT JOIN student_courses sc ON s.student_id = sc.student_id
+LEFT JOIN courses c ON sc.course_id = c.course_id
+WHERE p.payment_id = ?
+LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $payment_id);
     $stmt->execute();
@@ -55,7 +57,9 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $pdf->Cell(0, 6, 'Date: ' . $date, 0, 1);
     $pdf->Cell(100, 6, 'Student: ' . $data['student_name'], 0, 0);
     $pdf->Cell(0, 6, 'Time: ' . $time, 0, 1);
-    $pdf->MultiCell(0, 6, $data['address'], 0, 'L');
+    $pdf->Cell(0, 6, 'Guardian: ' . $data['guardian_name'], 0, 1);
+    $pdf->MultiCell(0, 6, $data['student_address'], 0, 'L');
+
     $pdf->Ln(3);
 
     // Course Info
