@@ -105,47 +105,13 @@ $total = $base_fee + $one_time_fee;
                 <fieldset>
                     <legend>Select Payment Method</legend>
                     <label><input type="radio" name="payment_method" value="ewallet" required> E-Wallet</label>
-                    <label><input type="radio" name="payment_method" value="banking_transfer"> Online Banking</label>
+                    <label><input type="radio" name="payment_method" value="bank_transfer"> Online Banking</label>
                 </fieldset>
-
-                <!-- E-Wallet Details -->
-                <!-- <div id="ewallet-details" style="display: none;">
-                <label for="ewallet_provider">E-Wallet Provider</label>
-                <select name="ewallet_provider" id="ewallet_provider">
-                    <option value="Touch 'n Go">Touch 'n Go</option>
-                    <option value="Boost">Boost</option>
-                    <option value="GrabPay">GrabPay</option>
-                </select>
-
-                <label for="ewallet_number">E-Wallet Account Number</label>
-                <input type="text" name="ewallet_number" id="ewallet_number">
-            </div> -->
-
-                <!-- Online Banking Details  -->
-                <!--<div id="banking-details" style="display: none;">
-                <label for="bank_name">Bank</label>
-                <select name="bank_name" id="bank_name">
-                    <option value="Maybank">Maybank</option>
-                    <option value="CIMB">CIMB</option>
-                    <option value="Public Bank">Public Bank</option>
-                    <option value="RHB">RHB</option>
-                </select>
-
-                <label for="transaction_id">Transaction ID</label>
-                <input type="text" name="transaction_id" id="transaction_id">
-            </div> -->
 
                 <br>
                 <input type="submit" value="Check Out" id="checkoutButton">
                 <button type="button" id="cancelButton">Cancel</button>
             </form>
-
-            <!-- <div id="payment-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:999;">
-            <div style="background:white; width:90%; max-width:400px; margin:10% auto; padding:20px; border-radius:8px; text-align:center;">
-                <p id="modal-message" style="margin-bottom:1rem; font-size:1.1rem;"></p>
-                <button id="close-modal" style="padding:0.5rem 1rem; background:#4f46e5; color:white; border:none; border-radius:4px;">Close</button>
-            </div>
-        </div> -->
         </main>
     </div>
 
