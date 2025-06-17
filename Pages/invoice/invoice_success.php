@@ -10,9 +10,13 @@ $stmt->bind_result($invoice_path);
 $stmt->fetch();
 $stmt->close();
 
-$download_link = (!empty($invoice_path) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $invoice_path))
-    ? '/' . $invoice_path
-    : null;
+$invoice_path = str_replace('../../', '', $invoice_path); // make it relative to web root
+$fullPath = $_SERVER['DOCUMENT_ROOT'] . '/' . $invoice_path;
+
+$download_link = null;
+if (!empty($invoice_path) && file_exists($fullPath)) {
+    $download_link = '/' . $invoice_path;
+}
 ?>
 <!DOCTYPE html>
 <html>
