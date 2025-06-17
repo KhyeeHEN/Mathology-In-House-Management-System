@@ -47,6 +47,7 @@ LIMIT 1";
 
     $pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     $pdf->SetTitle('Official Invoice');
+    $pdf->setPrintHeader(false);
     $pdf->AddPage();
 
     // Header
@@ -68,9 +69,12 @@ LIMIT 1";
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(0, 7, 'Particulars:', 0, 1);
     $pdf->SetFont('helvetica', '', 10);
-    $details = "Programme Duration {$data['program_start']} - {$data['program_end']}\n{$data['hours_per_week']} Hour(s) Per Week";
-    $pdf->Cell(140, 6, $details, 1);
-    $pdf->Cell(0, 6, 'RM ' . $amount, 1, 1, 'R');
+    $pdf->MultiCell(0,6,
+        "1. {$data['course_name']} ({$data['level']})\n" .
+            "   Programme Duration: {$data['program_start']} - {$data['program_end']}\n" .
+            "   Hours Per Week: {$data['hours_per_week']}"
+    );
+    $pdf->Ln(2);
 
     // Total
     $pdf->SetFont('helvetica', 'B', 10);
@@ -80,11 +84,14 @@ LIMIT 1";
     // Notes
     $pdf->Ln(4);
     $pdf->SetFont('helvetica', '', 8);
-    $pdf->MultiCell( 0,5,
+    $pdf->MultiCell(
+        0,
+        5,
         "1. All registration, diagnostic test and program fees paid are non-refundable.\n" .
             "2. Cancellation requires 1 month advance notice.\n" .
             "3. No signature required. This is a computer-generated document.",
-            0,'L'
+        0,
+        'L'
     );
     // Footer
     $pdf->Ln(6);
