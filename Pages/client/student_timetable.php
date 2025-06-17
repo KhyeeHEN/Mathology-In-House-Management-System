@@ -31,13 +31,15 @@ $student_id = $user_info['student_id'];
 // Fetch timetable data with student and course details
 $sql = "SELECT 
             st.id, 
-            st.course,
+            c.course_name,
+            c.level,
             st.day,
             TIME_FORMAT(st.start_time, '%h:%i %p') as start_time,
             TIME_FORMAT(st.end_time, '%h:%i %p') as end_time,
             DATE_FORMAT(st.approved_at, '%M %d, %Y') as approved_at
         FROM student_timetable st
         JOIN student_courses sc ON st.student_course_id = sc.student_course_id
+        JOIN courses c ON sc.course_id = c.course_id
         WHERE sc.student_id = ?
         ORDER BY FIELD(st.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), st.start_time";
 
@@ -162,7 +164,8 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                     <table class="timetable">
                         <thead>
                             <tr>
-                                <th>Course</th>
+                                <th>Course Name</th>
+                                <th>Level</th>
                                 <th>Day</th>
                                 <th>Start Time</th>
                                 <th>End Time</th>
@@ -172,7 +175,8 @@ $student_info = $student_result ? $student_result->fetch_assoc() : null;
                         <tbody>
                             <?php foreach ($timetable_data as $row): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($row['course'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['course_name'] ?? 'N/A') ?></td>
+                                    <td><?= htmlspecialchars($row['level'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['day'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['start_time'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($row['end_time'] ?? 'N/A') ?></td>
