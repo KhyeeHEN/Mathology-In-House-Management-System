@@ -93,6 +93,6 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $update->close();
 
 
-    header("Location: $relPath");
+    header("Location: invoice_success.php?payment_id=$payment_id");
     exit;
 }
