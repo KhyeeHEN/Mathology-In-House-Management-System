@@ -104,25 +104,39 @@ if (isset($_GET['generate_invoice']) && isset($_GET['payment_id'])) {
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(0, 7, 'Particulars:', 0, 1);
     $pdf->SetFont('helvetica', '', 10);
-    $pdf->MultiCell(
-        0,
-        6,
-        "1. {$data['course_name']} ({$data['level']})\n" .
-            "   Programme Duration: {$data['program_start']} - {$data['program_end']}\n" .
-            "   Hours Per Week: {$data['hours_per_week']}\n" .
-            "   Package Hours: {$data['package_hours']}\n" .
-            "   Package Time: {$data['time']}\n" .
-            "   Fee Amount: RM {$fee_amount}\n" .
-            ($is_first_payment ? "   \n2. One-Time Fees:\n" . $one_time_details : ''),
-        0,
-        'L'
-    );
+
+    $details = "Course: {$data['course_name']} ({$data['level']})\n" .
+        "Duration: {$data['program_start']} - {$data['program_end']}\n" .
+        "Hours/Week: {$data['hours_per_week']}\n" .
+        "Package: {$data['package_hours']} Hours - {$data['time']}";
+
+    $fee = number_format($data['fee_amount'], 2);
+
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->MultiCell(140, 24, $details, 1, 'L', false, 0);
+    $pdf->Cell(0, 24, 'RM ' . $fee, 1, 1, 'R');
+    if ($is_first_payment) {
+        $pdf->Ln(2);
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(0, 7, '2. One-Time Fees:', 0, 1);
+
+        $pdf->SetFont('helvetica', '', 10);
+        $res = $conn->query("SELECT name, amount FROM one_time_fees");
+        $index = 1;
+        while ($fee = $res->fetch_assoc()) {
+            $label = "2.$index. {$fee['name']}";
+            $amount = 'RM ' . number_format($fee['amount'], 2);
+            $pdf->Cell(140, 6, $label, 1);
+            $pdf->Cell(0, 6, $amount, 1, 1, 'R');
+            $index++;
+        }
+    }
     $pdf->Ln(2);
 
     // Total
     $pdf->SetFont('helvetica', 'B', 10);
     $pdf->Cell(140, 6, 'Total Amount:', 1);
-    $grand_total = $data['payment_amount'];
+    $grand_total = $data['payment_amount'] + ($is_first_payment ? $one_time_fee : 0);
     $pdf->Cell(0, 6, 'RM ' . number_format($grand_total, 2), 1, 1, 'R');
 
     // Notes
