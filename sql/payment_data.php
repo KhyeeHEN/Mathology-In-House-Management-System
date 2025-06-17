@@ -76,8 +76,8 @@ if ($result && $result->num_rows > 0) {
         $method = ucfirst($row['payment_method']);
         $mode = ucfirst($row['payment_mode']);
         $date = date('Y-m-d H:i', strtotime($row['payment_date']));
-        $invoice = !empty($row['invoice_path']) && file_exists('../../' . $row['invoice_path'])
-            ? "<a href='../../{$row['invoice_path']}' target='_blank'>Download</a>"
+        $invoice = (!empty($row['invoice_path']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . str_replace('../../', '', $row['invoice_path'])))
+            ? "<a href='../../{$row['invoice_path']}' target='_blank' class='download-btn'>View Invoice</a>"
             : "<span style='color:gray;'>Not available</span>";
 
         // Main row
