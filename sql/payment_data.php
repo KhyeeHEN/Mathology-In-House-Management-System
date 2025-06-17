@@ -3,49 +3,28 @@ $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : 
 $sort_column = isset($_GET['sort']) ? $_GET['sort'] : 'payment_date';
 $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
+// Allowed columns to prevent SQL injection
 $allowed_columns = [
-    'payment_id',
-    'payment_method',
-    'payment_mode',
-    'payment_amount',
-    'deposit_status',
-    'payment_status',
-    'payment_date',
-    'student_name'
+    'payment_id', 'payment_method', 'payment_mode', 'payment_amount',
+    'deposit_status', 'payment_status', 'payment_date', 'student_name'
 ];
 
 if (!in_array($sort_column, $allowed_columns)) {
     $sort_column = 'payment_date';
 }
 
-$sort_sql = match ($sort_column) {
-    'student_name' => "s.Last_Name",
-    default => "p.$sort_column"
-};
+$sort_sql = $sort_column === 'student_name' ? "s.Last_Name" : "p.$sort_column";
 
-$recordsPerPage = 10;
+// Pagination setup
+$limit = 10;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$offset = ($page - 1) * $recordsPerPage;
+$offset = ($page - 1) * $limit;
 
-$sql = "
-   SELECT
-        p.payment_id,
-        CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
-        p.payment_method,
-        p.payment_mode,
-        p.payment_amount,
-        p.deposit_status,
-        p.payment_status,
-        p.payment_date,
-        p.invoice_path
+// Count total records for pagination
+$countSql = "
+    SELECT COUNT(*) AS total
     FROM payment p
     LEFT JOIN students s ON p.student_id = s.student_id
-";
-
-$countSql = "
-   SELECT COUNT(*) AS total
-   FROM payment p
-   LEFT JOIN students s ON p.student_id = s.student_id
 ";
 
 if (!empty($search)) {
@@ -59,13 +38,38 @@ if (!empty($search)) {
 
 $countResult = $conn->query($countSql);
 $totalRows = $countResult->fetch_assoc()['total'];
-$totalPages = ceil($totalRows / $recordsPerPage);
+$totalPages = ceil($totalRows / $limit);
 
-$sql .= " ORDER BY $sort_sql $sort_direction";
-$sql .= " LIMIT $recordsPerPage OFFSET $offset";
+// Main query with limit
+$sql = "
+    SELECT
+        p.payment_id,
+        CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
+        p.payment_method,
+        p.payment_mode,
+        p.payment_amount,
+        p.deposit_status,
+        p.payment_status,
+        p.payment_date,
+        p.invoice_path
+    FROM payment p
+    LEFT JOIN students s ON p.student_id = s.student_id
+";
+
+if (!empty($search)) {
+    $sql .= " WHERE
+        s.First_Name LIKE '%$search%' OR
+        s.Last_Name LIKE '%$search%' OR
+        p.payment_method LIKE '%$search%' OR
+        p.payment_status LIKE '%$search%' OR
+        p.payment_mode LIKE '%$search%'";
+}
+
+$sql .= " ORDER BY $sort_sql $sort_direction LIMIT $limit OFFSET $offset";
 
 $result = $conn->query($sql);
 
+// Begin table output
 echo "<table class='payment-table'>
         <thead>
             <tr>
@@ -94,46 +98,39 @@ if ($result && $result->num_rows > 0) {
             ? "<a href='../../{$row['invoice_path']}' target='_blank' class='download-btn'>View Invoice</a>"
             : "<span style='color:gray;'>Not available</span>";
 
-        // Main row
-        echo "<tr>";
-        echo "<td>$id</td>";
-        echo "<td>$student</td>";
-        echo "<td>RM $amount</td>";
-        echo "<td>$deposit</td>";
-        echo "<td>$status</td>";
-        echo "<td>$invoice</td>";
-        echo "<td>
-        <div class='action-buttons'>
-        <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
-        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
-          <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a> </td></div>";
-        echo "</tr>";
+        echo "<tr>
+                <td>$id</td>
+                <td>$student</td>
+                <td>RM $amount</td>
+                <td>$deposit</td>
+                <td>$status</td>
+                <td>$invoice</td>
+                <td>
+                    <div class='action-buttons'>
+                        <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
+                        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
+                        <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a>
+                    </div>
+                </td>
+              </tr>";
 
-        // Hidden details row
-        echo "<tr id='details-$id' class='details-row' style='display: none; background-color: #f9f9f9;'>";
-        echo "<td colspan='6'>
-                <strong>Payment Method:</strong> $method<br>
-                <strong>Payment Mode:</strong> $mode<br>
-                <strong>Payment Date:</strong> $date<br>
-
-              </td>";
-        echo "</tr>";
+        // Details row
+        echo "<tr id='details-$id' class='details-row' style='display: none; background-color: #f9f9f9;'>
+                <td colspan='7'>
+                    <strong>Payment Method:</strong> $method<br>
+                    <strong>Payment Mode:</strong> $mode<br>
+                    <strong>Payment Date:</strong> $date<br>
+                </td>
+              </tr>";
     }
-} else {
-    echo "<tr><td colspan='6'>No payment records found.</td></tr>";
-}
+    echo "</tbody></table>";
 
-echo "</tbody></table>";
+    // Pagination controls
+    $encodedSearch = urlencode($search);
+    $encodedSort = urlencode($sort_column);
+    $encodedDir = urlencode($sort_direction);
 
-// Encode URL params
-$encodedSearch = urlencode($search);
-$encodedSort = urlencode($sort_column);
-$encodedDir = urlencode($sort_direction);
-
-// Pagination controls
-if ($totalPages > 1) {
     echo "<div class='pagination'>";
-
     if ($page > 1) {
         echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
     } else {
@@ -141,8 +138,8 @@ if ($totalPages > 1) {
     }
 
     for ($i = 1; $i <= $totalPages; $i++) {
-        $active = ($i == $page) ? 'class=\"active\"' : '';
-        echo "<a href='?page=$i&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir' $active>$i</a>";
+        $activeClass = $i == $page ? 'active' : '';
+        echo "<a href='?page=$i&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir' class='$activeClass'>$i</a>";
     }
 
     if ($page < $totalPages) {
@@ -150,9 +147,10 @@ if ($totalPages > 1) {
     } else {
         echo "<a class='disabled'>Next</a>";
     }
-
     echo "</div>";
+} else {
+    echo "<tr><td colspan='7'>No payment records found.</td></tr></tbody></table>";
 }
 
-
 $conn->close();
+?>
