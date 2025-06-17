@@ -173,7 +173,7 @@ $encodedSort = urlencode($sort_column);
 $encodedDir = urlencode($sort_direction);
 
 // Pagination controls
-if ($totalPages > 1) {
+if ($totalPages >= 1) {
     echo "<div class='pagination'>";
 
     if ($page > 1) {
