@@ -1,8 +1,8 @@
 <?php
 
 
-if (!isset($_SESSION['user_id'])) {
-    echo "Unauthorized access.";
+if (empty($_SESSION['user_id']) || empty($_SESSION['role'])) {
+    header('Location: /Pages/login.php');
     exit;
 }
 
