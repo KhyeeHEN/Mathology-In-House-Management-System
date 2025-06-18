@@ -37,6 +37,26 @@ $stmt->bind_param("issds", $student_id, $method, $mode, $amount, $deposit_status
 $stmt->execute();
 $stmt->close();
 
+// Fetch package_hours
+$package_stmt = $conn->prepare("SELECT package_hours FROM course_fees WHERE course_id = ? AND time = ?");
+$package_stmt->bind_param("is", $course_id, $mode);
+$package_stmt->execute();
+$package_stmt->bind_result($package_hours);
+$package_stmt->fetch();
+$package_stmt->close();
+
+// Update attendance_records
+if ($package_hours > 0) {
+    $update_hours = $conn->prepare("
+        UPDATE attendance_records
+        SET hours_remaining = hours_remaining + ?
+        WHERE student_id = ? AND course = ?
+    ");
+    $update_hours->bind_param("dii", $package_hours, $student_id, $course_id);
+    $update_hours->execute();
+    $update_hours->close();
+}
+
 $new_payment_id = $conn->insert_id;
 header("Location: ../Pages/invoice/generate_invoice.php?generate_invoice=1&payment_id=$new_payment_id");
 exit;
