@@ -21,7 +21,9 @@ $studentsResult = $conn->query("
     FROM students s
     JOIN student_courses sc ON s.student_id = sc.student_id
     JOIN instructor_courses ic ON sc.course_id = ic.course_id
-    WHERE ic.instructor_id = $instructor_id AND ic.status = 'active'
+    WHERE ic.instructor_id = $instructor_id
+      AND ic.status = 'active'
+      AND sc.status = 'active'
 ");
 $coursesResult = $conn->query("
     SELECT c.course_id, c.course_name, c.level
