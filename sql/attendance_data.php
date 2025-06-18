@@ -44,55 +44,54 @@ switch ($sort) {
         $sort_column = "ar.timetable_datetime";
 }
 
+// Setup pagination
 $recordsPerPage = 10;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($page - 1) * $recordsPerPage;
 
-$sql = "
-  SELECT ar.*,
-       s.First_Name AS student_first_name,
-       s.Last_Name AS student_last_name,
-       i.First_Name AS instructor_first_name,
-       i.Last_Name AS instructor_last_name,
-       c.course_name AS course_name,
-       c.level AS course_level
-FROM attendance_records ar
-LEFT JOIN students s ON ar.student_id = s.student_id
-LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
-LEFT JOIN courses c ON ar.course = c.course_id
-LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
-";
-
+// Count total records (MUST MATCH your filtering logic)
 $countSql = "
-  SELECT COUNT(*) AS total
-  FROM attendance_records ar
-  LEFT JOIN students s ON ar.student_id = s.student_id
-  LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
-  LEFT JOIN courses c ON ar.course = c.course_id
+    SELECT COUNT(DISTINCT ar.record_id) AS total
+    FROM attendance_records ar
+    LEFT JOIN students s ON ar.student_id = s.student_id
+    LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+    LEFT JOIN courses c ON ar.course = c.course_id
 ";
 
+$searchClause = "";
 if (!empty($search)) {
-    $countSql .= " WHERE
-        s.First_Name LIKE '%$search%' OR
-        s.Last_Name LIKE '%$search%' OR
-        i.First_Name LIKE '%$search%' OR
-        i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
-        ar.status LIKE '%$search%' ";
+    $searchEscaped = $conn->real_escape_string($search);
+    $searchClause = " WHERE
+        s.First_Name LIKE '%$searchEscaped%' OR
+        s.Last_Name LIKE '%$searchEscaped%' OR
+        i.First_Name LIKE '%$searchEscaped%' OR
+        i.Last_Name LIKE '%$searchEscaped%' OR
+        ar.course LIKE '%$searchEscaped%' OR
+        ar.status LIKE '%$searchEscaped%'";
+    $countSql .= $searchClause;
 }
 
 $countResult = $conn->query($countSql);
 $totalRows = $countResult->fetch_assoc()['total'];
 $totalPages = ceil($totalRows / $recordsPerPage);
 
-if (!empty($search)) {
-    $sql .= " WHERE
-        s.First_Name LIKE '%$search%' OR
-        s.Last_Name LIKE '%$search%' OR
-        i.First_Name LIKE '%$search%' OR
-        i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
-        ar.status LIKE '%$search%' ";
+// Main data query (with LIMIT and OFFSET)
+$sql = "
+    SELECT ar.*,
+           s.First_Name AS student_first_name,
+           s.Last_Name AS student_last_name,
+           i.First_Name AS instructor_first_name,
+           i.Last_Name AS instructor_last_name,
+           c.course_name AS course_name,
+           c.level AS course_level
+    FROM attendance_records ar
+    LEFT JOIN students s ON ar.student_id = s.student_id
+    LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+    LEFT JOIN courses c ON ar.course = c.course_id
+";
+
+if (!empty($searchClause)) {
+    $sql .= $searchClause;
 }
 
 $sql .= " ORDER BY $sort_column $sort_direction LIMIT $recordsPerPage OFFSET $offset";
@@ -167,26 +166,27 @@ if ($result && $result->num_rows > 0) {
 
 echo "</tbody></table>";
 
-// Safely encode parameters
-$encodedSearch = urlencode($search);
-$encodedSort = urlencode($sort_column);
-$encodedDir = urlencode($sort_direction);
-
-// Pagination controls
 if ($totalPages >= 1) {
     echo "<div class='pagination'>";
 
+    $encodedSearch = urlencode($search);
+    $encodedSort = urlencode($sort_column);
+    $encodedDir = urlencode($sort_direction);
+
+    // Previous button
     if ($page > 1) {
         echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
 
+    // Page numbers
     for ($i = 1; $i <= $totalPages; $i++) {
         $activeClass = ($i == $page) ? 'active' : '';
         echo "<a href='?page=$i&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir' class='$activeClass'>$i</a>";
     }
 
+    // Next button
     if ($page < $totalPages) {
         echo "<a href='?page=" . ($page + 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Next</a>";
     } else {
