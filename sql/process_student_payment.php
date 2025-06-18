@@ -37,24 +37,19 @@ $stmt->bind_param("issds", $student_id, $method, $mode, $amount, $deposit_status
 $stmt->execute();
 $stmt->close();
 
-// Fetch package_hours
-$package_stmt = $conn->prepare("SELECT package_hours FROM course_fees WHERE course_id = ? AND time = ?");
-$package_stmt->bind_param("is", $course_id, $mode);
-$package_stmt->execute();
-$package_stmt->bind_result($package_hours);
-$package_stmt->fetch();
-$package_stmt->close();
+// Get package hours for the selected course and payment mode
+$hours_stmt = $conn->prepare("SELECT package_hours FROM course_fees WHERE course_id = ? AND time = ?");
+$hours_stmt->bind_param("is", $course_id, $mode);
+$hours_stmt->execute();
+$hours_stmt->bind_result($package_hours);
+$hasResult = $hours_stmt->fetch();
+$hours_stmt->close();
 
-// Update attendance_records
-if ($package_hours > 0) {
-    $update_hours = $conn->prepare("
-        UPDATE attendance_records
-        SET hours_remaining = hours_remaining + ?
-        WHERE student_id = ? AND course = ?
-    ");
-    $update_hours->bind_param("dii", $package_hours, $student_id, $course_id);
-    $update_hours->execute();
-    $update_hours->close();
+if ($hasResult && $package_hours > 0) {
+    $update = $conn->prepare("UPDATE attendance_records SET hours_remaining = hours_remaining + ? WHERE student_id = ?");
+    $update->bind_param("ii", $package_hours, $student_id);
+    $update->execute();
+    $update->close();
 }
 
 $new_payment_id = $conn->insert_id;
