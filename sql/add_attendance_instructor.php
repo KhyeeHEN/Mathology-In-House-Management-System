@@ -60,66 +60,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Add Attendance</title>
     <link rel="stylesheet" href="/Styles/common.css">
     <style>
-        form { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
-        button { margin-top: 20px; padding: 10px 20px; background: #1f2937; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-        button:hover { background: rgb(71, 82, 95); }
-        .error { color: red; text-align: center; }
+        body {
+            font-family: Arial;
+            background: #f7f7f7;
+            padding: 30px;
+        }
+
+        form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #1f2937;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #374151;
+        }
     </style>
 </head>
+
 <body>
 
-<h2 style="text-align:center;">Add Attendance</h2>
-<?php if (isset($error)) echo "<div class='error'>$error</div>"; ?>
+    <h2 style="text-align:center;">Add Attendance</h2>
+    <?php if (isset($error)) echo "<div class='error'>$error</div>"; ?>
 
-<form method="POST">
-    <label for="student_id">Student:</label>
-    <select name="student_id" required>
-        <option value="">-- Select Student --</option>
-        <?php while ($s = $studentsResult->fetch_assoc()): ?>
-            <option value="<?= $s['student_id'] ?>">
-                <?= htmlspecialchars($s['Last_Name'] . ' ' . $s['First_Name']) ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
+    <form method="POST">
+        <label for="student_id">Student:</label>
+        <select name="student_id" required>
+            <option value="">-- Select Student --</option>
+            <?php while ($s = $studentsResult->fetch_assoc()): ?>
+                <option value="<?= $s['student_id'] ?>">
+                    <?= htmlspecialchars($s['Last_Name'] . ' ' . $s['First_Name']) ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
 
-    <label for="course_id">Course:</label>
-    <select name="course_id" required>
-        <option value="">-- Select Course --</option>
-        <?php while ($c = $coursesResult->fetch_assoc()): ?>
-            <option value="<?= $c['course_id'] ?>">
-                <?= htmlspecialchars($c['course_name'] . ' (' . $c['level'] . ')') ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
+        <label for="course_id">Course:</label>
+        <select name="course_id" required>
+            <option value="">-- Select Course --</option>
+            <?php while ($c = $coursesResult->fetch_assoc()): ?>
+                <option value="<?= $c['course_id'] ?>">
+                    <?= htmlspecialchars($c['course_name'] . ' (' . $c['level'] . ')') ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
 
-    <label for="attendance_datetime">Attendance Date & Time:</label>
-    <input type="datetime-local" name="attendance_datetime" required>
+        <label for="attendance_datetime">Attendance Date & Time:</label>
+        <input type="datetime-local" name="attendance_datetime" required>
 
-    <label for="hours_attended">Hours Attended:</label>
-    <input type="number" step="0.1" name="hours_attended" required>
+        <label for="hours_attended">Hours Attended:</label>
+        <input type="number" step="0.1" name="hours_attended" required>
 
-    <label for="hours_replacement">Hours Replacement:</label>
-    <input type="number" step="0.1" name="hours_replacement">
+        <label for="hours_replacement">Hours Replacement:</label>
+        <input type="number" step="0.1" name="hours_replacement">
 
-    <label for="hours_remaining">Hours Remaining:</label>
-    <input type="number" step="0.1" name="hours_remaining">
+        <label for="hours_remaining">Hours Remaining:</label>
+        <input type="number" step="0.1" name="hours_remaining">
 
-    <label for="status">Status:</label>
-    <select name="status" required>
-        <option value="attended">Attended</option>
-        <option value="missed">Missed</option>
-        <option value="replacement_booked">Replacement Booked</option>
-    </select>
+        <label for="status">Status:</label>
+        <select name="status" required>
+            <option value="attended">Attended</option>
+            <option value="missed">Missed</option>
+            <option value="replacement_booked">Replacement Booked</option>
+        </select>
 
-    <button type="submit">Add Attendance</button>
-</form>
+        <button type="submit">Add Attendance</button>
+        <a href="../Pages/instructors/attendance_instructors.php" style="margin-left: 10px;">
+            <button type="button" style="background: #ccc; color: #000;">Cancel</button>
+        </a>
+    </form>
 
 </body>
+
 </html>
