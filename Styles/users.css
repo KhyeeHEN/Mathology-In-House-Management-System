@@ -65,6 +65,8 @@ h1 {
 .actions-cell button.action-btn.view {
   background: #e8f0fe;
   color: #2176c1;
+    position: relative;
+  top: 2px; 
 }
 
 .actions-cell button.action-btn:hover {
