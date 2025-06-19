@@ -205,22 +205,6 @@ h1 {
     }
 }
 
-.add-entry-button button {
-    height: 42px;
-    padding: 0 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    background: #222e3a;
-    color: #fff;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
 /* --- Filter Dropdown Styling --- */
 .filter-dropdown {
     display: flex;
