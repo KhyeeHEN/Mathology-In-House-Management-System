@@ -2,9 +2,9 @@
 table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
     margin-top: 20px 0;
-    margin-left: 50px;
-    margin-right: 50px;
 }
 
 table th, table td {
