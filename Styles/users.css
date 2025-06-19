@@ -11,8 +11,9 @@
 }
 
 .table-container table {
-  min-width: 1100px; /* or any width you need */
-  width: 100%;
+    min-width: 1100px;
+    /* or any width you need */
+    width: 100%;
 }
 
 .table-container th,
@@ -33,56 +34,42 @@ h1 {
     color: #333;
 }
 
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 50%;
-    margin: 0 2px;
-    font-size: 1.3em;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 6px rgba(60, 60, 60, 0.08);
+td .action-btn,
+td form {
+    display: inline-block;
+    vertical-align: middle;
 }
 
-.action-btn.view {
-    background: #e3f0fc;
+td .action-btn {
+    margin: 0 2px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: #f5f5f5;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 1.08em;
+}
+
+td .action-btn.view {
     color: #2176c1;
 }
 
-.action-btn.view:hover,
-.action-btn.view:focus {
-    background: #2176c1;
-    color: #fff;
+td .action-btn.edit {
+    color: #ff9800;
 }
 
-.action-btn.edit {
-    background: #fbeee0;
-    color: #e67e22;
+td .action-btn.delete {
+    color: #e74c3c;
 }
 
-.action-btn.edit:hover,
-.action-btn.edit:focus {
-    background: #e67e22;
-    color: #fff;
+td .action-btn:hover {
+    background: #e3e7ed;
 }
 
-.action-btn.delete {
-    background: #fdeaea;
-    color: #ea3c53;
-}
-
-.action-btn.delete:hover,
-.action-btn.delete:focus {
-    background: #ea3c53;
-    color: #fff;
-}
-
-.action-btn i {
-    pointer-events: none;
+td form {
+    margin: 0;
+    padding: 0;
 }
 
 .users-controls-row {
