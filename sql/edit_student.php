@@ -205,6 +205,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 padding: 12px;
             }
         }
+                button {
+            background-color: #1f2937;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: rgb(71, 82, 95);
+        }
+
+        a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: rgb(71, 82, 95);
+        }
     </style>
 </head>
 
