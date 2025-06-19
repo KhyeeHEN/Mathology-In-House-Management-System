@@ -157,8 +157,6 @@ h1 {
 .add-entry-button form,
 .add-entry-button {
     display: flex;
-    align-items: center;
-    justify-content: center;
     margin: 0;
 }
 
@@ -181,8 +179,6 @@ h1 {
 
 .filter-dropdown {
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #user-filter-select {
