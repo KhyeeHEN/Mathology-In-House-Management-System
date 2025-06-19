@@ -172,7 +172,7 @@ if ($result->num_rows > 0) {
     // Pagination controls
     echo "<div class='pagination'>";
     if ($page > 1) {
-        echo "<a href='?students_page=" . ($page - 1) . "&active_tab=students&search=$search'>Previous</a>";
+        echo "<a href='?students_page=" . ($page - 1) . "&active_tab=students&search=$search'><i class='fa-solid fa-arrow-left'></i></a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
@@ -181,7 +181,7 @@ if ($result->num_rows > 0) {
         echo "<a href='?students_page=$i&active_tab=students&search=$search' class='$activeClass'>$i</a>";
     }
     if ($page < $totalPages) {
-        echo "<a href='?students_page=" . ($page + 1) . "&active_tab=students&search=$search'>Next</a>";
+        echo "<a href='?students_page=" . ($page + 1) . "&active_tab=students&search=$search'><i class='fa-solid fa-arrow-right'></i></a>";
     } else {
         echo "<a class='disabled'>Next</a>";
     }

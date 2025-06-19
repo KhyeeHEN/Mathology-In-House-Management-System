@@ -67,7 +67,7 @@ if ($result->num_rows > 0) {
     // Pagination controls
     echo "<div class='pagination'>";
     if ($page > 1) {
-        echo "<a href='?admins_page=" . ($page - 1) . "&active_tab=admins&search=$search'>Previous</a>";
+        echo "<a href='?admins_page=" . ($page - 1) . "&active_tab=admins&search=$search'><i class='fa-solid fa-arrow-left'></i></a>";
     } else {
         echo "<a class='disabled'>Previous</a>";
     }
@@ -76,7 +76,7 @@ if ($result->num_rows > 0) {
         echo "<a href='?admins_page=$i&active_tab=admins&search=$search' class='$activeClass'>$i</a>";
     }
     if ($page < $totalPages) {
-        echo "<a href='?admins_page=" . ($page + 1) . "&active_tab=admins&search=$search'>Next</a>";
+        echo "<a href='?admins_page=" . ($page + 1) . "&active_tab=admins&search=$search'><i class='fa-solid fa-arrow-right'></i></a>";
     } else {
         echo "<a class='disabled'>Next</a>";
     }
