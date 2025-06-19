@@ -10,10 +10,6 @@
     overflow-x: auto;
 }
 
-.table-container table {
-  min-width: 1100px; 
-}
-
 .table-container th,
 .table-container td {
     padding: 10px;
