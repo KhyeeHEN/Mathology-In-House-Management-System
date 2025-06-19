@@ -198,6 +198,7 @@ button[type="button"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
 }
 
 /* Optional: Add hover effect for clarity */
