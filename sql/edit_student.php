@@ -236,7 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <select id="student_course" name="course_id" required>
                 <option value="">Select Course</option>
                 <?php
-                // Output all courses as options with data-level attribute
                 $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
                 while ($course = $courses->fetch_assoc()) {
                     $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);

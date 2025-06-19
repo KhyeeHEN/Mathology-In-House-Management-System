@@ -217,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div id="day-times-container">
                 <?php
-                // Show time inputs for each selected day (from instructor_timetable)
                 $timetableDays = [];
                 foreach ($instTimetable as $row) {
                     if ($row['day']) $timetableDays[$row['day']] = $row;
