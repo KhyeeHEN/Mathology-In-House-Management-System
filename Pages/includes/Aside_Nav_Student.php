@@ -21,7 +21,7 @@
         </a>
         <a href="../client/student_reschedule.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'student_reschedule.php' ? 'active' : ''; ?>">
-            <i class="fas fa-calendar-pen"></i>
+            <i class="fas fa-calendar-xmark"></i>
             <span>Reschedule</span>
         </a>
 
