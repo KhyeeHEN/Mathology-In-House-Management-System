@@ -12,7 +12,6 @@
 
 .table-container table {
   min-width: 1100px; /* or any width you need */
-  width: 100%;
 }
 
 .table-container th,
