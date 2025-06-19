@@ -99,7 +99,7 @@ if ($result->num_rows > 0) {
                 <button class='action-btn view' title='Show more details' onclick=\"toggleDetails('{$detailsId}')\">
                     <i class='fas fa-eye'></i>
                 </button>
-                <form method='get' action='../../sql/edit_instructor.php' style='display:inline; margin:0; padding:0; title='Edit''>
+                <form method='get' action='../../sql/edit_instructor.php' style='display:inline; margin:0; padding:0;' title='Edit'>
                     <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn edit'>
                         <i class='fas fa-edit'></i> 
