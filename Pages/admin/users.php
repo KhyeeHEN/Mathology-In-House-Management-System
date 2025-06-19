@@ -58,6 +58,15 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </form>
                 </div>
 
+                <!-- Add Entry Button -->
+                <div class="add-entry-button">
+                    <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
+                        <button type="submit" style="margin-left: 8px;">
+                            Add Entry
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Filter Dropdown -->
                 <div class="filter-dropdown">
                     <select id="user-filter-select" style="padding: 6px 12px; font-size: 1em;">
@@ -71,15 +80,6 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                         showTable(this.value);
                     });
                 </script>
-
-                <!-- Add Entry Button -->
-                <div class="add-entry-button">
-                    <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                        <button type="submit" style="margin-left: 8px;">
-                            Add Entry
-                        </button>
-                    </form>
-                </div>
             </div>
 
             <!-- Display User Data -->
