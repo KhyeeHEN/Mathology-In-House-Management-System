@@ -58,21 +58,19 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                     </form>
                 </div>
 
-                <!-- Filter Buttons -->
-                <div class="filter-buttons">
-                    <button onclick="showTable('students-table')" id="students-btn"
-                        class="<?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>">
-                        Students
-                    </button>
-                    <button onclick="showTable('instructors-table')" id="instructors-btn"
-                        class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'active' : ''; ?>">
-                        Instructors
-                    </button>
-                    <button onclick="showTable('admins-table')" id="admins-btn"
-                        class="<?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'active' : ''; ?>">
-                        Admins
-                    </button>
+                <!-- Filter Dropdown -->
+                <div class="filter-dropdown">
+                    <select id="user-filter-select" style="padding: 6px 12px; font-size: 1em;">
+                        <option value="students-table" <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'selected' : ''; ?>>Students</option>
+                        <option value="instructors-table" <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'selected' : ''; ?>>Instructors</option>
+                        <option value="admins-table" <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'selected' : ''; ?>>Admins</option>
+                    </select>
                 </div>
+                <script>
+                    document.getElementById('user-filter-select').addEventListener('change', function () {
+                        showTable(this.value);
+                    });
+                </script>
 
                 <!-- Add Entry Button -->
                 <div class="add-entry-button">
@@ -82,7 +80,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                         </button>
                     </form>
                 </div>
-            </div>        
+            </div>
 
             <!-- Display User Data -->
             <div class="table-container <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'active' : ''; ?>"
