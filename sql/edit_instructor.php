@@ -146,69 +146,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Edit Instructor</h1>
     <?php if ($error) echo "<p class='error'>$error</p>"; ?>
     <form id="instructor-form" method="POST">
-        <input type="hidden" name="user_type" value="instructor">
-        <label for="instructor_last_name">Last Name:</label>
-        <input type="text" id="instructor_last_name" name="Last_Name" value="<?=htmlspecialchars($instructor['Last_Name'])?>" required><br>
-        <label for="instructor_first_name">First Name:</label>
-        <input type="text" id="instructor_first_name" name="First_Name" value="<?=htmlspecialchars($instructor['First_Name'])?>" required><br>
-        <label for="instructor_gender">Gender:</label>
-        <select id="instructor_gender" name="Gender" required>
-            <option value="1" <?=$instructor['Gender'] == '1' ? 'selected' : ''?>>Male</option>
-            <option value="0" <?=$instructor['Gender'] == '0' ? 'selected' : ''?>>Female</option>
-        </select><br>
-        <label for="instructor_dob">Date of Birth:</label>
-        <input type="date" id="instructor_dob" name="DOB" value="<?=htmlspecialchars($instructor['DOB'])?>" required><br>
-        <label for="instructor_highest_education">Highest Education:</label>
-        <input type="text" id="instructor_highest_education" name="Highest_Education" value="<?=htmlspecialchars($instructor['Highest_Education'])?>"><br>
-        <label for="instructor_remark">Remark:</label>
-        <textarea id="instructor_remark" name="Remark"><?=htmlspecialchars($instructor['Remark'])?></textarea><br>
-        <label for="instructor_training_status">Training Status:</label>
-        <input type="text" id="instructor_training_status" name="Training_Status" value="<?=htmlspecialchars($instructor['Training_Status'])?>"><br>
-        <label for="instructor_contact">Contact Number:</label>
-        <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" value="<?=htmlspecialchars($instructor['contact'])?>" required><br>
-        <label for="instructor_hiring_status">Hiring Status:</label>
-        <select id="instructor_hiring_status" name="hiring_status" required>
-            <option value="true" <?=$instructor['hiring_status'] == 'true' ? 'selected' : ''?>>Hired</option>
-            <option value="false" <?=$instructor['hiring_status'] == 'false' ? 'selected' : ''?>>Not Hired</option>
-        </select><br>
-        <label for="instructor_total_hours">Total Hours:</label>
-        <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" value="<?=htmlspecialchars($instructor['Total_Hours'])?>" required><br>
-        <label for="instructor_employment_type">Employment Type:</label>
-        <select id="instructor_employment_type" name="Employment_Type" required>
-            <option value="Full-Time" <?=$instructor['Employment_Type'] == 'Full-Time' ? 'selected' : ''?>>Full-Time</option>
-            <option value="Part-Time" <?=$instructor['Employment_Type'] == 'Part-Time' ? 'selected' : ''?>>Part-Time</option>
-        </select><br>
-
-        <!-- Course Level and Name selection -->
-        <label for="instructor_course_level">Course Level:</label>
-        <select id="instructor_course_level" name="course_level" required>
-            <option value="">Select Level</option>
-            <?php foreach ($levels as $level): ?>
-                <option value="<?=$level?>" <?=($instCourse && $courses[array_search($instCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : ''?>><?=$level?></option>
-            <?php endforeach; ?>
-        </select><br>
-        <label for="instructor_course_name">Course Name:</label>
-        <select id="instructor_course_name" name="course_id" required>
-            <option value="">Select Course</option>
-            <?php foreach ($courses as $course): ?>
-                <option value="<?=$course['course_id']?>"
-                    data-level="<?=$course['level']?>"
-                    <?=($instCourse && $instCourse['course_id'] == $course['course_id']) ? 'selected' : ''?>>
-                    <?=$course['course_name']?>
-                </option>
-            <?php endforeach; ?>
-        </select><br>
-
-        <div id="part-time-days-times" style="display:<?=$instructor['Employment_Type'] == 'Part-Time' ? '' : 'none'?>">
-            <label for="instructor_working_days">Working Days:</label>
-            <select id="instructor_working_days" name="Working_Days[]" multiple <?=$instructor['Employment_Type'] == 'Full-Time' ? 'disabled' : ''?>>
-                <?php
-                $selected_days = $instructor['Working_Days'] ? explode(',', $instructor['Working_Days']) : [];
-                $daysOfWeek = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-                foreach ($daysOfWeek as $day): ?>
-                    <option value="<?=$day?>" <?=in_array($day, $selected_days) ? 'selected' : ''?>><?=$day?></option>
+        <div class="form-row">
+            <label for="instructor_last_name">Last Name:</label>
+            <input type="text" id="instructor_last_name" name="Last_Name" value="<?=htmlspecialchars($instructor['Last_Name'])?>" required>
+            <label for="instructor_first_name">First Name:</label>
+            <input type="text" id="instructor_first_name" name="First_Name" value="<?=htmlspecialchars($instructor['First_Name'])?>" required>
+            <label for="instructor_gender">Gender:</label>
+            <select id="instructor_gender" name="Gender" required>
+                <option value="1" <?=$instructor['Gender'] == '1' ? 'selected' : ''?>>Male</option>
+                <option value="0" <?=$instructor['Gender'] == '0' ? 'selected' : ''?>>Female</option>
+            </select>
+            <label for="instructor_dob">Date of Birth:</label>
+            <input type="date" id="instructor_dob" name="DOB" value="<?=htmlspecialchars($instructor['DOB'])?>" required>
+        </div>
+        <div class="form-row">
+            <label for="instructor_highest_education">Highest Education:</label>
+            <input type="text" id="instructor_highest_education" name="Highest_Education" value="<?=htmlspecialchars($instructor['Highest_Education'])?>">
+            <label for="instructor_remark">Remark:</label>
+            <textarea id="instructor_remark" name="Remark" style="min-width:140px;flex:1 1 140px;"><?=htmlspecialchars($instructor['Remark'])?></textarea>
+            <label for="instructor_training_status">Training Status:</label>
+            <input type="text" id="instructor_training_status" name="Training_Status" value="<?=htmlspecialchars($instructor['Training_Status'])?>">
+        </div>
+        <div class="form-row">
+            <label for="instructor_contact">Contact Number:</label>
+            <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" value="<?=htmlspecialchars($instructor['contact'])?>" required>
+            <label for="instructor_hiring_status">Hiring Status:</label>
+            <select id="instructor_hiring_status" name="hiring_status" required>
+                <option value="true" <?=$instructor['hiring_status'] == 'true' ? 'selected' : ''?>>Hired</option>
+                <option value="false" <?=$instructor['hiring_status'] == 'false' ? 'selected' : ''?>>Not Hired</option>
+            </select>
+            <label for="instructor_total_hours">Total Hours:</label>
+            <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" value="<?=htmlspecialchars($instructor['Total_Hours'])?>" required>
+            <label for="instructor_employment_type">Employment Type:</label>
+            <select id="instructor_employment_type" name="Employment_Type" required>
+                <option value="Full-Time" <?=$instructor['Employment_Type'] == 'Full-Time' ? 'selected' : ''?>>Full-Time</option>
+                <option value="Part-Time" <?=$instructor['Employment_Type'] == 'Part-Time' ? 'selected' : ''?>>Part-Time</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="instructor_course_level">Course Level:</label>
+            <select id="instructor_course_level" name="course_level" required>
+                <option value="">Select Level</option>
+                <?php foreach ($levels as $level): ?>
+                    <option value="<?=$level?>" <?=($instCourse && $courses[array_search($instCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : ''?>><?=$level?></option>
                 <?php endforeach; ?>
             </select>
+            <label for="instructor_course_name">Course Name:</label>
+            <select id="instructor_course_name" name="course_id" required>
+                <option value="">Select Course</option>
+                <?php foreach ($courses as $course): ?>
+                    <option value="<?=$course['course_id']?>"
+                        data-level="<?=$course['level']?>"
+                        <?=($instCourse && $instCourse['course_id'] == $course['course_id']) ? 'selected' : ''?>>
+                        <?=$course['course_name']?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div id="part-time-days-times" style="display:<?=$instructor['Employment_Type'] == 'Part-Time' ? '' : 'none'?>">
+            <div class="form-row">
+                <label for="instructor_working_days">Working Days:</label>
+                <select id="instructor_working_days" name="Working_Days[]" multiple <?=$instructor['Employment_Type'] == 'Full-Time' ? 'disabled' : ''?>>
+                    <?php
+                    $selected_days = $instructor['Working_Days'] ? explode(',', $instructor['Working_Days']) : [];
+                    $daysOfWeek = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                    foreach ($daysOfWeek as $day): ?>
+                        <option value="<?=$day?>" <?=in_array($day, $selected_days) ? 'selected' : ''?>><?=$day?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <div id="day-times-container">
                 <?php
                 // Show time inputs for each selected day (from instructor_timetable)
@@ -229,80 +235,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endforeach; ?>
             </div>
         </div>
-        <br>
         <button type="submit">Update Instructor</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
+    <script>
+        const allCourses = <?=json_encode($courses)?>;
 
-<script>
-const allCourses = <?=json_encode($courses)?>;
+        document.getElementById('instructor_course_level').addEventListener('change', function() {
+            const selectedLevel = this.value;
+            const nameSelect = document.getElementById('instructor_course_name');
+            nameSelect.innerHTML = '<option value="">Select Course</option>';
+            allCourses.forEach(function(course) {
+                if (course.level === selectedLevel) {
+                    const opt = document.createElement('option');
+                    opt.value = course.course_id;
+                    opt.textContent = course.course_name;
+                    opt.setAttribute('data-level', course.level);
+                    nameSelect.appendChild(opt);
+                }
+            });
+        });
 
-document.getElementById('instructor_course_level').addEventListener('change', function() {
-    const selectedLevel = this.value;
-    const nameSelect = document.getElementById('instructor_course_name');
-    nameSelect.innerHTML = '<option value="">Select Course</option>';
-    allCourses.forEach(function(course) {
-        if (course.level === selectedLevel) {
-            const opt = document.createElement('option');
-            opt.value = course.course_id;
-            opt.textContent = course.course_name;
-            opt.setAttribute('data-level', course.level);
-            nameSelect.appendChild(opt);
-        }
-    });
-});
-
-function setWorkingDaysState() {
-    const employmentType = document.getElementById('instructor_employment_type');
-    const daysDiv = document.getElementById('part-time-days-times');
-    const workingDaysInput = document.getElementById('instructor_working_days');
-    const dayTimesContainer = document.getElementById('day-times-container');
-    if (employmentType.value === 'Part-Time') {
-        daysDiv.style.display = '';
-        workingDaysInput.disabled = false;
-        updateDayTimes();
-    } else {
-        daysDiv.style.display = 'none';
-        workingDaysInput.disabled = true;
-        dayTimesContainer.innerHTML = '';
-        // Deselect all
-        for(let i=0;i<workingDaysInput.options.length;i++) {
-            workingDaysInput.options[i].selected = false;
-        }
-    }
-}
-document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
-
-function updateDayTimes() {
-    const workingDaysInput = document.getElementById('instructor_working_days');
-    const dayTimesContainer = document.getElementById('day-times-container');
-    dayTimesContainer.innerHTML = '';
-    Array.from(workingDaysInput.selectedOptions).forEach(option => {
-        const day = option.value;
-        // fetch old values if present
-        let start = '', end = '';
-        <?php if (!empty($timetableDays)) { ?>
-            const timetableDays = <?=json_encode($timetableDays)?>;
-            if (typeof timetableDays[day] !== 'undefined') {
-                start = timetableDays[day].start_time;
-                end = timetableDays[day].end_time;
+        function setWorkingDaysState() {
+            const employmentType = document.getElementById('instructor_employment_type');
+            const daysDiv = document.getElementById('part-time-days-times');
+            const workingDaysInput = document.getElementById('instructor_working_days');
+            const dayTimesContainer = document.getElementById('day-times-container');
+            if (employmentType.value === 'Part-Time') {
+                daysDiv.style.display = '';
+                workingDaysInput.disabled = false;
+                updateDayTimes();
+            } else {
+                daysDiv.style.display = 'none';
+                workingDaysInput.disabled = true;
+                dayTimesContainer.innerHTML = '';
+                // Deselect all
+                for(let i=0;i<workingDaysInput.options.length;i++) {
+                    workingDaysInput.options[i].selected = false;
+                }
             }
-        <?php } ?>
-        dayTimesContainer.innerHTML += `
-            <div>
-                <label>${day} Start:</label>
-                <input type="time" name="start_time[${day}]" value="${start}" required>
-                <label>End:</label>
-                <input type="time" name="end_time[${day}]" value="${end}" required>
-            </div>
-        `;
-    });
-}
-document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
+        }
+        document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
 
-document.addEventListener('DOMContentLoaded', function() {
-    setWorkingDaysState();
-});
-</script>
+        function updateDayTimes() {
+            const workingDaysInput = document.getElementById('instructor_working_days');
+            const dayTimesContainer = document.getElementById('day-times-container');
+            dayTimesContainer.innerHTML = '';
+            Array.from(workingDaysInput.selectedOptions).forEach(option => {
+                const day = option.value;
+                // fetch old values if present
+                let start = '', end = '';
+                <?php if (!empty($timetableDays)) { ?>
+                    const timetableDays = <?=json_encode($timetableDays)?>;
+                    if (typeof timetableDays[day] !== 'undefined') {
+                        start = timetableDays[day].start_time;
+                        end = timetableDays[day].end_time;
+                    }
+                <?php } ?>
+                dayTimesContainer.innerHTML += `
+                    <div>
+                        <label>${day} Start:</label>
+                        <input type="time" name="start_time[${day}]" value="${start}" required>
+                        <label>End:</label>
+                        <input type="time" name="end_time[${day}]" value="${end}" required>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setWorkingDaysState();
+        });
+    </script>
 </body>
 </html>

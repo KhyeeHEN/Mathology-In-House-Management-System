@@ -148,140 +148,150 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Edit Student</h1>
     <form method="POST">
         <h2>Student Details</h2>
-        <label for="Last_Name">Last Name:</label>
-        <input type="text" id="Last_Name" name="Last_Name"
-            value="<?php echo htmlspecialchars($student['Last_Name']); ?>" required><br>
-        <label for="First_Name">First Name:</label>
-        <input type="text" id="First_Name" name="First_Name"
-            value="<?php echo htmlspecialchars($student['First_Name']); ?>" required><br>
-        <label for="Gender">Gender:</label>
-        <select id="Gender" name="Gender" required>
-            <option value="1" <?php if ($student['Gender'])
-                echo 'selected'; ?>>Male</option>
-            <option value="0" <?php if (!$student['Gender'])
-                echo 'selected'; ?>>Female</option>
-        </select><br>
-        <label for="DOB">Date of Birth:</label>
-        <input type="date" id="DOB" name="DOB" value="<?php echo htmlspecialchars($student['DOB']); ?>" required><br>
-        <label for="School_Syllabus">School Syllabus:</label>
-        <input type="text" id="School_Syllabus" name="School_Syllabus"
-            value="<?php echo htmlspecialchars($student['School_Syllabus']); ?>" required><br>
-        <label for="School_Intake">School Intake (Month):</label>
-        <select id="School_Intake" name="School_Intake" required>
-            <option value="">Select Month</option>
-            <?php
-            $months = [
-                'January',
-                'February',
-                'March',
-                'April',
-                'May',
-                'June',
-                'July',
-                'August',
-                'September',
-                'October',
-                'November',
-                'December'
-            ];
-            foreach ($months as $month) {
-                $selected = ($student['School_Intake'] === $month) ? 'selected' : '';
-                echo "<option value=\"$month\" $selected>$month</option>";
-            }
-            ?>
-        </select><br>
-        <label for="Current_School_Grade">Current School Grade:</label>
-        <input type="text" id="Current_School_Grade" name="Current_School_Grade"
-            value="<?php echo htmlspecialchars($student['Current_School_Grade']); ?>" required><br>
-        <label for="School">School:</label>
-        <input type="text" id="School" name="School" value="<?php echo htmlspecialchars($student['School']); ?>"
-            required><br>
-        <label for="Mathology_Level">Mathology Level:</label>
-        <select id="Mathology_Level" name="Mathology_Level" required>
-            <?php for ($i = 1; $i <= 9; $i++) {
-                $selected = ($student['Mathology_Level'] == $i) ? 'selected' : '';
-                echo "<option value='$i' $selected>Level $i</option>";
-            } ?>
-        </select><br>
-        <label for="Email">Email:</label>
-        <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($student['email']); ?>"
-            required><br>
-        <label for="How_Heard_About_Us">How did you hear about us?</label>
-        <input type="text" id="How_Heard_About_Us" name="How_Heard_About_Us"
-            value="<?php echo htmlspecialchars($student['How_Did_You_Heard_About_Us']); ?>" required><br>
-
+        <div class="form-row">
+            <label for="Last_Name">Last Name:</label>
+            <input type="text" id="Last_Name" name="Last_Name"
+                value="<?php echo htmlspecialchars($student['Last_Name']); ?>" required>
+            <label for="First_Name">First Name:</label>
+            <input type="text" id="First_Name" name="First_Name"
+                value="<?php echo htmlspecialchars($student['First_Name']); ?>" required>
+            <label for="Gender">Gender:</label>
+            <select id="Gender" name="Gender" required>
+                <option value="1" <?php if ($student['Gender'])
+                    echo 'selected'; ?>>Male</option>
+                <option value="0" <?php if (!$student['Gender'])
+                    echo 'selected'; ?>>Female</option>
+            </select>
+            <label for="DOB">Date of Birth:</label>
+            <input type="date" id="DOB" name="DOB" value="<?php echo htmlspecialchars($student['DOB']); ?>" required>
+        </div>
+        <div class="form-row">
+            <label for="School_Syllabus">School Syllabus:</label>
+            <input type="text" id="School_Syllabus" name="School_Syllabus"
+                value="<?php echo htmlspecialchars($student['School_Syllabus']); ?>" required>
+            <label for="School_Intake">School Intake (Month):</label>
+            <select id="School_Intake" name="School_Intake" required>
+                <option value="">Select Month</option>
+                <?php
+                $months = [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December'
+                ];
+                foreach ($months as $month) {
+                    $selected = ($student['School_Intake'] === $month) ? 'selected' : '';
+                    echo "<option value=\"$month\" $selected>$month</option>";
+                }
+                ?>
+            </select>
+            <label for="Current_School_Grade">Current School Grade:</label>
+            <input type="text" id="Current_School_Grade" name="Current_School_Grade"
+                value="<?php echo htmlspecialchars($student['Current_School_Grade']); ?>" required>
+        </div>
+        <div class="form-row">
+            <label for="School">School:</label>
+            <input type="text" id="School" name="School" value="<?php echo htmlspecialchars($student['School']); ?>"
+                required>
+            <label for="Mathology_Level">Mathology Level:</label>
+            <select id="Mathology_Level" name="Mathology_Level" required>
+                <?php for ($i = 1; $i <= 9; $i++) {
+                    $selected = ($student['Mathology_Level'] == $i) ? 'selected' : '';
+                    echo "<option value='$i' $selected>Level $i</option>";
+                } ?>
+            </select>
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($student['email']); ?>"
+                required>
+        </div>
+        <div class="form-row">
+            <label for="How_Heard_About_Us">How did you hear about us?</label>
+            <input type="text" id="How_Heard_About_Us" name="How_Heard_About_Us"
+                value="<?php echo htmlspecialchars($student['How_Did_You_Heard_About_Us']); ?>" required>
+        </div>
         <h2>Course Details</h2>
-        <label for="course_level_select">Course Level:</label>
-        <select id="course_level_select" name="course_level" required onchange="filterCoursesByLevel()">
-            <option value="">Select Level</option>
-            <?php
-            // Get all unique course levels
-            $levels = [];
-            $courses_result = $conn->query("SELECT DISTINCT level FROM courses WHERE level IS NOT NULL");
-            while ($row = $courses_result->fetch_assoc()) {
-                $level = htmlspecialchars($row['level'], ENT_QUOTES);
-                $selected = ($student['level'] === $level) ? 'selected' : '';
-                echo "<option value=\"$level\" $selected>$level</option>";
-            }
-            ?>
-        </select><br>
-
-        <label for="student_course">Course:</label>
-        <select id="student_course" name="course_id" required>
-            <option value="">Select Course</option>
-            <?php
-            // Output all courses as options with data-level attribute
-            $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
-            while ($course = $courses->fetch_assoc()) {
-                $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
-                $level = htmlspecialchars($course['level'], ENT_QUOTES);
-                $selected = ($student['course_id'] == $course['course_id']) ? 'selected' : '';
-                echo "<option value='{$course['course_id']}' data-level=\"$level\" $selected>{$course_name}</option>";
-            }
-            ?>
-        </select><br>
-
+        <div class="form-row">
+            <label for="course_level_select">Course Level:</label>
+            <select id="course_level_select" name="course_level" required>
+                <option value="">Select Level</option>
+                <?php
+                $levels = [];
+                $courses_result = $conn->query("SELECT DISTINCT level FROM courses WHERE level IS NOT NULL");
+                while ($row = $courses_result->fetch_assoc()) {
+                    $level = htmlspecialchars($row['level'], ENT_QUOTES);
+                    $selected = ($student['level'] === $level) ? 'selected' : '';
+                    echo "<option value=\"$level\" $selected>$level</option>";
+                }
+                ?>
+            </select>
+            <label for="student_course">Course:</label>
+            <select id="student_course" name="course_id" required>
+                <option value="">Select Course</option>
+                <?php
+                // Output all courses as options with data-level attribute
+                $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
+                while ($course = $courses->fetch_assoc()) {
+                    $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
+                    $level = htmlspecialchars($course['level'], ENT_QUOTES);
+                    $selected = ($student['course_id'] == $course['course_id']) ? 'selected' : '';
+                    echo "<option value='{$course['course_id']}' data-level=\"$level\" $selected>{$course_name}</option>";
+                }
+                ?>
+            </select>
+        </div>
         <fieldset>
             <legend>Primary Contact</legend>
-            <label for="primary_owner_last_name">Last Name:</label>
-            <input type="text" id="primary_owner_last_name" name="primary_owner_last_name"
-                value="<?php echo htmlspecialchars($student['primary_owner_last_name']); ?>" required><br>
-            <label for="primary_owner_first_name">First Name:</label>
-            <input type="text" id="primary_owner_first_name" name="primary_owner_first_name"
-                value="<?php echo htmlspecialchars($student['primary_owner_first_name']); ?>" required><br>
-            <label for="primary_relationship">Relationship:</label>
-            <input type="text" id="primary_relationship" name="primary_relationship"
-                value="<?php echo htmlspecialchars($student['primary_relationship']); ?>" required><br>
-            <label for="primary_phone">Phone:</label>
-            <input type="text" id="primary_phone" name="primary_phone"
-                value="<?php echo htmlspecialchars($student['primary_phone']); ?>" required><br>
-            <label for="primary_email">Email:</label>
-            <input type="text" id="primary_email" name="primary_email"
-                value="<?php echo htmlspecialchars($student['primary_email']); ?>" required><br>
-            <label for="primary_address">Address:</label>
-            <input type="text" id="primary_address" name="primary_address"
-                value="<?php echo htmlspecialchars($student['primary_address']); ?>" required><br>
-            <label for="primary_postcode">Postcode:</label>
-            <input type="text" id="primary_postcode" name="primary_postcode"
-                value="<?php echo htmlspecialchars($student['primary_postcode']); ?>" required><br>
+            <div class="form-row">
+                <label for="primary_owner_last_name">Last Name:</label>
+                <input type="text" id="primary_owner_last_name" name="primary_owner_last_name"
+                    value="<?php echo htmlspecialchars($student['primary_owner_last_name']); ?>" required>
+                <label for="primary_owner_first_name">First Name:</label>
+                <input type="text" id="primary_owner_first_name" name="primary_owner_first_name"
+                    value="<?php echo htmlspecialchars($student['primary_owner_first_name']); ?>" required>
+                <label for="primary_relationship">Relationship:</label>
+                <input type="text" id="primary_relationship" name="primary_relationship"
+                    value="<?php echo htmlspecialchars($student['primary_relationship']); ?>" required>
+            </div>
+            <div class="form-row">
+                <label for="primary_phone">Phone:</label>
+                <input type="text" id="primary_phone" name="primary_phone"
+                    value="<?php echo htmlspecialchars($student['primary_phone']); ?>" required>
+                <label for="primary_email">Email:</label>
+                <input type="text" id="primary_email" name="primary_email"
+                    value="<?php echo htmlspecialchars($student['primary_email']); ?>" required>
+                <label for="primary_address">Address:</label>
+                <input type="text" id="primary_address" name="primary_address"
+                    value="<?php echo htmlspecialchars($student['primary_address']); ?>" required>
+                <label for="primary_postcode">Postcode:</label>
+                <input type="text" id="primary_postcode" name="primary_postcode"
+                    value="<?php echo htmlspecialchars($student['primary_postcode']); ?>" required>
+            </div>
         </fieldset>
-
         <fieldset>
             <legend>Secondary Contact</legend>
-            <label for="secondary_owner_last_name">Last Name:</label>
-            <input type="text" id="secondary_owner_last_name" name="secondary_owner_last_name"
-                value="<?php echo htmlspecialchars($student['secondary_owner_last_name']); ?>"><br>
-            <label for="secondary_owner_first_name">First Name:</label>
-            <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name"
-                value="<?php echo htmlspecialchars($student['secondary_owner_first_name']); ?>"><br>
-            <label for="secondary_relationship">Relationship:</label>
-            <input type="text" id="secondary_relationship" name="secondary_relationship"
-                value="<?php echo htmlspecialchars($student['secondary_relationship']); ?>"><br>
-            <label for="secondary_phone">Phone:</label>
-            <input type="text" id="secondary_phone" name="secondary_phone"
-                value="<?php echo htmlspecialchars($student['secondary_phone']); ?>"><br>
+            <div class="form-row">
+                <label for="secondary_owner_last_name">Last Name:</label>
+                <input type="text" id="secondary_owner_last_name" name="secondary_owner_last_name"
+                    value="<?php echo htmlspecialchars($student['secondary_owner_last_name']); ?>">
+                <label for="secondary_owner_first_name">First Name:</label>
+                <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name"
+                    value="<?php echo htmlspecialchars($student['secondary_owner_first_name']); ?>">
+                <label for="secondary_relationship">Relationship:</label>
+                <input type="text" id="secondary_relationship" name="secondary_relationship"
+                    value="<?php echo htmlspecialchars($student['secondary_relationship']); ?>">
+                <label for="secondary_phone">Phone:</label>
+                <input type="text" id="secondary_phone" name="secondary_phone"
+                    value="<?php echo htmlspecialchars($student['secondary_phone']); ?>">
+            </div>
         </fieldset>
-
         <button type="submit">Update</button>
         <a href="../Pages/admin/users.php?active_tab=students">Cancel</a>
     </form>
