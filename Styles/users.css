@@ -205,47 +205,6 @@ h1 {
     }
 }
 
-/* --- Filter Dropdown Styling --- */
-.filter-dropdown {
-    display: flex;
-    align-items: center;
-    margin-left: 12px;
-}
-
-#user-filter-select {
-    background: #f5f8fa;
-    color: #2176c1;
-    border: 1.5px solid #2176c1;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 1.05em;
-    font-weight: 500;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-    min-width: 160px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(33, 118, 193, 0.06);
-}
-
-#user-filter-select:focus,
-#user-filter-select:hover {
-    border-color: #174c79;
-    background: #e3f0fc;
-    color: #174c79;
-}
-
-@media (max-width: 700px) {
-    .filter-dropdown {
-        margin: 10px 0 0 0;
-        justify-content: flex-start;
-    }
-
-    #user-filter-select {
-        width: 100%;
-        min-width: 0;
-    }
-}
-
 /* PAGINATION */
 .pagination {
     display: flex;
