@@ -1,3 +1,7 @@
+h1 {
+  text-align: center;
+}
+
 .form-row {
   display: flex;
   flex-wrap: wrap;
