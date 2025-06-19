@@ -240,6 +240,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="/Styles/common.css">
     <link rel="stylesheet" href="/Styles/forms.css">
     <title>Add Entry</title>
+    <style>
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .form-row label {
+            min-width: 110px;
+            font-size: 0.96em;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            min-width: 140px;
+            flex: 1 1 140px;
+            padding: 6px 8px;
+            font-size: 1em;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 8px 16px 8px 16px;
+            margin-bottom: 16px;
+        }
+        legend {
+            font-size: 1.09em;
+            font-weight: bold;
+        }
+        form {
+            background: #fafbfc;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(60,60,60,0.12);
+            padding: 18px 24px;
+            margin-top: 18px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        button[type="submit"], a[href$="users.php"] {
+            margin-top: 14px;
+            margin-right: 10px;
+        }
+        @media (max-width: 800px) {
+            .form-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+            form {
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -249,204 +305,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } ?>
 
     <form id="user-type-form" method="POST">
-        <label for="user_type">User Type:</label>
-        <select id="user_type" name="user_type" required onchange="toggleForms()">
-            <option value="">Select User Type</option>
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
-            <option value="admin">Admin</option>
-        </select><br><br>
+        <div class="form-row">
+            <label for="user_type">User Type:</label>
+            <select id="user_type" name="user_type" required onchange="toggleForms()">
+                <option value="">Select User Type</option>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
     </form>
 
     <!-- Student Form -->
     <form id="student-form" method="POST" style="display: none;">
         <input type="hidden" name="user_type" value="student">
         <h2>Student Details</h2>
-        <label for="student_last_name">Last Name:</label>
-        <input type="text" id="student_last_name" name="Last_Name" required><br>
-        <label for="student_first_name">First Name:</label>
-        <input type="text" id="student_first_name" name="First_Name" required><br>
-        <label for="student_gender">Gender:</label>
-        <select id="student_gender" name="Gender" required>
-            <option value="1">Male</option>
-            <option value="0">Female</option>
-        </select><br>
-        <label for="student_dob">Date of Birth:</label>
-        <input type="date" id="student_dob" name="DOB" required><br>
-        <label for="student_school_syllabus">School Syllabus:</label>
-        <input type="text" id="student_school_syllabus" name="School_Syllabus"><br>
-        <label for="student_school_intake">School Intake (Month):</label>
-        <select id="student_school_intake" name="School_Intake" required>
-            <option value="">Select Month</option>
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-        </select><br>
-        <label for="student_current_grade">Current School Grade:</label>
-        <input type="text" id="student_current_grade" name="Current_School_Grade"><br>
-        <label for="student_school">School:</label>
-        <input type="text" id="student_school" name="School"><br>
-        <label for="student_mathology_level">Mathology Level:</label>
-        <select id="student_mathology_level" name="Mathology_Level" required>
-            <option value="">Select Level</option>
-            <?php
-            for ($i = 1; $i <= 9; $i++) {
-                echo "<option value='$i'>Level $i</option>";
-            }
-            ?>
-        </select><br>
-        <label for="student_email">Email:</label>
-        <input type="email" id="student_email" name="email" required><br>
-        <label for="student_password">Password:</label>
-        <input type="password" id="student_password" name="password" required><br><br>
-        <label for="course_level_select">Course Level:</label>
-        <select id="course_level_select" name="course_level" required onchange="filterCoursesByLevel()">
-            <option value="">Select Level</option>
-            <?php
-            // Get all unique course levels
-            $levels = [];
-            $courses_result = $conn->query("SELECT DISTINCT level FROM courses WHERE level IS NOT NULL");
-            while ($row = $courses_result->fetch_assoc()) {
-                $level = htmlspecialchars($row['level'], ENT_QUOTES);
-                echo "<option value=\"$level\">$level</option>";
-            }
-            ?>
-        </select><br>
-        <label for="student_course">Course:</label>
-        <select id="student_course" name="course_id" required>
-            <option value="">Select Level</option>
-        </select><br>
-        <label for="enrollment_date">Enrollment Date:</label>
-        <input type="date" id="enrollment_date" name="Enrollment_Date" required><br>
-        <label for="program_start">Program Start:</label>
-        <input type="date" id="program_start" name="program_start" required><br>
-
-        <label for="program_end">Program End:</label>
-        <input type="date" id="program_end" name="program_end" required><br>
-
-        <label for="hours_per_week">Hours per Week:</label>
-        <input type="number" step="0.1" id="hours_per_week" name="hours_per_week" required><br>
-        <label for="student_day">Day:</label>
-        <select id="student_day" name="Day" required>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
-        </select><br>
-        <label for="student_start_time">Start Time:</label>
-        <input type="time" id="student_start_time" name="Start_Time" required><br>
-        <label for="student_end_time">End Time:</label>
-        <input type="time" id="student_end_time" name="End_Time" required><br><br>
-
-        <fieldset style="margin-top:16px;">
-            <legend>Primary Contact</legend>
-            <label for="primary_owner_last_name">Last Name:</label>
-            <input type="text" id="primary_owner_last_name" name="primary_owner_last_name" required><br>
-            <label for="primary_owner_first_name">First Name:</label>
-            <input type="text" id="primary_owner_first_name" name="primary_owner_first_name" required><br>
-            <label for="primary_relationship">Relationship with Student:</label>
-            <input type="text" id="primary_relationship" name="primary_relationship" required><br>
-            <label for="primary_phone">Phone:</label>
-            <input type="text" id="primary_phone" name="primary_phone" required><br>
-            <label for="primary_email">Email:</label>
-            <input type="text" id="primary_email" name="primary_email" required><br>
-            <label for="primary_address">Address:</label>
-            <input type="text" id="primary_address" name="primary_address" required><br>
-            <label for="primary_postcode">Postcode:</label>
-            <input type="text" id="primary_postcode" name="primary_postcode" required><br>
-        </fieldset>
-        <fieldset style="margin-top:10px;">
-            <legend>Secondary Contact</legend>
-            <label for="secondary_owner_last_name">Last Name:</label>
-            <input type="text" id="secondary_owner_last_name" name="secondary_owner_last_name"><br>
-            <label for="secondary_owner_first_name">First Name:</label>
-            <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name"><br>
-            <label for="secondary_relationship">Relationship with Student:</label>
-            <input type="text" id="secondary_relationship" name="secondary_relationship"><br>
-            <label for="secondary_phone">Phone:</label>
-            <input type="text" id="secondary_phone" name="secondary_phone"><br>
-        </fieldset>
-        <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
-        <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100"><br>
-        <button type="submit">Add Student</button>
-        <a href="../Pages/admin/users.php">Cancel</a>
-    </form>
-
-    <!-- Instructor Form -->
-    <form id="instructor-form" method="POST" style="display: none;">
-        <input type="hidden" name="user_type" value="instructor">
-        <h2>Instructor Details</h2>
-        <label for="instructor_last_name">Last Name:</label>
-        <input type="text" id="instructor_last_name" name="Last_Name" required><br>
-        <label for="instructor_first_name">First Name:</label>
-        <input type="text" id="instructor_first_name" name="First_Name" required><br>
-        <label for="instructor_gender">Gender:</label>
-        <select id="instructor_gender" name="Gender" required>
-            <option value="1">Male</option>
-            <option value="0">Female</option>
-        </select><br>
-        <label for="instructor_dob">Date of Birth:</label>
-        <input type="date" id="instructor_dob" name="DOB" required><br>
-        <label for="instructor_highest_education">Highest Education:</label>
-        <input type="text" id="instructor_highest_education" name="Highest_Education"><br>
-        <label for="instructor_remark">Remark:</label>
-        <textarea id="instructor_remark" name="Remark"></textarea><br>
-        <label for="instructor_training_status">Training Status:</label>
-        <input type="text" id="instructor_training_status" name="Training_Status"><br>
-        <label for="instructor_contact">Contact Number:</label>
-        <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" required><br>
-        <label for="instructor_hiring_status">Hiring Status:</label>
-        <select id="instructor_hiring_status" name="hiring_status" required>
-            <option value="true">Hired</option>
-            <option value="false">Not Hired</option>
-        </select><br>
-        <label for="instructor_total_hours">Total Hours:</label>
-        <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" required><br>
-        <label for="instructor_employment_type">Employment Type:</label>
-        <select id="instructor_employment_type" name="Employment_Type" required>
-            <option value="Full-Time">Full-Time</option>
-            <option value="Part-Time">Part-Time</option>
-        </select><br>
-
-        <!-- Course Level and Name selection -->
-        <label for="instructor_course_level">Course Level:</label>
-        <select id="instructor_course_level" name="course_level" required>
-            <option value="">Select Level</option>
-            <?php
-            // Get enum values for level from courses table
-            $levelEnumRes = $conn->query("SHOW COLUMNS FROM courses LIKE 'level'");
-            $levelRow = $levelEnumRes->fetch_assoc();
-            preg_match("/^enum\((.*)\)$/", $levelRow['Type'], $matches);
-            $levels = [];
-            if (isset($matches[1])) {
-                foreach (explode(",", $matches[1]) as $level) {
-                    $val = trim($level, "'");
-                    $levels[] = $val;
-                    echo "<option value=\"$val\">$val</option>";
+        <div class="form-row">
+            <label for="student_last_name">Last Name:</label>
+            <input type="text" id="student_last_name" name="Last_Name" required>
+            <label for="student_first_name">First Name:</label>
+            <input type="text" id="student_first_name" name="First_Name" required>
+            <label for="student_gender">Gender:</label>
+            <select id="student_gender" name="Gender" required>
+                <option value="1">Male</option>
+                <option value="0">Female</option>
+            </select>
+            <label for="student_dob">DOB:</label>
+            <input type="date" id="student_dob" name="DOB" required>
+        </div>
+        <div class="form-row">
+            <label for="student_school_syllabus">School Syllabus:</label>
+            <input type="text" id="student_school_syllabus" name="School_Syllabus">
+            <label for="student_school_intake">School Intake:</label>
+            <select id="student_school_intake" name="School_Intake" required>
+                <option value="">Select Month</option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+            </select>
+            <label for="student_current_grade">Current Grade:</label>
+            <input type="text" id="student_current_grade" name="Current_School_Grade">
+        </div>
+        <div class="form-row">
+            <label for="student_school">School:</label>
+            <input type="text" id="student_school" name="School">
+            <label for="student_mathology_level">Mathology Level:</label>
+            <select id="student_mathology_level" name="Mathology_Level" required>
+                <option value="">Select Level</option>
+                <?php for ($i = 1; $i <= 9; $i++) { echo "<option value='$i'>Level $i</option>"; } ?>
+            </select>
+            <label for="student_email">Email:</label>
+            <input type="email" id="student_email" name="email" required>
+            <label for="student_password">Password:</label>
+            <input type="password" id="student_password" name="password" required>
+        </div>
+        <div class="form-row">
+            <label for="course_level_select">Course Level:</label>
+            <select id="course_level_select" name="course_level" required onchange="filterCoursesByLevel()">
+                <option value="">Select Level</option>
+                <?php
+                $levels = [];
+                $courses_result = $conn->query("SELECT DISTINCT level FROM courses WHERE level IS NOT NULL");
+                while ($row = $courses_result->fetch_assoc()) {
+                    $level = htmlspecialchars($row['level'], ENT_QUOTES);
+                    echo "<option value=\"$level\">$level</option>";
                 }
-            }
-            ?>
-        </select><br>
-        <label for="instructor_course_name">Course Name:</label>
-        <select id="instructor_course_name" name="course_id" required>
-            <option value="">Select Course</option>
-            <!-- Options will be dynamically populated by JS -->
-        </select><br>
-        <div id="part-time-days-times" style="display:none;">
-            <label for="instructor_working_days">Working Days:</label>
-            <select id="instructor_working_days" name="Working_Days[]" multiple>
+                ?>
+            </select>
+            <label for="student_course">Course:</label>
+            <select id="student_course" name="course_id" required>
+                <option value="">Select Course</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="enrollment_date">Enrollment Date:</label>
+            <input type="date" id="enrollment_date" name="Enrollment_Date" required>
+            <label for="program_start">Program Start:</label>
+            <input type="date" id="program_start" name="program_start" required>
+            <label for="program_end">Program End:</label>
+            <input type="date" id="program_end" name="program_end" required>
+            <label for="hours_per_week">Hours/Week:</label>
+            <input type="number" step="0.1" id="hours_per_week" name="hours_per_week" required>
+        </div>
+        <div class="form-row">
+            <label for="student_day">Day:</label>
+            <select id="student_day" name="Day" required>
                 <option value="Monday">Monday</option>
                 <option value="Tuesday">Tuesday</option>
                 <option value="Wednesday">Wednesday</option>
@@ -455,13 +407,138 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="Saturday">Saturday</option>
                 <option value="Sunday">Sunday</option>
             </select>
+            <label for="student_start_time">Start Time:</label>
+            <input type="time" id="student_start_time" name="Start_Time" required>
+            <label for="student_end_time">End Time:</label>
+            <input type="time" id="student_end_time" name="End_Time" required>
+        </div>
+        <fieldset>
+            <legend>Primary Contact</legend>
+            <div class="form-row">
+                <label for="primary_owner_last_name">Last Name:</label>
+                <input type="text" id="primary_owner_last_name" name="primary_owner_last_name" required>
+                <label for="primary_owner_first_name">First Name:</label>
+                <input type="text" id="primary_owner_first_name" name="primary_owner_first_name" required>
+                <label for="primary_relationship">Relationship:</label>
+                <input type="text" id="primary_relationship" name="primary_relationship" required>
+            </div>
+            <div class="form-row">
+                <label for="primary_phone">Phone:</label>
+                <input type="text" id="primary_phone" name="primary_phone" required>
+                <label for="primary_email">Email:</label>
+                <input type="text" id="primary_email" name="primary_email" required>
+                <label for="primary_address">Address:</label>
+                <input type="text" id="primary_address" name="primary_address" required>
+                <label for="primary_postcode">Postcode:</label>
+                <input type="text" id="primary_postcode" name="primary_postcode" required>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Secondary Contact</legend>
+            <div class="form-row">
+                <label for="secondary_owner_last_name">Last Name:</label>
+                <input type="text" id="secondary_owner_last_name" name="secondary_owner_last_name">
+                <label for="secondary_owner_first_name">First Name:</label>
+                <input type="text" id="secondary_owner_first_name" name="secondary_owner_first_name">
+                <label for="secondary_relationship">Relationship:</label>
+                <input type="text" id="secondary_relationship" name="secondary_relationship">
+                <label for="secondary_phone">Phone:</label>
+                <input type="text" id="secondary_phone" name="secondary_phone">
+            </div>
+        </fieldset>
+        <div class="form-row">
+            <label for="How_Did_You_Heard_About_Us">How did you hear about us?</label>
+            <input type="text" id="How_Did_You_Heard_About_Us" name="How_Did_You_Heard_About_Us" maxlength="100">
+        </div>
+        <button type="submit">Add Student</button>
+        <a href="../Pages/admin/users.php">Cancel</a>
+    </form>
+
+    <!-- Instructor Form -->
+    <form id="instructor-form" method="POST" style="display: none;">
+        <input type="hidden" name="user_type" value="instructor">
+        <h2>Instructor Details</h2>
+        <div class="form-row">
+            <label for="instructor_last_name">Last Name:</label>
+            <input type="text" id="instructor_last_name" name="Last_Name" required>
+            <label for="instructor_first_name">First Name:</label>
+            <input type="text" id="instructor_first_name" name="First_Name" required>
+            <label for="instructor_gender">Gender:</label>
+            <select id="instructor_gender" name="Gender" required>
+                <option value="1">Male</option>
+                <option value="0">Female</option>
+            </select>
+            <label for="instructor_dob">DOB:</label>
+            <input type="date" id="instructor_dob" name="DOB" required>
+        </div>
+        <div class="form-row">
+            <label for="instructor_highest_education">Highest Education:</label>
+            <input type="text" id="instructor_highest_education" name="Highest_Education">
+            <label for="instructor_remark">Remark:</label>
+            <textarea id="instructor_remark" name="Remark" style="min-width:140px;flex:1 1 140px;"></textarea>
+            <label for="instructor_training_status">Training Status:</label>
+            <input type="text" id="instructor_training_status" name="Training_Status">
+        </div>
+        <div class="form-row">
+            <label for="instructor_contact">Contact Number:</label>
+            <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" required>
+            <label for="instructor_hiring_status">Hiring Status:</label>
+            <select id="instructor_hiring_status" name="hiring_status" required>
+                <option value="true">Hired</option>
+                <option value="false">Not Hired</option>
+            </select>
+            <label for="instructor_total_hours">Total Hours:</label>
+            <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" required>
+            <label for="instructor_employment_type">Employment Type:</label>
+            <select id="instructor_employment_type" name="Employment_Type" required>
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="instructor_course_level">Course Level:</label>
+            <select id="instructor_course_level" name="course_level" required>
+                <option value="">Select Level</option>
+                <?php
+                $levelEnumRes = $conn->query("SHOW COLUMNS FROM courses LIKE 'level'");
+                $levelRow = $levelEnumRes->fetch_assoc();
+                preg_match("/^enum\((.*)\)$/", $levelRow['Type'], $matches);
+                $levels = [];
+                if (isset($matches[1])) {
+                    foreach (explode(",", $matches[1]) as $level) {
+                        $val = trim($level, "'");
+                        $levels[] = $val;
+                        echo "<option value=\"$val\">$val</option>";
+                    }
+                }
+                ?>
+            </select>
+            <label for="instructor_course_name">Course Name:</label>
+            <select id="instructor_course_name" name="course_id" required>
+                <option value="">Select Course</option>
+            </select>
+        </div>
+        <div id="part-time-days-times" style="display:none;">
+            <div class="form-row">
+                <label for="instructor_working_days">Working Days:</label>
+                <select id="instructor_working_days" name="Working_Days[]" multiple>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
             <div id="day-times-container"></div>
         </div>
-        <br>
-        <label for="instructor_email">Email:</label>
-        <input type="email" id="instructor_email" name="email" required><br>
-        <label for="instructor_password">Password:</label>
-        <input type="password" id="instructor_password" name="password" required><br>
+        <div class="form-row">
+            <label for="instructor_email">Email:</label>
+            <input type="email" id="instructor_email" name="email" required>
+            <label for="instructor_password">Password:</label>
+            <input type="password" id="instructor_password" name="password" required>
+        </div>
         <button type="submit">Add Instructor</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
@@ -470,23 +547,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form id="admin-form" method="POST" style="display: none;">
         <input type="hidden" name="user_type" value="admin">
         <h2>Admin Details</h2>
-        <label for="admin_email">Email:</label>
-        <input type="email" id="admin_email" name="email" required><br>
-        <label for="admin_password">Password:</label>
-        <input type="password" id="admin_password" name="password" required><br><br>
+        <div class="form-row">
+            <label for="admin_email">Email:</label>
+            <input type="email" id="admin_email" name="email" required>
+            <label for="admin_password">Password:</label>
+            <input type="password" id="admin_password" name="password" required>
+        </div>
         <button type="submit">Add Admin</button>
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
 
     <script>
         const allCourses = <?php
-                            $courses = [];
-                            $res = $conn->query("SELECT course_id, course_name, level FROM courses");
-                            while ($row = $res->fetch_assoc()) {
-                                $courses[] = $row;
-                            }
-                            echo json_encode($courses);
-                            ?>;
+            $courses = [];
+            $res = $conn->query("SELECT course_id, course_name, level FROM courses");
+            while ($row = $res->fetch_assoc()) {
+                $courses[] = $row;
+            }
+            echo json_encode($courses);
+        ?>;
 
         document.getElementById('course_level_select').addEventListener('change', function() {
             const selectedLevel = this.value;
@@ -589,5 +668,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </body>
-
 </html>

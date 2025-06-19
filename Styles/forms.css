@@ -1,79 +1,40 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f4f6;
-    color: #1f2937;
-    margin: 0;
-    padding: 40px;
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-h1 {
-    text-align: center;
-    color: #1f2937;
+.form-row label {
+  min-width: 110px;
+  font-size: 0.96em;
+  margin-right: 6px;
+  white-space: nowrap;
 }
 
-form {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+.form-row input,
+.form-row select {
+  min-width: 140px;
+  flex: 1 1 140px;
+  padding: 6px 8px;
+  font-size: 1em;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #1f2937;
+fieldset {
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  padding: 8px 16px 8px 16px;
+  margin-bottom: 16px;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="datetime-local"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    transition: box-shadow 0.3s ease;
+legend {
+  font-size: 1.09em;
+  font-weight: bold;
 }
 
-input:focus,
-select:focus {
-    outline: none;
-    border-color: #1f2937;
-    box-shadow: 0 0 5px rgba(31, 41, 55, 0.5);
-}
-
-p {
-    margin-bottom: 10px;
-}
-
-button {
-    background-color: #1f2937;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: rgb(71, 82, 95);
-}
-
-a {
-    margin-left: 15px;
-    text-decoration: none;
-    color: #1f2937;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: rgb(71, 82, 95);
+@media (max-width: 800px) {
+  .form-row {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
