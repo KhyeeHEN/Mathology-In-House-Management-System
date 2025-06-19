@@ -17,7 +17,7 @@
         </a>
                 <a href="../instructors/attendance_instructors.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'attendance_instructors.php' ? 'active' : ''; ?>">
-            <i class="fas fa-check"></i>
+            <i class="fas fa-calendar-alt"></i>
             <span>Attendance</span>
         </a>
     </nav>
