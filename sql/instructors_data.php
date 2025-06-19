@@ -100,13 +100,13 @@ if ($result->num_rows > 0) {
                     <i class='fas fa-eye'></i>
                 </button>
                 <form method='get' action='../../sql/edit_instructor.php' style='display:inline; margin:0; padding:0;'>
-                    <input type='hidden' name='edit_instructor' value='{$row['edit_instructor']}'>
+                    <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn edit'>
                         <i class='fas fa-edit'></i> 
                     </button>
                 </form>
-                <form method='get' action='../../sql/delete_edit_instructor.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
-                    <input type='hidden' name='edit_instructor_id' value='{$row['edit_instructor_id']}'>
+                <form method='get' action='../../sql/delete_edit_instructor.php' style='display:inline; margin:0; padding:0;' onsubmit=\"return confirm('Are you sure you want to delete this instructor?');\">
+                    <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn delete'>
                         <i class='fas fa-trash'></i> 
                     </button>
