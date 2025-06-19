@@ -78,68 +78,74 @@ h1 {
     pointer-events: none;
 }
 
-/* USERS PAGE CONTROL ROWS & SEARCH BAR */
-
-/* --- Users Controls Row: Center everything horizontally --- */
 .users-controls-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Center all child items horizontally */
     gap: 24px;
-    margin: 20px 0;
+    margin: 32px 0 20px 0;
     flex-wrap: wrap;
     width: 100%;
 }
 
-.search-bar,
-.add-entry-button,
-.filter-dropdown {
+.users-controls-row>* {
+    /* Remove any extra width, center items as a block */
+    flex: 0 0 auto;
+    min-width: unset;
+}
+
+.search-bar {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* --- Search Bar Input & Buttons --- */
+#search-form {
+    display: flex;
+    gap: 8px;
+}
+
 #search-form input[type="text"] {
-    border: 1.5px solid #bbb;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 1em;
-    min-width: 150px;
+    border: 2px solid #bbb;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    min-width: 170px;
     transition: border 0.2s;
 }
 
 #search-form input[type="text"]:focus {
-    border: 1.5px solid #2176c1;
+    border: 2px solid #2176c1;
     outline: none;
 }
 
-/* --- Search, Reset, and Add Entry Buttons --- */
-#search-form button[type="submit"],
-#search-form button[type="button"],
-.add-entry-button button[type="submit"] {
+#search-form button[type="submit"] {
     background-color: #2176c1;
     color: #fff;
     border: none;
-    border-radius: 5px;
-    padding: 8px 20px;
-    font-size: 1em;
+    border-radius: 7px;
+    padding: 10px 28px;
+    font-size: 1.1em;
     cursor: pointer;
+    font-weight: 500;
     transition: background 0.2s;
-    margin-left: 0px;
 }
 
-#search-form button[type="submit"]:hover,
-#search-form button[type="button"]:hover,
-.add-entry-button button[type="submit"]:hover {
+#search-form button[type="submit"]:hover {
     background-color: #174c79;
 }
 
 #search-form button[type="button"] {
     background: #bbb;
     color: #fff;
-    margin-left: 6px;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 28px;
+    font-size: 1.1em;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 0;
+    transition: background 0.2s;
 }
 
 #search-form button[type="button"]:hover {
@@ -147,31 +153,50 @@ h1 {
     color: #fff;
 }
 
-/* --- Add Entry Button --- */
-.add-entry-button button[type="submit"] {
-    margin-left: 8px;
+.add-entry-button form,
+.add-entry-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
 }
 
-/* --- Filter Dropdown Styling --- */
+.add-entry-button button[type="submit"] {
+    background-color: #2176c1;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 28px;
+    font-size: 1.1em;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 0;
+    transition: background 0.2s;
+}
+
+.add-entry-button button[type="submit"]:hover {
+    background: #174c79;
+}
+
 .filter-dropdown {
     display: flex;
     align-items: center;
-    margin-left: 12px;
+    justify-content: center;
 }
 
 #user-filter-select {
     background: #f5f8fa;
     color: #2176c1;
-    border: 1.5px solid #2176c1;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 1.05em;
+    border: 2px solid #2176c1;
+    border-radius: 8px;
+    padding: 10px 28px 10px 18px;
+    font-size: 1.1em;
     font-weight: 500;
     outline: none;
-    transition: border-color 0.2s, background 0.2s;
-    min-width: 160px;
+    min-width: 150px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(33, 118, 193, 0.06);
+    transition: border-color 0.2s, background 0.2s;
 }
 
 #user-filter-select:focus,
@@ -181,27 +206,15 @@ h1 {
     color: #174c79;
 }
 
-/* --- Responsive: stack vertically on small screens --- */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
     .users-controls-row {
         flex-direction: column;
-        gap: 12px;
+        gap: 18px;
     }
 
-    .users-controls-row>div {
+    .users-controls-row>* {
         width: 100%;
-        min-width: 0;
         justify-content: center;
-    }
-
-    .filter-dropdown {
-        margin: 10px 0 0 0;
-        justify-content: flex-start;
-    }
-
-    #user-filter-select {
-        width: 100%;
-        min-width: 0;
     }
 }
 
