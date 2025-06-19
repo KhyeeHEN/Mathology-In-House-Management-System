@@ -11,7 +11,7 @@
         </a>
         <a href="../client/learninghours.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'learninghours.php' ? 'active' : ''; ?>">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="fas fa-clock"></i>
             <span>Learning hours</span>
         </a>
         <a href="../client/student_timetable.php"
@@ -21,7 +21,7 @@
         </a>
         <a href="../client/student_reschedule.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'student_reschedule.php' ? 'active' : ''; ?>">
-            <i class="fas fa-calendar-alt"></i>
+            <i class="fas fa-calendar-pen"></i>
             <span>Reschedule</span>
         </a>
 
