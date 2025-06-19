@@ -11,13 +11,13 @@
         </a>
                 <a href="../instructors/instruct_days.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'instruct_days.php' ? 'active' : ''; ?>">
-            <i class="fas fa-home"></i>
+            <i class="fas fa-user"></i>
             <span>My details</span>
         </a>
         </a>
                 <a href="../instructors/attendance_instructors.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'attendance_instructors.php' ? 'active' : ''; ?>">
-            <i class="fas fa-home"></i>
+            <i class="fas fa-check"></i>
             <span>Attendance</span>
         </a>
     </nav>

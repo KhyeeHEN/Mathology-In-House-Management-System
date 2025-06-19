@@ -25,16 +25,16 @@
             <span>Reschedule</span>
         </a>
 
-        <a href="../client/paymentclient.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'paymentclient.php' ? 'active' : ''; ?>">
-            <i class="fas fa-credit-card"></i>
-            <span>Payment</span>
-        </a>
-
         <a href="../client/leave.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
             <i class="fas fa-check"></i>
             <span>Apply Leave</span>
+        </a>
+
+        <a href="../client/paymentclient.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'paymentclient.php' ? 'active' : ''; ?>">
+            <i class="fas fa-credit-card"></i>
+            <span>Payment</span>
         </a>
     </nav>
 </aside>

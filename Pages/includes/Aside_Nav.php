@@ -22,7 +22,12 @@
         <a href="../admin/instructor_timetable.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'instructor_timetable.php' ? 'active' : ''; ?>">
             <i class="fas fa-calendar-alt"></i>
-            <span>Instructor</span>
+            <span>Instructor Timetable</span>
+        </a>
+        <a href="../admin/leave.php"
+            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
+            <i class="fas fa-check"></i>
+            <span>Leave</span>
         </a>
         <a href="../admin/users.php"
             class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
@@ -34,10 +39,6 @@
             <i class="fas fa-credit-card"></i>
             <span>Payments</span>
         </a>
-        <a href="../admin/leave.php"
-            class="nav-item <?php echo basename($_SERVER['PHP_SELF']) == 'leave.php' ? 'active' : ''; ?>">
-            <i class="fas fa-check"></i>
-            <span>Leave</span>
-        </a>
+
     </nav>
 </aside>
