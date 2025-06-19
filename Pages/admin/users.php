@@ -45,7 +45,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
             <div class="users-controls-row">
                 <!-- Search Bar -->
-                <div class="search-bar" style="flex: 1; min-width: 220px;">
+                <div class="search-bar">
                     <form method="GET" action="users.php" id="search-form" style="display: flex; gap: 8px;">
                         <input type="text" name="search" id="search-input" placeholder="Search users by name or ID"
                             value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
@@ -69,7 +69,7 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
 
                 <!-- Filter Dropdown -->
                 <div class="filter-dropdown">
-                    <select id="user-filter-select" style="padding: 6px 12px; font-size: 1em;">
+                    <select id="user-filter-select">
                         <option value="students-table" <?php echo (!isset($_GET['active_tab']) || $_GET['active_tab'] === 'students') ? 'selected' : ''; ?>>Students</option>
                         <option value="instructors-table" <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'instructors') ? 'selected' : ''; ?>>Instructors</option>
                         <option value="admins-table" <?php echo (isset($_GET['active_tab']) && $_GET['active_tab'] === 'admins') ? 'selected' : ''; ?>>Admins</option>
