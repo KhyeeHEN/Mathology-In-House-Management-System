@@ -5,7 +5,7 @@
     margin: 0 auto;
     border-radius: 8px;
     border-collapse: collapse;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .table-container th,
@@ -27,52 +27,55 @@ h1 {
 }
 
 .action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  margin: 0 2px;
-  font-size: 1.3em;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 6px rgba(60,60,60,0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    margin: 0 2px;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(60, 60, 60, 0.08);
 }
 
 .action-btn.view {
-  background: #e3f0fc;
-  color: #2176c1;
+    background: #e3f0fc;
+    color: #2176c1;
 }
+
 .action-btn.view:hover,
 .action-btn.view:focus {
-  background: #2176c1;
-  color: #fff;
+    background: #2176c1;
+    color: #fff;
 }
 
 .action-btn.edit {
-  background: #fbeee0;
-  color: #e67e22;
+    background: #fbeee0;
+    color: #e67e22;
 }
+
 .action-btn.edit:hover,
 .action-btn.edit:focus {
-  background: #e67e22;
-  color: #fff;
+    background: #e67e22;
+    color: #fff;
 }
 
 .action-btn.delete {
-  background: #fdeaea;
-  color: #ea3c53;
+    background: #fdeaea;
+    color: #ea3c53;
 }
+
 .action-btn.delete:hover,
 .action-btn.delete:focus {
-  background: #ea3c53;
-  color: #fff;
+    background: #ea3c53;
+    color: #fff;
 }
 
 .action-btn i {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 /* USERS PAGE CONTROL ROWS & SEARCH BAR */
@@ -116,39 +119,45 @@ h1 {
     background: #1a2330;
 }
 
-/* FILTER BUTTONS (STUDENTS/INSTRUCTORS/ADMINS) */
-.filter-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.filter-buttons button,
-.add-entry-button button {
-    height: 42px;
-    padding: 0 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: none;
-    background: #222e3a;
-    color: #fff;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
+/* --- Filter Dropdown Styling --- */
+.filter-dropdown {
     display: flex;
     align-items: center;
-    gap: 6px;
+    margin-left: 12px;
 }
 
-.filter-buttons button.active,
-.filter-buttons button:focus,
-.add-entry-button button.active,
-.add-entry-button button.focus {
-    background: #34495e;
+#user-filter-select {
+    background: #f5f8fa;
+    color: #2176c1;
+    border: 1.5px solid #2176c1;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 1.05em;
+    font-weight: 500;
     outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    min-width: 160px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(33, 118, 193, 0.06);
 }
 
-.filter-buttons button:hover .add-entry-button button:hover {
-    background: #1a2330;
+#user-filter-select:focus,
+#user-filter-select:hover {
+    border-color: #174c79;
+    background: #e3f0fc;
+    color: #174c79;
+}
+
+@media (max-width: 700px) {
+    .filter-dropdown {
+        margin: 10px 0 0 0;
+        justify-content: flex-start;
+    }
+
+    #user-filter-select {
+        width: 100%;
+        min-width: 0;
+    }
 }
 
 /* PAGINATION */
