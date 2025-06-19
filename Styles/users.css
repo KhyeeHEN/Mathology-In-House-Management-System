@@ -91,12 +91,14 @@ h1 {
 .users-controls-row>* {
     flex: 0 0 auto;
     min-width: unset;
+    margin: 0;
 }
 
 .search-bar {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 0;
 }
 
 #search-form {
