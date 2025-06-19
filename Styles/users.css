@@ -1,11 +1,18 @@
 /* Styling for the sorting table */
 .table-container {
     padding: 20px;
-    max-width: 1600px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
     border-radius: 8px;
     border-collapse: collapse;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.table-container table {
+  min-width: 1100px; /* or any width you need */
+  width: 100%;
 }
 
 .table-container th,
