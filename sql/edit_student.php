@@ -132,7 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -142,6 +141,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="/Styles/common.css">
     <link rel="stylesheet" href="/Styles/forms.css">
     <title>Edit Student</title>
+    <style>
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .form-row label {
+            min-width: 110px;
+            font-size: 0.96em;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            min-width: 140px;
+            flex: 1 1 140px;
+            padding: 6px 8px;
+            font-size: 1em;
+        }
+
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 8px 16px 8px 16px;
+            margin-bottom: 16px;
+        }
+
+        legend {
+            font-size: 1.09em;
+            font-weight: bold;
+        }
+
+        form {
+            background: #fafbfc;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(60, 60, 60, 0.12);
+            padding: 18px 24px;
+            margin-top: 18px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button[type="submit"],
+        a[href$="users.php"] {
+            margin-top: 14px;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 800px) {
+            .form-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            form {
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -236,6 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <select id="student_course" name="course_id" required>
                 <option value="">Select Course</option>
                 <?php
+                // Output all courses as options with data-level attribute
                 $courses = $conn->query("SELECT course_id, course_name, level FROM courses");
                 while ($course = $courses->fetch_assoc()) {
                     $course_name = htmlspecialchars($course['course_name'], ENT_QUOTES);
