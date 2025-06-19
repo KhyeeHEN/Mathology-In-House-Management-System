@@ -26,6 +26,55 @@ h1 {
     color: #333;
 }
 
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  margin: 0 2px;
+  font-size: 1.3em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(60,60,60,0.08);
+}
+
+.action-btn.view {
+  background: #e3f0fc;
+  color: #2176c1;
+}
+.action-btn.view:hover,
+.action-btn.view:focus {
+  background: #2176c1;
+  color: #fff;
+}
+
+.action-btn.edit {
+  background: #fbeee0;
+  color: #e67e22;
+}
+.action-btn.edit:hover,
+.action-btn.edit:focus {
+  background: #e67e22;
+  color: #fff;
+}
+
+.action-btn.delete {
+  background: #fdeaea;
+  color: #ea3c53;
+}
+.action-btn.delete:hover,
+.action-btn.delete:focus {
+  background: #ea3c53;
+  color: #fff;
+}
+
+.action-btn i {
+  pointer-events: none;
+}
+
 /* USERS PAGE CONTROL ROWS & SEARCH BAR */
 
 .users-controls-row {
