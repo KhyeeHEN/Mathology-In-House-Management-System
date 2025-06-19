@@ -32,56 +32,45 @@ h1 {
     color: #333;
 }
 
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 50%;
-    margin: 0 2px;
-    font-size: 1.3em;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 6px rgba(60, 60, 60, 0.08);
+.actions-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
 }
 
-.action-btn.view {
-    background: #e3f0fc;
-    color: #2176c1;
+.actions-cell button.action-btn {
+  min-width: 36px;
+  min-height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #e8f0fe;
+  color: #2176c1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 0;
 }
 
-.action-btn.view:hover,
-.action-btn.view:focus {
-    background: #2176c1;
-    color: #fff;
+.actions-cell button.action-btn.edit {
+  background: #fff6e0;
+  color: #e8a100;
+}
+.actions-cell button.action-btn.delete {
+  background: #ffeaea;
+  color: #d12a2a;
+}
+.actions-cell button.action-btn.view {
+  background: #e8f0fe;
+  color: #2176c1;
 }
 
-.action-btn.edit {
-    background: #fbeee0;
-    color: #e67e22;
-}
-
-.action-btn.edit:hover,
-.action-btn.edit:focus {
-    background: #e67e22;
-    color: #fff;
-}
-
-.action-btn.delete {
-    background: #fdeaea;
-    color: #ea3c53;
-}
-
-.action-btn.delete:hover,
-.action-btn.delete:focus {
-    background: #ea3c53;
-    color: #fff;
-}
-
-.action-btn i {
-    pointer-events: none;
+.actions-cell button.action-btn:hover {
+  filter: brightness(0.95);
 }
 
 .users-controls-row {

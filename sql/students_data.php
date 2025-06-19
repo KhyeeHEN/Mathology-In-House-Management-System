@@ -106,17 +106,17 @@ if ($result->num_rows > 0) {
             <td>" . $row['First_Name'] . "</td>
             <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
             <td>" . $row['email'] . "</td>
-            <td>
-                <button class='action-btn view' title='Show more details' onclick=\"toggleDetails('{$detailsId}')\" >
-                    <i class='fas fa-eye'></i>
+            <td class='actions-cell'> 
+                <button class='action-btn view' title='Show more details' onclick=\"toggleDetails('{$detailsId}')\">
+                    i class='fas fa-eye'></i>
                 </button>
-                <form method='get' action='../../sql/edit_student.php' style='display:inline; margin:0; padding:0;' title='Edit'>
+                <form method='get' action='../../sql/edit_student.php' style='margin:0; padding:0;' title='Edit'>
                     <input type='hidden' name='student_id' value='{$row['student_id']}'>
                     <button type='submit' class='action-btn edit'>
                         <i class='fas fa-edit'></i> 
                     </button>
                 </form>
-                <form method='get' action='../../sql/delete_student.php' style='display:inline; margin:0; padding:0;' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                <form method='get' action='../../sql/delete_student.php' style='margin:0; padding:0;' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
                     <input type='hidden' name='student_id' value='{$row['student_id']}'>
                     <button type='submit' class='action-btn delete'>
                         <i class='fas fa-trash'></i> 
