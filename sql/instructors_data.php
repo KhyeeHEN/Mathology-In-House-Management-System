@@ -95,7 +95,7 @@ if ($result->num_rows > 0) {
             <td>" . $row['First_Name'] . "</td>
             <td>" . ($row['Gender'] ? 'Male' : 'Female') . "</td>
             <td>" . $row['email'] . "</td>
-            <td>
+            <td class='actions-cell'>  
                 <button class='action-btn view' title='Show more details' onclick=\"toggleDetails('{$detailsId}')\">
                     <i class='fas fa-eye'></i>
                 </button>
