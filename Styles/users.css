@@ -177,6 +177,35 @@ h1 {
     background: #174c79;
 }
 
+button[title] {
+    position: relative;
+}
+
+/* Optional: Style the icon buttons to be round and modern */
+button i.fas {
+    font-size: 1.1em;
+    pointer-events: none;
+    /* Let the button get the hover, not the icon */
+}
+
+/* Make sure icon buttons are not too wide */
+button[type="submit"],
+button[type="button"] {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Optional: Add hover effect for clarity */
+button[type="submit"]:hover,
+button[type="button"]:hover {
+    background: #174c79;
+    color: #fff;
+}
+
 .filter-dropdown {
     display: flex;
 }

@@ -53,20 +53,24 @@ $error = isset($_GET['error']) ? $_GET['error'] : null;
                             value="<?php echo isset($_GET['active_tab']) ? $_GET['active_tab'] : 'students'; ?>">
                         <input type="hidden" name="students_page" id="students_page" value="1">
                         <input type="hidden" name="instructors_page" id="instructors_page" value="1">
-                        <button type="submit">Search</button>
-                        <button type="button" id="reset-button">Reset</button>
+                        <button type="submit" title="Search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button type="button" id="reset-button" title="Reset">
+                            <i class="fas fa-undo"></i>
+                        </button>
                     </form>
                 </div>
 
                 <!-- Add Entry Button -->
                 <div class="add-entry-button">
                     <form action="../../sql/add_entry.php" method="get" style="margin: 0;">
-                        <button type="submit" style="margin-left: 8px;">
-                            Add Entry
+                        <button type="submit" style="margin-left: 8px;" title="Add Entry">
+                            <i class="fas fa-user-plus"></i>
                         </button>
                     </form>
                 </div>
-
+                
                 <!-- Filter Dropdown -->
                 <div class="filter-dropdown">
                     <select id="user-filter-select">
