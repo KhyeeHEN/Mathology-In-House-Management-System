@@ -108,7 +108,7 @@ if ($result->num_rows > 0) {
             <td>" . $row['email'] . "</td>
             <td class='actions-cell'> 
                 <button class='action-btn view' title='Show more details' onclick=\"toggleDetails('{$detailsId}')\">
-                    i class='fas fa-eye'></i>
+                    <i class='fas fa-eye'></i>
                 </button>
                 <form method='get' action='../../sql/edit_student.php' style='margin:0; padding:0;' title='Edit'>
                     <input type='hidden' name='student_id' value='{$row['student_id']}'>
