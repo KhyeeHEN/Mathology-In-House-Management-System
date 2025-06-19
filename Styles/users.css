@@ -89,7 +89,6 @@ h1 {
 }
 
 .users-controls-row>* {
-    /* Remove any extra width, center items as a block */
     flex: 0 0 auto;
     min-width: unset;
 }
@@ -189,7 +188,6 @@ h1 {
     color: #2176c1;
     border: 2px solid #2176c1;
     border-radius: 8px;
-    padding: 10px 28px 10px 18px;
     font-size: 1.1em;
     font-weight: 500;
     outline: none;
