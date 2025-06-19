@@ -110,7 +110,7 @@ if ($result && $result->num_rows > 0) {
     <style>
         .content-container {
             padding: 20px;
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         .search-bar {
