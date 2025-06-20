@@ -94,6 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE student_id = $student_id
     ";
 
+    if (!empty($_POST['password'])) {
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+        $updateUserPasswordQuery = "UPDATE users SET password='$password' WHERE student_id='$student_id'";
+        $conn->query($updateUserPasswordQuery);
+    }
+
     // Update primary contact
     $updatePrimaryContactQuery = "
         UPDATE primary_contact_number SET 
@@ -205,7 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 padding: 12px;
             }
         }
-                button {
+
+        button {
             background-color: #1f2937;
             color: white;
             border: none;
@@ -301,6 +308,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="Email">Email:</label>
             <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($student['email']); ?>"
                 required>
+            <label for="student_password">New Password:</label>
+            <input type="password" id="student_password" name="password"
+                placeholder="Leave blank to keep current password">
         </div>
         <div class="form-row">
             <label for="How_Heard_About_Us">How did you hear about us?</label>
