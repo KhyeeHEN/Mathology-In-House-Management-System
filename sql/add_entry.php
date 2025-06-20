@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $student_course_id = $conn->insert_id;
 
+                var_dump($course_id);
                 // Insert into student_timetable table
                 $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status, course)
                                          VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active', '$course_id')";
@@ -248,12 +249,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 12px;
             align-items: center;
         }
+
         .form-row label {
             min-width: 110px;
             font-size: 0.96em;
             margin-right: 6px;
             white-space: nowrap;
         }
+
         .form-row input,
         .form-row select,
         .form-row textarea {
@@ -262,35 +265,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 6px 8px;
             font-size: 1em;
         }
+
         fieldset {
             border: 1px solid #ddd;
             border-radius: 7px;
             padding: 8px 16px 8px 16px;
             margin-bottom: 16px;
         }
+
         legend {
             font-size: 1.09em;
             font-weight: bold;
         }
+
         form {
             background: #fafbfc;
             border-radius: 10px;
-            box-shadow: 0 2px 16px rgba(60,60,60,0.12);
+            box-shadow: 0 2px 16px rgba(60, 60, 60, 0.12);
             padding: 18px 24px;
             margin-top: 18px;
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
         }
-        button[type="submit"], a[href$="users.php"] {
+
+        button[type="submit"],
+        a[href$="users.php"] {
             margin-top: 14px;
             margin-right: 10px;
         }
+
         @media (max-width: 800px) {
             .form-row {
                 flex-direction: column;
                 gap: 6px;
             }
+
             form {
                 padding: 12px;
             }
@@ -361,7 +371,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="student_mathology_level">Mathology Level:</label>
             <select id="student_mathology_level" name="Mathology_Level" required>
                 <option value="">Select Level</option>
-                <?php for ($i = 1; $i <= 9; $i++) { echo "<option value='$i'>Level $i</option>"; } ?>
+                <?php for ($i = 1; $i <= 9; $i++) {
+                    echo "<option value='$i'>Level $i</option>";
+                } ?>
             </select>
             <label for="student_email">Email:</label>
             <input type="email" id="student_email" name="email" required>
@@ -559,19 +571,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         const allCourses = <?php
-            $courses = [];
-            $res = $conn->query("SELECT course_id, course_name, level FROM courses");
-            while ($row = $res->fetch_assoc()) {
-                $courses[] = $row;
-            }
-            echo json_encode($courses);
+        $courses = [];
+        $res = $conn->query("SELECT course_id, course_name, level FROM courses");
+        while ($row = $res->fetch_assoc()) {
+            $courses[] = $row;
+        }
+        echo json_encode($courses);
         ?>;
 
-        document.getElementById('course_level_select').addEventListener('change', function() {
+        document.getElementById('course_level_select').addEventListener('change', function () {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('student_course');
             nameSelect.innerHTML = '<option value="">Select Course</option>';
-            allCourses.forEach(function(course) {
+            allCourses.forEach(function (course) {
                 if (course.level === selectedLevel) {
                     const opt = document.createElement('option');
                     opt.value = course.course_id;
@@ -581,11 +593,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
 
-        document.getElementById('instructor_course_level').addEventListener('change', function() {
+        document.getElementById('instructor_course_level').addEventListener('change', function () {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('instructor_course_name');
             nameSelect.innerHTML = '<option value="">Select Course</option>';
-            allCourses.forEach(function(course) {
+            allCourses.forEach(function (course) {
                 if (course.level === selectedLevel) {
                     const opt = document.createElement('option');
                     opt.value = course.course_id;
@@ -638,7 +650,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
 
         // On page load or form show
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setWorkingDaysState();
         });
 
@@ -668,4 +680,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </body>
+
 </html>
