@@ -70,7 +70,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                     <button type="button" id="reset-button" onclick="window.location='attendance.php'"><i class="fas fa-undo"></i></button>
                     <button type="button" onclick="window.location='../../sql/add_attendance.php'"><i class="fas fa-user-plus"></i></button>
                     <button type="button" onclick="window.location='daily_report.php'">
-                        <i class="fas fa-chart-line" style="margin-right: 8px;"></i>
+                        <i class="fas fa-chart-line"></i>
                     </button>
                 </form>
             </div>
