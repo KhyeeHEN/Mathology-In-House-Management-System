@@ -310,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="form-row">
             <label for="Email">Email:</label>
-            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($instructor['email']); ?>"
+            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($user['email']); ?>"
                 required>
             <label for="instructor_password">New Password:</label>
             <input type="password" id="instructor_password" name="password"
