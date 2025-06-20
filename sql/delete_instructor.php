@@ -24,8 +24,6 @@ try {
 
         // 2. Delete all instructor_timetable rows for those courses
         $conn->query("DELETE FROM instructor_timetable WHERE instructor_course_id IN ($ids)");
-
-        // Optionally, delete attendance_records or other child tables here if needed.
     }
 
     // 3. Delete from instructor_courses
@@ -44,7 +42,7 @@ try {
     exit();
 } catch (Exception $e) {
     $conn->rollback();
-    header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Failed+to+delete+instructor");
+    header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Failed+to+delete+instructor". urlencode($e->getMessage()));
     exit();
 }
 ?>
