@@ -75,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $student_course_id = $conn->insert_id;
 
                 // Insert into student_timetable table
-                $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status)
-                                         VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active')";
+                $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status, course)
+                                         VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active', '$course_id')";
                 if (!$conn->query($insertTimetableQuery)) {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
