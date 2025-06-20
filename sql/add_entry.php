@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $student_course_id = $conn->insert_id;
 
                 var_dump($course_id);
+                var_dump($insertTimetableQuery);
                 // Insert into student_timetable table
                 $insertTimetableQuery = "INSERT INTO student_timetable (student_course_id, day, start_time, end_time, status, course)
                                          VALUES ('$student_course_id', '$day', '$start_time', '$end_time', 'active', '$course_id')";
