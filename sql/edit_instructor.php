@@ -49,6 +49,10 @@ if ($instCourse) {
     }
 }
 
+$userQuery = "SELECT email FROM users WHERE instructor_id=$instructor_id";
+$userResult = $conn->query($userQuery);
+$user = $userResult->fetch_assoc();
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {

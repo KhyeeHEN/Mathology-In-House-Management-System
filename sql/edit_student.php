@@ -306,7 +306,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } ?>
             </select>
             <label for="Email">Email:</label>
-            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($instructor['email']); ?>"
+            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($student['email']); ?>"
                 required>
             <label for="student_password">New Password:</label>
             <input type="password" id="student_password" name="password"
