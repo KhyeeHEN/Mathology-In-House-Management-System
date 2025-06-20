@@ -48,6 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $primary_address = $conn->real_escape_string($_POST['primary_address']);
                 $primary_postcode = $conn->real_escape_string($_POST['primary_postcode']);
 
+                var_dump($student_course_id);
+                var_dump($course_id);
+                var_dump($day);
+                var_dump($start_time);
+                var_dump($end_time);
+
                 // Insert into students table
                 $insertStudentQuery = "INSERT INTO students (Last_Name, First_Name, Gender, DOB, School_Syllabus, School_Intake, Current_School_Grade, School, Mathology_Level, How_Did_You_Heard_About_Us)
                                        VALUES ('$last_name', '$first_name', '$gender', '$dob', '$school_syllabus', '$school_intake', '$current_grade', '$school', '$mathology_level', '$how_did_you_heard_about_us')";
@@ -81,8 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$conn->query($insertTimetableQuery)) {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
-                var_dump($course_id);
                 var_dump($insertTimetableQuery);
+
                 $insertAttendanceQuery = "INSERT INTO attendance_records (student_id)
                                          VALUES ('$student_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
