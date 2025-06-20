@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
 
-                $insertAttendanceQuery = "INSERT INTO attendance_records (student_id)
-                                         VALUES ('$student_id')";
+                $insertAttendanceQuery = "INSERT INTO attendance_records (student_id, course)
+                                         VALUES ('$student_id', '$course_id')";
                 if (!$conn->query($insertAttendanceQuery)) {
                     throw new Exception("Error adding into attendance table: " . $conn->error);
                 }
