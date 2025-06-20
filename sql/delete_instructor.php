@@ -1,12 +1,12 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
-if (!isset($_GET['id'])) {
+if (!isset($_GET['instructor_id'])) {
     header("Location: ../Pages/admin/users.php?active_tab=instructors");
     exit();
 }
 
-$instructor_id = intval($_GET['id']);
+$instructor_id = intval($_GET['instructor_id']);
 
 // Start transaction for safety
 $conn->begin_transaction();
