@@ -63,13 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $contact = $conn->real_escape_string($_POST['contact']);
         $hiring_status = $conn->real_escape_string($_POST['hiring_status']);
         $total_hours = floatval($_POST['Total_Hours']);
+        $email = $conn->real_escape_string($_POST['Email']);
 
         $course_level = $conn->real_escape_string($_POST['course_level']);
         $course_id = intval($_POST['course_id']);
 
         $working_days = null;
         if ($employment_type === 'Part-Time' && isset($_POST['Working_Days'])) {
-            $working_days_arr = array_map([$conn, 'real_escape_string'], (array)$_POST['Working_Days']);
+            $working_days_arr = array_map([$conn, 'real_escape_string'], (array) $_POST['Working_Days']);
             $working_days = implode(',', $working_days_arr);
         }
 
@@ -92,16 +93,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Error updating instructor: " . $conn->error);
         }
 
+        // Update users table
+        $updateUserQuery = "
+        UPDATE users SET 
+            email = '$email' 
+        WHERE student_id = $instructor_id
+    ";
+
+        if (!empty($_POST['password'])) {
+            $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+            $updateUserPasswordQuery = "UPDATE users SET password='$password' WHERE instructor_id='$instructor_id'";
+            $conn->query($updateUserPasswordQuery);
+        }
+
         // Update/insert instructor_courses (only keep one for this UI)
         if ($instCourse) {
             $updateCourseQuery = "UPDATE instructor_courses SET course_id='$course_id' WHERE instructor_course_id={$instCourse['instructor_course_id']}";
-            if (!$conn->query($updateCourseQuery)) throw new Exception("Error updating instructor course: " . $conn->error);
+            if (!$conn->query($updateCourseQuery))
+                throw new Exception("Error updating instructor course: " . $conn->error);
             $instructor_course_id = $instCourse['instructor_course_id'];
         } else {
             $assigned_date = date('Y-m-d');
             $insertCourseQuery = "INSERT INTO instructor_courses (instructor_id, course_id, assigned_date)
                                   VALUES ('$instructor_id', '$course_id', '$assigned_date')";
-            if (!$conn->query($insertCourseQuery)) throw new Exception("Error adding instructor course: " . $conn->error);
+            if (!$conn->query($insertCourseQuery))
+                throw new Exception("Error adding instructor course: " . $conn->error);
             $instructor_course_id = $conn->insert_id;
         }
 
@@ -136,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Edit Instructor</title>
@@ -149,12 +166,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 12px;
             align-items: center;
         }
+
         .form-row label {
             min-width: 110px;
             font-size: 0.96em;
             margin-right: 6px;
             white-space: nowrap;
         }
+
         .form-row input,
         .form-row select,
         .form-row textarea {
@@ -163,39 +182,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 6px 8px;
             font-size: 1em;
         }
+
         fieldset {
             border: 1px solid #ddd;
             border-radius: 7px;
             padding: 8px 16px 8px 16px;
             margin-bottom: 16px;
         }
+
         legend {
             font-size: 1.09em;
             font-weight: bold;
         }
+
         form {
             background: #fafbfc;
             border-radius: 10px;
-            box-shadow: 0 2px 16px rgba(60,60,60,0.12);
+            box-shadow: 0 2px 16px rgba(60, 60, 60, 0.12);
             padding: 18px 24px;
             margin-top: 18px;
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
         }
-        button[type="submit"], a[href$="users.php"] {
+
+        button[type="submit"],
+        a[href$="users.php"] {
             margin-top: 14px;
             margin-right: 10px;
         }
+
         @media (max-width: 800px) {
             .form-row {
                 flex-direction: column;
                 gap: 6px;
             }
+
             form {
                 padding: 12px;
             }
         }
+
         button {
             background-color: #1f2937;
             color: white;
@@ -224,76 +251,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
+
 <body>
     <h1>Edit Instructor</h1>
-    <?php if ($error) echo "<p class='error'>$error</p>"; ?>
+    <?php if ($error)
+        echo "<p class='error'>$error</p>"; ?>
     <form id="instructor-form" method="POST">
         <div class="form-row">
             <label for="instructor_last_name">Last Name:</label>
-            <input type="text" id="instructor_last_name" name="Last_Name" value="<?=htmlspecialchars($instructor['Last_Name'])?>" required>
+            <input type="text" id="instructor_last_name" name="Last_Name"
+                value="<?= htmlspecialchars($instructor['Last_Name']) ?>" required>
             <label for="instructor_first_name">First Name:</label>
-            <input type="text" id="instructor_first_name" name="First_Name" value="<?=htmlspecialchars($instructor['First_Name'])?>" required>
+            <input type="text" id="instructor_first_name" name="First_Name"
+                value="<?= htmlspecialchars($instructor['First_Name']) ?>" required>
             <label for="instructor_gender">Gender:</label>
             <select id="instructor_gender" name="Gender" required>
-                <option value="1" <?=$instructor['Gender'] == '1' ? 'selected' : ''?>>Male</option>
-                <option value="0" <?=$instructor['Gender'] == '0' ? 'selected' : ''?>>Female</option>
+                <option value="1" <?= $instructor['Gender'] == '1' ? 'selected' : '' ?>>Male</option>
+                <option value="0" <?= $instructor['Gender'] == '0' ? 'selected' : '' ?>>Female</option>
             </select>
             <label for="instructor_dob">Date of Birth:</label>
-            <input type="date" id="instructor_dob" name="DOB" value="<?=htmlspecialchars($instructor['DOB'])?>" required>
+            <input type="date" id="instructor_dob" name="DOB" value="<?= htmlspecialchars($instructor['DOB']) ?>"
+                required>
         </div>
         <div class="form-row">
             <label for="instructor_highest_education">Highest Education:</label>
-            <input type="text" id="instructor_highest_education" name="Highest_Education" value="<?=htmlspecialchars($instructor['Highest_Education'])?>">
+            <input type="text" id="instructor_highest_education" name="Highest_Education"
+                value="<?= htmlspecialchars($instructor['Highest_Education']) ?>">
             <label for="instructor_remark">Remark:</label>
-            <textarea id="instructor_remark" name="Remark" style="min-width:140px;flex:1 1 140px;"><?=htmlspecialchars($instructor['Remark'])?></textarea>
+            <textarea id="instructor_remark" name="Remark"
+                style="min-width:140px;flex:1 1 140px;"><?= htmlspecialchars($instructor['Remark']) ?></textarea>
             <label for="instructor_training_status">Training Status:</label>
-            <input type="text" id="instructor_training_status" name="Training_Status" value="<?=htmlspecialchars($instructor['Training_Status'])?>">
+            <input type="text" id="instructor_training_status" name="Training_Status"
+                value="<?= htmlspecialchars($instructor['Training_Status']) ?>">
         </div>
         <div class="form-row">
             <label for="instructor_contact">Contact Number:</label>
-            <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12" value="<?=htmlspecialchars($instructor['contact'])?>" required>
+            <input type="text" id="instructor_contact" name="contact" pattern="[0-9]{10,12}" maxlength="12"
+                value="<?= htmlspecialchars($instructor['contact']) ?>" required>
             <label for="instructor_hiring_status">Hiring Status:</label>
             <select id="instructor_hiring_status" name="hiring_status" required>
-                <option value="true" <?=$instructor['hiring_status'] == 'true' ? 'selected' : ''?>>Hired</option>
-                <option value="false" <?=$instructor['hiring_status'] == 'false' ? 'selected' : ''?>>Not Hired</option>
+                <option value="true" <?= $instructor['hiring_status'] == 'true' ? 'selected' : '' ?>>Hired</option>
+                <option value="false" <?= $instructor['hiring_status'] == 'false' ? 'selected' : '' ?>>Not Hired</option>
             </select>
             <label for="instructor_total_hours">Total Hours:</label>
-            <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0" value="<?=htmlspecialchars($instructor['Total_Hours'])?>" required>
+            <input type="number" id="instructor_total_hours" name="Total_Hours" step="0.1" min="0"
+                value="<?= htmlspecialchars($instructor['Total_Hours']) ?>" required>
             <label for="instructor_employment_type">Employment Type:</label>
             <select id="instructor_employment_type" name="Employment_Type" required>
-                <option value="Full-Time" <?=$instructor['Employment_Type'] == 'Full-Time' ? 'selected' : ''?>>Full-Time</option>
-                <option value="Part-Time" <?=$instructor['Employment_Type'] == 'Part-Time' ? 'selected' : ''?>>Part-Time</option>
+                <option value="Full-Time" <?= $instructor['Employment_Type'] == 'Full-Time' ? 'selected' : '' ?>>Full-Time
+                </option>
+                <option value="Part-Time" <?= $instructor['Employment_Type'] == 'Part-Time' ? 'selected' : '' ?>>Part-Time
+                </option>
             </select>
+        </div>
+        <div class="form-row">
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($instructor['email']); ?>"
+                required>
+            <label for="instructor_password">New Password:</label>
+            <input type="password" id="instructor_password" name="password"
+                placeholder="Leave blank to keep current password">
         </div>
         <div class="form-row">
             <label for="instructor_course_level">Course Level:</label>
             <select id="instructor_course_level" name="course_level" required>
                 <option value="">Select Level</option>
                 <?php foreach ($levels as $level): ?>
-                    <option value="<?=$level?>" <?=($instCourse && $courses[array_search($instCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : ''?>><?=$level?></option>
+                    <option value="<?= $level ?>" <?= ($instCourse && $courses[array_search($instCourse['course_id'], array_column($courses, 'course_id'))]['level'] == $level) ? 'selected' : '' ?>><?= $level ?></option>
                 <?php endforeach; ?>
             </select>
             <label for="instructor_course_name">Course Name:</label>
             <select id="instructor_course_name" name="course_id" required>
                 <option value="">Select Course</option>
                 <?php foreach ($courses as $course): ?>
-                    <option value="<?=$course['course_id']?>"
-                        data-level="<?=$course['level']?>"
-                        <?=($instCourse && $instCourse['course_id'] == $course['course_id']) ? 'selected' : ''?>>
-                        <?=$course['course_name']?>
+                    <option value="<?= $course['course_id'] ?>">
+                        data-level="<?= $course['level'] ?>"
+                        <?= ($instCourse && $instCourse['course_id'] == $course['course_id']) ? 'selected' : '' ?>
+                        <?= $course['course_name'] ?>
                     </option>
                 <?php endforeach; ?>
             </select>
         </div>
-        <div id="part-time-days-times" style="display:<?=$instructor['Employment_Type'] == 'Part-Time' ? '' : 'none'?>">
+        <div id="part-time-days-times"
+            style="display:<?= $instructor['Employment_Type'] == 'Part-Time' ? '' : 'none' ?>">
             <div class="form-row">
                 <label for="instructor_working_days">Working Days:</label>
-                <select id="instructor_working_days" name="Working_Days[]" multiple <?=$instructor['Employment_Type'] == 'Full-Time' ? 'disabled' : ''?>>
+                <select id="instructor_working_days" name="Working_Days[]" multiple
+                    <?= $instructor['Employment_Type'] == 'Full-Time' ? 'disabled' : '' ?>>
                     <?php
                     $selected_days = $instructor['Working_Days'] ? explode(',', $instructor['Working_Days']) : [];
-                    $daysOfWeek = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                    $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                     foreach ($daysOfWeek as $day): ?>
-                        <option value="<?=$day?>" <?=in_array($day, $selected_days) ? 'selected' : ''?>><?=$day?></option>
+                        <option value="<?= $day ?>" <?= in_array($day, $selected_days) ? 'selected' : '' ?>><?= $day ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -302,18 +352,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Show time inputs for each selected day (from instructor_timetable)
                 $timetableDays = [];
                 foreach ($instTimetable as $row) {
-                    if ($row['day']) $timetableDays[$row['day']] = $row;
+                    if ($row['day'])
+                        $timetableDays[$row['day']] = $row;
                 }
                 foreach ($selected_days as $day):
                     $start = isset($timetableDays[$day]) ? $timetableDays[$day]['start_time'] : '';
                     $end = isset($timetableDays[$day]) ? $timetableDays[$day]['end_time'] : '';
-                ?>
-                <div>
-                    <label><?=$day?> Start:</label>
-                    <input type="time" name="start_time[<?=$day?>]" value="<?=$start?>" required>
-                    <label>End:</label>
-                    <input type="time" name="end_time[<?=$day?>]" value="<?=$end?>" required>
-                </div>
+                    ?>
+                    <div>
+                        <label><?= $day ?> Start:</label>
+                        <input type="time" name="start_time[<?= $day ?>]" value="<?= $start ?>" required>
+                        <label>End:</label>
+                        <input type="time" name="end_time[<?= $day ?>]" value="<?= $end ?>" required>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -321,13 +372,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../Pages/admin/users.php">Cancel</a>
     </form>
     <script>
-        const allCourses = <?=json_encode($courses)?>;
+        const allCourses = <?= json_encode($courses) ?>;
 
-        document.getElementById('instructor_course_level').addEventListener('change', function() {
+        document.getElementById('instructor_course_level').addEventListener('change', function () {
             const selectedLevel = this.value;
             const nameSelect = document.getElementById('instructor_course_name');
             nameSelect.innerHTML = '<option value="">Select Course</option>';
-            allCourses.forEach(function(course) {
+            allCourses.forEach(function (course) {
                 if (course.level === selectedLevel) {
                     const opt = document.createElement('option');
                     opt.value = course.course_id;
@@ -352,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 workingDaysInput.disabled = true;
                 dayTimesContainer.innerHTML = '';
                 // Deselect all
-                for(let i=0;i<workingDaysInput.options.length;i++) {
+                for (let i = 0; i < workingDaysInput.options.length; i++) {
                     workingDaysInput.options[i].selected = false;
                 }
             }
@@ -368,7 +419,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // fetch old values if present
                 let start = '', end = '';
                 <?php if (!empty($timetableDays)) { ?>
-                    const timetableDays = <?=json_encode($timetableDays)?>;
+                    const timetableDays = <?= json_encode($timetableDays) ?>;
                     if (typeof timetableDays[day] !== 'undefined') {
                         start = timetableDays[day].start_time;
                         end = timetableDays[day].end_time;
@@ -386,9 +437,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             setWorkingDaysState();
         });
     </script>
 </body>
+
 </html>
