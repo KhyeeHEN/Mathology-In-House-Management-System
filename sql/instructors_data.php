@@ -105,7 +105,7 @@ if ($result->num_rows > 0) {
                         <i class='fas fa-edit'></i> 
                     </button>
                 </form>
-                <form method='get' action='../../sql/delete_edit_instructor.php' style='display:inline; margin:0; padding:0;' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this instructor?');\">
+                <form method='get' action='../../sql/delete_instructor.php' style='display:inline; margin:0; padding:0;' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this instructor?');\">
                     <input type='hidden' name='instructor_id' value='{$row['instructor_id']}'>
                     <button type='submit' class='action-btn delete'>
                         <i class='fas fa-trash'></i> 
