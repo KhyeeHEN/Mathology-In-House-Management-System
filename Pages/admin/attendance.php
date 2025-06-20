@@ -50,28 +50,41 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
             <!-- Search -->
             <div class="search-bar">
                 <form method="GET" action="attendance.php">
-                    <input type="text" name="search" placeholder="Search attendance..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" name="search" placeholder="Search attendance..."
+                        value="<?php echo htmlspecialchars($search); ?>">
 
                     <label for="sort">Sort by:</label>
                     <select id="sort" name="sort">
-                        <option value="student_id" <?php if ($sort === 'student_id') echo 'selected'; ?>>Student ID</option>
-                        <option value="student_name" <?php if ($sort === 'student_name') echo 'selected'; ?>>Student Name</option>
-                        <option value="attendance_datetime" <?php if ($sort === 'attendance_datetime') echo 'selected'; ?>>Attendance</option>
-                        <option value="hours_attended" <?php if ($sort === 'hours_attended') echo 'selected'; ?>>Hours Attended</option>
-                        <option value="course" <?php if ($sort === 'course') echo 'selected'; ?>>Course</option>
+                        <option value="student_id" <?php if ($sort === 'student_id')
+                            echo 'selected'; ?>>Student ID
+                        </option>
+                        <option value="student_name" <?php if ($sort === 'student_name')
+                            echo 'selected'; ?>>Student Name
+                        </option>
+                        <option value="attendance_datetime" <?php if ($sort === 'attendance_datetime')
+                            echo 'selected'; ?>>Attendance</option>
+                        <option value="hours_attended" <?php if ($sort === 'hours_attended')
+                            echo 'selected'; ?>>Hours
+                            Attended</option>
+                        <option value="course" <?php if ($sort === 'course')
+                            echo 'selected'; ?>>Course</option>
                     </select>
-
                     <select id="direction" name="direction">
-                        <option value="ASC" <?php if ($direction === 'ASC') echo 'selected'; ?>>Ascending</option>
-                        <option value="DESC" <?php if ($direction === 'DESC') echo 'selected'; ?>>Descending</option>
+                        <option value="ASC" <?php if ($direction === 'ASC')
+                            echo 'selected'; ?>>Ascending</option>
+                        <option value="DESC" <?php if ($direction === 'DESC')
+                            echo 'selected'; ?>>Descending</option>
                     </select>
 
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                    <button type="button" id="reset-button" onclick="window.location='attendance.php'"><i class="fas fa-undo"></i></button>
-                    <button type="button" onclick="window.location='../../sql/add_attendance.php'"><i class="fas fa-user-plus"></i></button>
-                    <button type="button" onclick="window.location='daily_report.php'">
+                    <button type="submit" title="Search"><i class="fas fa-search"></i></button>
+                    <button type="button" id="reset-button" onclick="window.location='attendance.php'" title="Reset"><i
+                            class="fas fa-undo"></i></button>
+                    <button type="button" onclick="window.location='../../sql/add_attendance.php'"
+                        title="Add Attendance"><i class="fas fa-user-plus"></i></button>
+                    <button type="button" onclick="window.location='daily_report.php'" title="View Daily Report">
                         <i class="fas fa-chart-line"></i>
                     </button>
+
                 </form>
             </div>
 
