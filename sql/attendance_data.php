@@ -141,9 +141,9 @@ if ($result && $result->num_rows > 0) {
         // Edit button + show/hide details
         echo "<td>
         <div class='action-buttons'>
-    <button onclick=\"toggleDetails('details-$record_id')\"><i class='fa fa-eye'></i></button>
-    <a href='../../sql/edit_attendance.php?record_id=$record_id'><i class='fas fa-edit'></i> </a>
-    <a href='../../sql/delete_attendance.php?id=$record_id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\"><i class='fas fa-trash'></i></a>
+    <button onclick=\"toggleDetails('details-$record_id')\" class='view'><i class='fa fa-eye'></i></button>
+    <a href='../../sql/edit_attendance.php?record_id=$record_id'><i class='fas fa-edit' class='edit'></i> </a>
+    <a href='../../sql/delete_attendance.php?id=$record_id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\" class='delete'><i class='fas fa-trash'></i></a>
         </div>
     </td>";
 
