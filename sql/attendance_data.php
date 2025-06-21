@@ -136,7 +136,9 @@ if ($result && $result->num_rows > 0) {
             . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
             . "</td>";
 
-        echo "<td>"  . htmlspecialchars($row['status']) .  "</td>";
+        $status = htmlspecialchars($row['status']);
+        $status_class = strtolower($row['status']) === 'attended' ? 'attended' : (strtolower($row['status']) === 'missed' ? 'missed' : '');
+        echo "<td class='attendance-status $status_class'>$status</td>";
         $record_id = (int)$row['record_id'];
         // Edit button + show/hide details
         echo "<td>

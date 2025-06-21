@@ -88,6 +88,16 @@
     align-items: center;
 }
 
+.attendance-status.attended {
+  color: #16a34a;  /* Green (Tailwind green-600) */
+  font-weight: bold;
+}
+
+.attendance-status.missed {
+  color: #dc2626;  /* Red (Tailwind red-600) */
+  font-weight: bold;
+}
+
 /* Search bar */
 .search-bar {
     display: flex;
