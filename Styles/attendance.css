@@ -162,7 +162,7 @@
     justify-content: center;
 }
 
-.actions-buttons button.action-btn {
+/* .actions-buttons button.action-btn {
     min-width: 36px;
     min-height: 36px;
     border: none;
@@ -174,7 +174,7 @@
     cursor: pointer;
     font-size: 1.1em;
     padding: 0;
-}
+} */
 
 /* Pagination */
 .pagination {
