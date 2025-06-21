@@ -21,10 +21,12 @@ try {
 
     if (!empty($courseIds)) {
         $ids = implode(',', $courseIds);
-
         // 2. Delete all instructor_timetable rows for those courses
         $conn->query("DELETE FROM instructor_timetable WHERE instructor_course_id IN ($ids)");
     }
+
+    // 2.1 Delete attendance records for this instructor
+    $conn->query("DELETE FROM attendance_records WHERE instructor_id = $instructor_id");
 
     // 3. Delete from instructor_courses
     $conn->query("DELETE FROM instructor_courses WHERE instructor_id = $instructor_id");
