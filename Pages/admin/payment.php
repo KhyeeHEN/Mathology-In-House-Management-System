@@ -55,10 +55,10 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                         <option value="DESC" <?php if ($direction === 'DESC') echo 'selected'; ?>>Descending</option>
                     </select>
 
-                    <button type="submit"><i class="fas fa-search"></i>Search/Sort</button>
-                    <button type="button" onclick="window.location='payment.php'"><i class="fas fa-undo"></i>Reset</button>
-                    <button type="button" onclick="window.location='manage_fees.php'"><i class="fas fa-book">Course Fee</button>
-                    <button type="button" onclick="window.location='../../sql/add_payment.php'"><i class="fas fa-money-bill">Add</button>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                    <button type="button" onclick="window.location='payment.php'"><i class="fas fa-undo"></i></button>
+                    <button type="button" onclick="window.location='manage_fees.php'"><i class="fas fa-book"></button>
+                    <button type="button" onclick="window.location='../../sql/add_payment.php'"><i class="fas fa-money-bill"></button>
                 </form>
             </div>
 
