@@ -33,7 +33,7 @@
     padding: 8px 12px;
     margin-right: 5px;
     border: none;
-    background-color: #2563eb;;
+    background-color: #3b82f6;;
     color: white;
     font-size: 14px;
     border-radius: 5px;
@@ -43,7 +43,7 @@
 }
 
 .attendence .action-buttons .view {
-    background-color: #2563eb;  /* Blue for view */
+    background-color: #3b82f6;  /* Blue for view */
     color: #fff;
 }
 
