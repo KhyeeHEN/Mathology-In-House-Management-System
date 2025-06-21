@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+and+associated+user+added+successfully");
                 exit();
-            } elseif ($user_type === 'instructor') {
+            } else if ($user_type === 'instructor') {
                 // Instructor form submission
                 $last_name = $conn->real_escape_string($_POST['Last_Name']);
                 $first_name = $conn->real_escape_string($_POST['First_Name']);
@@ -134,7 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $remark = $conn->real_escape_string($_POST['Remark']);
                 $training_status = $conn->real_escape_string($_POST['Training_Status']);
                 $employment_type = $conn->real_escape_string($_POST['Employment_Type']);
-                $working_days = isset($_POST['Working_Days']) ? $conn->real_escape_string(implode(',', (array) $_POST['Working_Days'])) : null;
                 $email = $conn->real_escape_string($_POST['email']);
                 $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
                 $contact = $conn->real_escape_string($_POST['contact']);
@@ -144,20 +143,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $course_level = $conn->real_escape_string($_POST['course_level']);
                 $course_id = intval($_POST['course_id']);
 
-                $working_days = null;
-                if ($employment_type === 'Part-Time' && isset($_POST['Working_Days'])) {
-                    $working_days_arr = array_map([$conn, 'real_escape_string'], (array) $_POST['Working_Days']);
-                    $working_days = implode(',', $working_days_arr); // Save as comma separated string
-                }
+                // Always fetch working days and times
+                $working_days_arr = isset($_POST['Working_Days']) ? array_map([$conn, 'real_escape_string'], (array) $_POST['Working_Days']) : [];
+                $working_days = implode(',', $working_days_arr); // Save as comma separated string
 
                 // Insert into instructor table
                 $insertInstructorQuery = "INSERT INTO instructor (
-            Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status,
-            Employment_Type, Working_Days, Worked_Days, contact, hiring_status, Total_Hours
-        ) VALUES (
-            '$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status',
-            '$employment_type', " . ($working_days ? "'$working_days'" : "NULL") . ", 0, '$contact', '$hiring_status', $total_hours
-        )";
+                    Last_Name, First_Name, Gender, DOB, Highest_Education, Remark, Training_Status,
+                    Employment_Type, Working_Days, Worked_Days, contact, hiring_status, Total_Hours
+                ) VALUES (
+                    '$last_name', '$first_name', '$gender', '$dob', '$highest_education', '$remark', '$training_status',
+                    '$employment_type', " . ($working_days ? "'$working_days'" : "NULL") . ", 0, '$contact', '$hiring_status', $total_hours
+                )";
                 if (!$conn->query($insertInstructorQuery)) {
                     throw new Exception("Error adding instructor: " . $conn->error);
                 }
@@ -179,25 +176,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $instructor_course_id = $conn->insert_id;
 
-                // Insert instructor_timetable
-                if ($employment_type === 'Part-Time' && isset($_POST['Working_Days'])) {
-                    foreach ($_POST['Working_Days'] as $day) {
-                        $day = $conn->real_escape_string($day);
+                // Always insert timetable for selected working days
+                if (!empty($working_days_arr) && isset($_POST['start_time']) && isset($_POST['end_time'])) {
+                    foreach ($working_days_arr as $day) {
+                        $day_esc = $conn->real_escape_string($day);
                         $start_time = isset($_POST['start_time'][$day]) ? $conn->real_escape_string($_POST['start_time'][$day]) : '00:00:00';
                         $end_time = isset($_POST['end_time'][$day]) ? $conn->real_escape_string($_POST['end_time'][$day]) : '00:00:00';
                         $insertTimetableQuery = "INSERT INTO instructor_timetable (day, start_time, end_time, status, instructor_course_id, course)
-                                         VALUES ('$day', '$start_time', '$end_time', 'active', '$instructor_course_id', '')";
+                                         VALUES ('$day_esc', '$start_time', '$end_time', 'active', '$instructor_course_id', '$course_id')";
                         if (!$conn->query($insertTimetableQuery)) {
                             throw new Exception("Error adding instructor timetable: " . $conn->error);
                         }
                     }
                 } else {
-                    // For Full-Time, insert a blank timetable entry (or a default if needed)
-                    $insertTimetableQuery = "INSERT INTO instructor_timetable (day, start_time, end_time, status, instructor_course_id, course)
-                                     VALUES ('', '00:00:00', '00:00:00', 'active', '$instructor_course_id', '')";
-                    if (!$conn->query($insertTimetableQuery)) {
-                        throw new Exception("Error adding blank instructor timetable: " . $conn->error);
-                    }
+                    throw new Exception("Working days and times are required for instructor.");
                 }
 
                 // Insert a blank attendance record
@@ -210,17 +202,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Commit the transaction
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+and+associated+user+added+successfully");
-                exit();
-            } elseif ($user_type === 'admin') {
-                $email = $conn->real_escape_string($_POST['email']);
-                $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
-                $insertUserQuery = "INSERT INTO users (email, password, role)
-                                    VALUES ('$email', '$password', 'admin')";
-                if (!$conn->query($insertUserQuery)) {
-                    throw new Exception("Error adding user: " . $conn->error);
-                }
-                $conn->commit();
-                header("Location: ../Pages/admin/users.php?active_tab=admins&message=Admin+added+successfully");
                 exit();
             }
         } catch (Exception $e) {
@@ -529,10 +510,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="">Select Course</option>
             </select>
         </div>
-        <div id="part-time-days-times" style="display:none;">
+        <div id="days-times-section">
             <div class="form-row">
                 <label for="instructor_working_days">Working Days:</label>
-                <select id="instructor_working_days" name="Working_Days[]" multiple>
+                <select id="instructor_working_days" name="Working_Days[]" multiple required>
                     <option value="Monday">Monday</option>
                     <option value="Tuesday">Tuesday</option>
                     <option value="Wednesday">Wednesday</option>
@@ -629,7 +610,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
 
-        // Show time pickers for each selected day (Part-Time only)
         function updateDayTimes() {
             const workingDaysInput = document.getElementById('instructor_working_days');
             const dayTimesContainer = document.getElementById('day-times-container');
@@ -647,12 +627,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
         document.getElementById('instructor_working_days').addEventListener('change', updateDayTimes);
-
-        // On page load or form show
         document.addEventListener('DOMContentLoaded', function () {
-            setWorkingDaysState();
+            updateDayTimes();
         });
-
+        
         // When switching to instructor form (if your toggleForms is used)
         function toggleForms() {
             const userType = document.getElementById('user_type').value;
