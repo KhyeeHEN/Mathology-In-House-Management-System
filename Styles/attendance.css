@@ -42,6 +42,34 @@
     transition: background-color 0.3s;
 }
 
+.attendence .action-buttons .view {
+    background-color: #2176c1;  /* Blue for view */
+    color: #fff;
+}
+
+.attendence .action-buttons .edit {
+    background-color: #e8a100;  /* Amber/Yellow for edit */
+    color: #fff;
+}
+
+.attendence .action-buttons .delete {
+    background-color: #d12a2a;  /* Red for delete */
+    color: #fff;
+}
+
+/* Optional: Hover effects for clarity */
+.attendence .action-buttons .view:hover {
+    background-color: #174c79;
+}
+
+.attendence .action-buttons .edit:hover {
+    background-color: #c17e00;
+}
+
+.attendence .action-buttons .delete:hover {
+    background-color: #a00000;
+}
+
 .attendence a:hover,
 .attendence button:hover {
     background-color: #174c79;
@@ -146,25 +174,6 @@
     cursor: pointer;
     font-size: 1.1em;
     padding: 0;
-}
-
-.actions-buttons button.action-btn.edit {
-    background: #fff6e0;
-    color: #e8a100;
-}
-
-.actions-buttons button.action-btn.delete {
-    background: #ffeaea;
-    color: #d12a2a;
-}
-
-.actions-buttons button.action-btn.view {
-    background: #e8f0fe;
-    color: #2176c1;
-}
-
-.actions-buttons button.action-btn:hover {
-    filter: brightness(0.95);
 }
 
 /* Pagination */
