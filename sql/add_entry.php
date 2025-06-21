@@ -68,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert into student_courses table
                 $insertStudentCourseQuery = "INSERT INTO student_courses (student_id, course_id, enrollment_date, program_start, program_end, hours_per_week)
                              VALUES ('$student_id', '$course_id', '$enrollment_date', '$program_start', '$program_end', '$hours_per_week')";
-
                 if (!$conn->query($insertStudentCourseQuery)) {
                     throw new Exception("Error adding student course: " . $conn->error);
                 }
@@ -81,10 +80,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Error adding student timetable: " . $conn->error);
                 }
 
-                $insertAttendanceQuery = "INSERT INTO attendance_records (student_id, course)
-                                         VALUES ('$student_id', '$course_id')";
-                if (!$conn->query($insertAttendanceQuery)) {
-                    throw new Exception("Error adding into attendance table: " . $conn->error);
+                // Check if attendance already exists for this student & course
+                $checkAttendance = $conn->query("SELECT 1 FROM attendance_records WHERE student_id='$student_id' AND course='$course_id'");
+                if ($checkAttendance->num_rows == 0) {
+                    $insertAttendanceQuery = "INSERT INTO attendance_records (student_id, course)
+                                             VALUES ('$student_id', '$course_id')";
+                    if (!$conn->query($insertAttendanceQuery)) {
+                        throw new Exception("Error adding into attendance table: " . $conn->error);
+                    }
                 }
 
                 $insertPaymentQuery = "INSERT INTO payment (student_id)
@@ -94,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $insertPrimaryContactQuery = "INSERT INTO primary_contact_number
-    (student_id, Last_Name, First_Name, Relationship_with_Student, phone, email, address, postcode)
-    VALUES ('$student_id', '$primary_owner_last_name', '$primary_owner_first_name', '$primary_relationship', '$primary_phone', '$primary_email', '$primary_address','$primary_postcode')";
+                    (student_id, Last_Name, First_Name, Relationship_with_Student, phone, email, address, postcode)
+                    VALUES ('$student_id', '$primary_owner_last_name', '$primary_owner_first_name', '$primary_relationship', '$primary_phone', '$primary_email', '$primary_address','$primary_postcode')";
                 if (!$conn->query($insertPrimaryContactQuery)) {
                     throw new Exception("Error adding primary contact: " . $conn->error);
                 }
@@ -113,8 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $secondary_phone = $conn->real_escape_string($_POST['secondary_phone']);
 
                     $insertSecondaryContactQuery = "INSERT INTO secondary_contact_number
-        (student_id, Last_Name, First_Name, Relationship_with_Student, phone)
-        VALUES ('$student_id', '$secondary_owner_last_name', '$secondary_owner_first_name', '$secondary_relationship', '$secondary_phone')";
+                        (student_id, Last_Name, First_Name, Relationship_with_Student, phone)
+                        VALUES ('$student_id', '$secondary_owner_last_name', '$secondary_owner_first_name', '$secondary_relationship', '$secondary_phone')";
                     if (!$conn->query($insertSecondaryContactQuery)) {
                         throw new Exception("Error adding secondary contact: " . $conn->error);
                     }
@@ -124,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=students&message=Student+and+associated+user+added+successfully");
                 exit();
-            } else if ($user_type === 'instructor') {
+            } elseif ($user_type === 'instructor') {
                 // Instructor form submission
                 $last_name = $conn->real_escape_string($_POST['Last_Name']);
                 $first_name = $conn->real_escape_string($_POST['First_Name']);
@@ -192,16 +195,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception("Working days and times are required for instructor.");
                 }
 
-                // Insert a blank attendance record
-                $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id, course)
-                                 VALUES ('$instructor_id', '$course_id')";
-                if (!$conn->query($insertAttendanceQuery)) {
-                    throw new Exception("Error adding into attendance table: " . $conn->error);
+                // Check if attendance already exists for this instructor & course
+                $checkAttendance = $conn->query("SELECT 1 FROM attendance_records WHERE instructor_id='$instructor_id' AND course='$course_id'");
+                if ($checkAttendance->num_rows == 0) {
+                    $insertAttendanceQuery = "INSERT INTO attendance_records (instructor_id, course)
+                                     VALUES ('$instructor_id', '$course_id')";
+                    if (!$conn->query($insertAttendanceQuery)) {
+                        throw new Exception("Error adding into attendance table: " . $conn->error);
+                    }
                 }
 
                 // Commit the transaction
                 $conn->commit();
                 header("Location: ../Pages/admin/users.php?active_tab=instructors&message=Instructor+and+associated+user+added+successfully");
+                exit();
+            } elseif ($user_type === 'admin') {
+                $email = $conn->real_escape_string($_POST['email']);
+                $password = password_hash($conn->real_escape_string($_POST['password']), PASSWORD_BCRYPT);
+                $insertUserQuery = "INSERT INTO users (email, password, role)
+                                    VALUES ('$email', '$password', 'admin')";
+                if (!$conn->query($insertUserQuery)) {
+                    throw new Exception("Error adding user: " . $conn->error);
+                }
+                $conn->commit();
+                header("Location: ../Pages/admin/users.php?active_tab=admins&message=Admin+added+successfully");
                 exit();
             }
         } catch (Exception $e) {
@@ -587,29 +604,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
 
-        // --- Employment type logic: days, time ranges ---
-        function setWorkingDaysState() {
-            const employmentType = document.getElementById('instructor_employment_type');
-            const daysDiv = document.getElementById('part-time-days-times');
-            const workingDaysInput = document.getElementById('instructor_working_days');
-            const dayTimesContainer = document.getElementById('day-times-container');
-            if (employmentType.value === 'Part-Time') {
-                daysDiv.style.display = '';
-                workingDaysInput.disabled = false;
-                // Show/hide time pickers for each selected day
-                updateDayTimes();
-            } else {
-                daysDiv.style.display = 'none';
-                workingDaysInput.disabled = true;
-                dayTimesContainer.innerHTML = '';
-                // Deselect all
-                for (let i = 0; i < workingDaysInput.options.length; i++) {
-                    workingDaysInput.options[i].selected = false;
-                }
-            }
-        }
-        document.getElementById('instructor_employment_type').addEventListener('change', setWorkingDaysState);
-
+        // Always show and require day/time pickers for selected working days
         function updateDayTimes() {
             const workingDaysInput = document.getElementById('instructor_working_days');
             const dayTimesContainer = document.getElementById('day-times-container');
@@ -618,11 +613,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const day = option.value;
                 const div = document.createElement('div');
                 div.innerHTML = `
-                <label>${day} Start:</label>
-                <input type="time" name="start_time[${day}]" required>
-                <label>End:</label>
-                <input type="time" name="end_time[${day}]" required>
-            `;
+                    <label>${day} Start:</label>
+                    <input type="time" name="start_time[${day}]" required>
+                    <label>End:</label>
+                    <input type="time" name="end_time[${day}]" required>
+                `;
                 dayTimesContainer.appendChild(div);
             });
         }
@@ -645,7 +640,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'block';
                 adminForm.style.display = 'none';
-                setWorkingDaysState();
+                updateDayTimes();
             } else if (userType === 'admin') {
                 studentForm.style.display = 'none';
                 instructorForm.style.display = 'none';
@@ -655,6 +650,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 instructorForm.style.display = 'none';
             }
         }
+
+        // Prevent double-submits on all forms
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    let btn = form.querySelector('button[type="submit"]');
+                    if (btn) btn.disabled = true;
+                });
+            });
+        });
     </script>
 </body>
 
