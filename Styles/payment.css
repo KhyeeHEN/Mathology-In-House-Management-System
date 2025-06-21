@@ -210,30 +210,41 @@
 }
 
 /* Action Buttons */
-.payment-table a,
-.payment-table button {
-    padding: 8px 12px;
-    margin-right: 5px;
+
+.payment-table td .action-buttons button {
+    min-width: 36px;
+    min-height: 36px;
     border: none;
-    background-color: #1f2937;
-    color: white;
-    font-size: 14px;
-    border-radius: 5px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    padding: 0;
     cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    transition: background 0.15s;
 }
 
-.payment-table a:hover,
-.payment-table button:hover {
-    background-color: #174c79;
+.payment-table td .action-buttons button.edit {
+    background: #fff6e0;
+    color: #e8a100;
 }
 
-.payment-table a:focus,
-.payment-table button:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgb(71, 82, 95);
+.payment-table td .action-buttons button.delete {
+    background: #ffeaea;
+    color: #d12a2a;
 }
+
+.payment-table td .action-buttons button.view {
+    background: #e8f0fe;
+    color: #2176c1;
+}
+
+.payment-table td .action-buttons button:hover {
+    filter: brightness(0.95);
+}
+
+
 
 .payment-table td .action-buttons {
     display: flex;
