@@ -251,11 +251,11 @@
 }
 
 .payment-table a.btn-edit {
-    background-color: #10b981; /* Green */
+    background-color: #decf36; /* Green */
 }
 
 .payment-table a.btn-edit:hover {
-    background-color: #059669;
+    background-color: #c17e00;
 }
 
 .payment-table a.btn-delete {
@@ -265,6 +265,17 @@
 .payment-table a.btn-delete:hover {
     background-color: #dc2626;
 }
+
+.status-paid {
+    color: #16a34a; /* green */
+    font-weight: bold;
+}
+
+.status-unpaid {
+    color: #dc2626; /* red */
+    font-weight: bold;
+}
+
 
 
 /* Details Box */
