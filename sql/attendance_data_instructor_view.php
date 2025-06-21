@@ -72,7 +72,7 @@ LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
 LEFT JOIN courses c ON ar.course = c.course_id
 LEFT JOIN instructor_courses ic ON ic.course_id = c.course_id
-WHERE ic.instructor_id = $instructor_id AND ic.status = 'active'
+WHERE ar.instructor_id = $instructor_id AND ic.status = 'active'
 ";
 
 if (!empty($search)) {
