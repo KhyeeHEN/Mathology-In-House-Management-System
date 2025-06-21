@@ -108,8 +108,8 @@ if ($result && $result->num_rows > 0) {
                 <td>
                     <div class='action-buttons'>
                         <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
-                        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
-                        <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a>
+                        <a href='../../sql/edit_payment.php?id=$id' class='edit' >Edit</a><br><br>
+                        <a href='../../sql/delete_payment.php?id=$id' class='delete' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a>
                     </div>
                 </td>
               </tr>";
