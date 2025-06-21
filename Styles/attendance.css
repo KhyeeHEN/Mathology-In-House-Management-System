@@ -43,17 +43,17 @@
 }
 
 .attendence .action-buttons .view {
-    background-color: #2176c1;  /* Blue for view */
+    background-color: #2563eb;  /* Blue for view */
     color: #fff;
 }
 
 .attendence .action-buttons .edit {
-    background-color: #e8a100;  /* Amber/Yellow for edit */
+    background-color: #10b981;  /* Amber/Yellow for edit */
     color: #fff;
 }
 
 .attendence .action-buttons .delete {
-    background-color: #d12a2a;  /* Red for delete */
+    background-color: #ef4444;  /* Red for delete */
     color: #fff;
 }
 
