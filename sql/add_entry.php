@@ -630,7 +630,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function () {
             updateDayTimes();
         });
-        
+
         // When switching to instructor form (if your toggleForms is used)
         function toggleForms() {
             const userType = document.getElementById('user_type').value;
