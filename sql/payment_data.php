@@ -107,9 +107,9 @@ if ($result && $result->num_rows > 0) {
                 <td>$invoice</td>
                 <td>
                     <div class='action-buttons'>
-                        <button onclick=\"toggleDetails('details-$id')\"><i class='fa fa-eye'></i></button><br><br>
-                        <a href='../../sql/edit_payment.php?id=$id' class='edit' ><i class='fas fa-edit'></i></a><br><br>
-                        <a href='../../sql/delete_payment.php?id=$id' class='delete' onclick=\"return confirm('Are you sure you want to delete this payment?');\"><i class='fas fa-trash'></i></a>
+                        <button onclick=\"toggleDetails('details-$id')\" class='btn-show'><i class='fa fa-eye'></i></button><br><br>
+                        <a href='../../sql/edit_payment.php?id=$id' class='btn-edit' ><i class='fas fa-edit'></i></a><br><br>
+                        <a href='../../sql/delete_payment.php?id=$id' class='btn-delete' onclick=\"return confirm('Are you sure you want to delete this payment?');\"><i class='fas fa-trash'></i></a>
                     </div>
                 </td>
               </tr>";

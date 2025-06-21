@@ -242,6 +242,31 @@
     align-items: center;
 }
 
+.payment-table a.btn-show {
+    background-color: #3b82f6; /* Blue */
+}
+
+.payment-table a.btn-show:hover {
+    background-color: #2563eb;
+}
+
+.payment-table a.btn-edit {
+    background-color: #10b981; /* Green */
+}
+
+.payment-table a.btn-edit:hover {
+    background-color: #059669;
+}
+
+.payment-table a.btn-delete {
+    background-color: #ef4444; /* Red */
+}
+
+.payment-table a.btn-delete:hover {
+    background-color: #dc2626;
+}
+
+
 /* Details Box */
 .details-box {
     background-color: #f9f9f9;
