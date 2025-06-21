@@ -38,7 +38,7 @@ switch ($sort) {
     case 'attendance_datetime':
     case 'hours_attended':
     case 'course':
-        $sort_column = "ar.$sort";
+        $sort_column = "c.course_name";
         break;
     default:
         $sort_column = "ar.timetable_datetime";
@@ -77,7 +77,8 @@ if (!empty($search)) {
         s.Last_Name LIKE '%$search%' OR
         i.First_Name LIKE '%$search%' OR
         i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
+        c.course_name LIKE '%$search%' OR
+        c.level LIKE '%$search%' OR
         ar.status LIKE '%$search%' ";
 }
 
@@ -91,7 +92,8 @@ if (!empty($search)) {
         s.Last_Name LIKE '%$search%' OR
         i.First_Name LIKE '%$search%' OR
         i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
+        c.course_name LIKE '%$search%' OR
+        c.level LIKE '%$search%' OR
         ar.status LIKE '%$search%' ";
 }
 
@@ -129,7 +131,7 @@ if ($result && $result->num_rows > 0) {
         // Show hours attended
         echo "<td>" . htmlspecialchars($row['hours_attended']) . "</td>";
 
-       // Show course
+        // Show course
         echo "<td>"
             . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
             . "</td>";
