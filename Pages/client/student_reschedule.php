@@ -41,12 +41,11 @@ $current_timetable = $conn->query("
     ORDER BY FIELD(t.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), t.start_time
 ");
 
-// Fetch student's enrolled courses for dropdown with level
+// Fetch all available courses for dropdown with level
 $enrolled_courses = $conn->query("
-    SELECT c.course_id, c.course_name, c.level 
-    FROM student_courses sc
-    JOIN courses c ON sc.course_id = c.course_id
-    WHERE sc.student_id = $student_id
+    SELECT course_id, course_name, level 
+    FROM courses 
+    ORDER BY course_name
 ");
 
 // Handle form submission
@@ -57,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
     $new_end = $conn->real_escape_string($_POST['new_end_time']);
     $reason = $conn->real_escape_string($_POST['reason']);
 
-    // Get student_course_id
+    // Get student_course_id (will enroll if not exists)
     $sc_result = $conn->query("
         SELECT student_course_id 
         FROM student_courses 
@@ -66,33 +65,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
     
     if ($sc_result->num_rows > 0) {
         $sc_id = $sc_result->fetch_assoc()['student_course_id'];
-        
-        // Insert reschedule request
-        $stmt = $conn->prepare("
-            INSERT INTO student_timetable_requests 
-            (student_course_id, day, start_time, end_time, status, requested_at, course)
-            VALUES (?, ?, ?, ?, 'pending', NOW(), ?)
-        ");
-        
-        $course_info = $conn->query("SELECT course_name, level FROM courses WHERE course_id = $course_id")->fetch_assoc();
-        $course_display = $course_info['course_name'] . ' - ' . $course_info['level'];
-        
-        $stmt->bind_param(
-            "issss", 
-            $sc_id, 
-            $new_day, 
-            $new_start, 
-            $new_end,
-            $course_display
-        );
-        
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Reschedule request submitted successfully!";
-        } else {
-            $_SESSION['error'] = "Failed to submit request: " . $stmt->error;
-        }
     } else {
-        $_SESSION['error'] = "You are not enrolled in this course";
+        // Auto-enroll the student if not enrolled
+        $conn->query("
+            INSERT INTO student_courses 
+            (student_id, course_id, enrollment_date, status)
+            VALUES ($student_id, $course_id, CURDATE(), 'active')
+        ");
+        $sc_id = $conn->insert_id;
+    }
+    
+    // Insert reschedule request
+    $stmt = $conn->prepare("
+        INSERT INTO student_timetable_requests 
+        (student_course_id, day, start_time, end_time, status, requested_at, course)
+        VALUES (?, ?, ?, ?, 'pending', NOW(), ?)
+    ");
+    
+    $course_info = $conn->query("SELECT course_name, level FROM courses WHERE course_id = $course_id")->fetch_assoc();
+    $course_display = $course_info['course_name'] . ' - ' . $course_info['level'];
+    
+    $stmt->bind_param(
+        "issss", 
+        $sc_id, 
+        $new_day, 
+        $new_start, 
+        $new_end,
+        $course_display
+    );
+    
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Reschedule request submitted successfully!";
+    } else {
+        $_SESSION['error'] = "Failed to submit request: " . $stmt->error;
     }
     
     header("Location: student_reschedule.php");
