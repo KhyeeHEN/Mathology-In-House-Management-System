@@ -20,9 +20,9 @@ if (!$student_result || $student_result->num_rows === 0) {
 }
 $student = $student_result->fetch_assoc();
 
-// Fetch available courses for this student
+// Fetch available courses for this student with level
 $courses = $conn->query("
-    SELECT course_id, course_name 
+    SELECT course_id, course_name, level 
     FROM courses 
     ORDER BY course_name
 ");
@@ -54,9 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_timetable'])) {
         }
         
         // Get course name
-        $course_name = $conn->query("
-            SELECT course_name FROM courses WHERE course_id = $course_id
-        ")->fetch_assoc()['course_name'];
+        $course_info = $conn->query("
+            SELECT course_name, level FROM courses WHERE course_id = $course_id
+        ")->fetch_assoc();
+        $course_display = $course_info['course_name'] . ', ' . $course_info['level'];
         
         // Insert timetable
         $stmt = $conn->prepare("
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_timetable'])) {
             VALUES (?, ?, ?, ?, ?, NOW(), 'active')
         ");
         
-        $stmt->bind_param("issss", $student_course_id, $course_name, $day, $start_time, $end_time);
+        $stmt->bind_param("issss", $student_course_id, $course_display, $day, $start_time, $end_time);
         
         if ($stmt->execute()) {
             $_SESSION['message'] = "Timetable added successfully!";
@@ -176,9 +177,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_timetable'])) {
                         <label>Course</label>
                         <select name="course_id" class="form-control" required>
                             <option value="">Select Course</option>
-                            <?php while ($course = $courses->fetch_assoc()): ?>
+                            <?php 
+                            $courses->data_seek(0); // Reset pointer to reuse result set
+                            while ($course = $courses->fetch_assoc()): ?>
                                 <option value="<?= htmlspecialchars($course['course_id']) ?>">
-                                    <?= htmlspecialchars($course['course_name']) ?>
+                                    <?= htmlspecialchars($course['course_name'] . ' - ' . $course['level']) ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
