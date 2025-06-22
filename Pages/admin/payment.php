@@ -16,7 +16,7 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments</title>
     <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../Styles/payment.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../../Styles/payment.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -55,10 +55,10 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                         <option value="DESC" <?php if ($direction === 'DESC') echo 'selected'; ?>>Descending</option>
                     </select>
 
-                    <button type="submit">Search/Sort</button>
-                    <button type="button" onclick="window.location='payment.php'">Reset</button>
-                    <button type="button" onclick="window.location='manage_fees.php'">Course Fee</button>
-                    <button type="button" onclick="window.location='../../sql/add_payment.php'">Add</button>
+                    <button type="submit"><i class="fas fa-search" title= 'Search/Sort'></i></button>
+                    <button type="button" onclick="window.location='payment.php'" title= 'Reset'><i class="fas fa-undo"></i></button>
+                    <button type="button" onclick="window.location='manage_fees.php'" title= 'Add Course'><i class="fas fa-book" ></i></button>
+                    <button type="button" onclick="window.location='../../sql/add_payment.php'"><i class="fas fa-money-bill" title= 'Add Payment'></i></button>
                 </form>
             </div>
 

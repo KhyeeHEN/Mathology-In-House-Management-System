@@ -38,7 +38,7 @@ switch ($sort) {
     case 'attendance_datetime':
     case 'hours_attended':
     case 'course':
-        $sort_column = "ar.$sort";
+        $sort_column = "c.course_name";
         break;
     default:
         $sort_column = "ar.timetable_datetime";
@@ -77,7 +77,8 @@ if (!empty($search)) {
         s.Last_Name LIKE '%$search%' OR
         i.First_Name LIKE '%$search%' OR
         i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
+        c.course_name LIKE '%$search%' OR
+        c.level LIKE '%$search%' OR
         ar.status LIKE '%$search%' ";
 }
 
@@ -91,7 +92,8 @@ if (!empty($search)) {
         s.Last_Name LIKE '%$search%' OR
         i.First_Name LIKE '%$search%' OR
         i.Last_Name LIKE '%$search%' OR
-        ar.course LIKE '%$search%' OR
+        c.course_name LIKE '%$search%' OR
+        c.level LIKE '%$search%' OR
         ar.status LIKE '%$search%' ";
 }
 
@@ -129,19 +131,21 @@ if ($result && $result->num_rows > 0) {
         // Show hours attended
         echo "<td>" . htmlspecialchars($row['hours_attended']) . "</td>";
 
-       // Show course
+        // Show course
         echo "<td>"
             . htmlspecialchars($row['course_name'] . ' (' . $row['course_level'] . ')')
             . "</td>";
 
-        echo "<td>"  . htmlspecialchars($row['status']) .  "</td>";
+        $status = htmlspecialchars($row['status']);
+        $status_class = strtolower($row['status']) === 'attended' ? 'attended' : (strtolower($row['status']) === 'missed' ? 'missed' : '');
+        echo "<td class='attendance-status $status_class'>$status</td>";
         $record_id = (int)$row['record_id'];
         // Edit button + show/hide details
         echo "<td>
         <div class='action-buttons'>
-    <button onclick=\"toggleDetails('details-$record_id')\"><i class='fa fa-eye'></i></button>
-    <a href='../../sql/edit_attendance.php?record_id=$record_id'><i class='fas fa-edit'></i> </a>
-    <a href='../../sql/delete_attendance.php?id=$record_id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\"><i class='fas fa-trash'></i></a>
+    <button onclick=\"toggleDetails('details-$record_id')\" class=\"view\"><i class='fa fa-eye'></i></button>
+    <a href='../../sql/edit_attendance.php?record_id=$record_id' class='edit'><i class='fas fa-edit'></i> </a>
+    <a href='../../sql/delete_attendance.php?id=$record_id' onclick=\"return confirm('Are you sure you want to delete this attendance record?');\" class='delete'><i class='fas fa-trash'></i></a>
         </div>
     </td>";
 

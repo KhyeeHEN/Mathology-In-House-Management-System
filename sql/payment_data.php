@@ -5,8 +5,14 @@ $sort_direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
 
 // Allowed columns to prevent SQL injection
 $allowed_columns = [
-    'payment_id', 'payment_method', 'payment_mode', 'payment_amount',
-    'deposit_status', 'payment_status', 'payment_date', 'student_name'
+    'payment_id',
+    'payment_method',
+    'payment_mode',
+    'payment_amount',
+    'deposit_status',
+    'payment_status',
+    'payment_date',
+    'student_name'
 ];
 
 if (!in_array($sort_column, $allowed_columns)) {
@@ -90,12 +96,14 @@ if ($result && $result->num_rows > 0) {
         $student = htmlspecialchars($row['student_name']);
         $amount = number_format($row['payment_amount'], 2);
         $deposit = ucfirst($row['deposit_status']);
-        $status = ucfirst($row['payment_status']);
+        $status_raw = strtolower($row['payment_status']);
+        $status = ucfirst($status_raw);
+        $status_class = $status_raw === 'paid' ? 'status-paid' : ($status_raw === 'unpaid' ? 'status-unpaid' : '');
         $method = ucfirst($row['payment_method']);
         $mode = ucfirst($row['payment_mode']);
         $date = date('Y-m-d H:i', strtotime($row['payment_date']));
         $invoice = (!empty($row['invoice_path']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . str_replace('../../', '', $row['invoice_path'])))
-            ? "<a href='../../{$row['invoice_path']}' target='_blank' class='download-btn'>View Invoice</a>"
+            ? "<a href='../../{$row['invoice_path']}' target='_blank' class='download-btn'><i class='fas fa-file-invoice'></i></a>"
             : "<span style='color:gray;'>Not available</span>";
 
         echo "<tr>
@@ -103,13 +111,13 @@ if ($result && $result->num_rows > 0) {
                 <td>$student</td>
                 <td>RM $amount</td>
                 <td>$deposit</td>
-                <td>$status</td>
+                <td class='$status_class'>$status</td>
                 <td>$invoice</td>
                 <td>
                     <div class='action-buttons'>
-                        <button onclick=\"toggleDetails('details-$id')\">Show More</button><br><br>
-                        <a href='../../sql/edit_payment.php?id=$id'>Edit</a><br><br>
-                        <a href='../../sql/delete_payment.php?id=$id' onclick=\"return confirm('Are you sure you want to delete this payment?');\">Delete</a>
+                        <button onclick=\"toggleDetails('details-$id')\" class='btn-show' title= 'Show More'><i class='fa fa-eye'></i></button><br><br>
+                        <a href='../../sql/edit_payment.php?id=$id' class='btn-edit' title= 'Edit'><i class='fas fa-edit'></i></a><br><br>
+                        <a href='../../sql/delete_payment.php?id=$id' class='btn-delete' onclick=\"return confirm('Are you sure you want to delete this payment?');\" title= 'Delete'><i class='fas fa-trash'></i></a>
                     </div>
                 </td>
               </tr>";
@@ -124,17 +132,16 @@ if ($result && $result->num_rows > 0) {
               </tr>";
     }
     echo "</tbody></table>";
-
 } else {
     echo "<tr><td colspan='7'>No payment records found.</td></tr></tbody></table>";
 }
 
- // Pagination controls
-    $encodedSearch = urlencode($search);
-    $encodedSort = urlencode($sort_column);
-    $encodedDir = urlencode($sort_direction);
+// Pagination controls
+$encodedSearch = urlencode($search);
+$encodedSort = urlencode($sort_column);
+$encodedDir = urlencode($sort_direction);
 
-    if ($totalPages >= 1) {
+if ($totalPages >= 1) {
     echo "<div class='pagination'>";
     if ($page > 1) {
         echo "<a href='?page=" . ($page - 1) . "&search=$encodedSearch&sort=$encodedSort&direction=$encodedDir'>Previous</a>";
@@ -155,4 +162,3 @@ if ($result && $result->num_rows > 0) {
     echo "</div>";
 }
 $conn->close();
-?>
