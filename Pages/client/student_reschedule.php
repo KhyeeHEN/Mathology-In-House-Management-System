@@ -41,9 +41,9 @@ $current_timetable = $conn->query("
     ORDER BY FIELD(t.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), t.start_time
 ");
 
-// Fetch student's enrolled courses for dropdown
+// Fetch student's enrolled courses for dropdown with level
 $enrolled_courses = $conn->query("
-    SELECT c.course_id, c.course_name 
+    SELECT c.course_id, c.course_name, c.level 
     FROM student_courses sc
     JOIN courses c ON sc.course_id = c.course_id
     WHERE sc.student_id = $student_id
@@ -74,7 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
             VALUES (?, ?, ?, ?, 'pending', NOW(), ?)
         ");
         
-        $course_name = $conn->query("SELECT course_name FROM courses WHERE course_id = $course_id")->fetch_assoc()['course_name'];
+        $course_info = $conn->query("SELECT course_name, level FROM courses WHERE course_id = $course_id")->fetch_assoc();
+        $course_display = $course_info['course_name'] . ' - ' . $course_info['level'];
         
         $stmt->bind_param(
             "issss", 
@@ -82,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
             $new_day, 
             $new_start, 
             $new_end,
-            $course_name
+            $course_display
         );
         
         if ($stmt->execute()) {
@@ -244,8 +245,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
                             <label for="course_id">Select Course</label>
                             <select name="course_id" id="course_id" class="form-control" required>
                                 <option value="">-- Select Course --</option>
-                                <?php while ($course = $enrolled_courses->fetch_assoc()): ?>
-                                    <option value="<?= $course['course_id'] ?>"><?= htmlspecialchars($course['course_name']) ?></option>
+                                <?php 
+                                $enrolled_courses->data_seek(0); // Reset pointer to reuse result set
+                                while ($course = $enrolled_courses->fetch_assoc()): ?>
+                                    <option value="<?= $course['course_id'] ?>"><?= htmlspecialchars($course['course_name'] . ' - ' . $course['level']) ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
@@ -311,6 +314,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reschedule'])
     });
     </script>
     <script type="module" src="/Scripts/common.js"></script>
-
 </body>
 </html>
