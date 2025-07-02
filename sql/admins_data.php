@@ -4,6 +4,7 @@ $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : 
 $limit = 10; // Default limit per page
 $page = isset($_GET['admins_page']) ? intval($_GET['admins_page']) : 1; // Default page
 $offset = ($page - 1) * $limit;
+$current_admin_id = $_SESSION['user_id'];
 
 // Get total rows for pagination
 $countQuery = "SELECT COUNT(*) AS total FROM users WHERE role = 'admin'";
