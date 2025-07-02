@@ -60,14 +60,21 @@ if ($result->num_rows > 0) {
                 <td>" . $row['user_id'] . "</td>
                 <td>" . $row['email'] . "</td>
                 <td>" . $row['created_at'] . "</td>
-                <td>";
-        echo "<a href='$edit_link'>Edit</a>";
-        if ($row['user_id'] != $_SESSION['user_id']) {
-            echo " | <a href='$delete_link' onclick=\"return confirm('Are you sure you want to delete this admin?');\">Delete</a>";
-        } else {
-            echo " | <span style='color:gray;'>Delete (disabled)</span>";
-        }
-        echo "</td>";
+                <td class='actions-cell'> 
+                <form method='get' action='../../sql/edit_admin.php' title='Edit'>
+                    <input type='hidden' name='user_id' value='{$row['user_id']}'>
+                    <button type='submit' class='action-btn edit'>
+                        <i class='fas fa-edit'></i> 
+                    </button>
+                </form>
+                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                    <input type='hidden' name='user_id' value='{$row['user_id']}'>
+                    <button type='submit' class='action-btn delete'>
+                        <i class='fas fa-trash'></i> 
+                    </button>
+                </form>
+                </td>
+        </tr>";
     }
     echo "</table>";
 
