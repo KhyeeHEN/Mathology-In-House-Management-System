@@ -44,7 +44,6 @@ if (!in_array($sort_direction, ['ASC', 'DESC'])) {
     $sort_direction = 'ASC';
 }
 
-// Build SQL query
 $sql = "
     SELECT f.fee_id, c.course_id, c.course_name, c.level, f.fee_amount, f.package_hours, f.time
     FROM course_fees f
@@ -56,10 +55,7 @@ if (!empty($search)) {
     $sql .= " WHERE c.course_name LIKE '%$search%' OR c.level LIKE '%$search%'";
 }
 
-// Add sorting
 $sql .= " ORDER BY $sort_column $sort_direction";
-
-// Execute
 $result = $conn->query($sql);
 ?>
 
