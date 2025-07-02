@@ -1,16 +1,16 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
+session_start();
 
-if (!isset($_GET['admin_id'])) {
+if (!isset($_GET['user_id'])) {
     header("Location: ../Pages/admin/users.php?active_tab=admins&error=Invalid+admin+ID");
     exit();
 }
 
-$admin_id = intval($_GET['admin_id']);
-session_start();
+$user_id = intval($_GET['user_id']);
 
 // Prevent deleting your own account
-if ($admin_id == $_SESSION['user_id']) {
+if ($user_id == $_SESSION['user_id']) {
     header("Location: ../Pages/admin/users.php?active_tab=admins&error=You+cannot+delete+your+own+admin+account+while+logged+in");
     exit();
 }
@@ -19,7 +19,7 @@ $conn->begin_transaction();
 
 try {
     // 1. Delete admin user record only (no cascading needed)
-    $deleteUserQuery = "DELETE FROM users WHERE user_id = $admin_id AND role = 'admin'";
+    $deleteUserQuery = "DELETE FROM users WHERE user_id = $user_id AND role = 'admin'";
     if (!$conn->query($deleteUserQuery)) {
         throw new Exception("Failed to delete admin user: " . $conn->error);
     }
