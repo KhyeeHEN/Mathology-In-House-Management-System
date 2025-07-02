@@ -21,11 +21,11 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->Cell(20, 7, 'Record ID', 1, 0, 'L');
     $pdf->Cell(30, 7, 'Student Name', 1, 0, 'L');
     $pdf->Cell(30, 7, 'Instructor Name', 1, 0, 'L');
-    $pdf->Cell(32, 7, 'Scheduled Time', 1, 0, 'L');
-    $pdf->Cell(32, 7, 'Attendance Time', 1, 0, 'L');
+    $pdf->Cell(40, 7, 'Scheduled Time', 1, 0, 'L');
+    $pdf->Cell(40, 7, 'Attendance Time', 1, 0, 'L');
     $pdf->Cell(28, 7, 'Hours Attended', 1, 0, 'L');
     $pdf->Cell(20, 7, 'Status', 1, 0, 'L');
-    $pdf->Cell(30, 7, 'Course', 1, 1, 'L');
+    $pdf->Cell(50, 7, 'Course', 1, 1, 'L');
 
     $sql = "SELECT
     ar.record_id,
@@ -62,14 +62,14 @@ WHERE DATE(ar.attendance_datetime) = ?";
         $scheduledTime = ($row['timetable_datetime'] && $row['timetable_datetime'] !== '0000-00-00 00:00:00')
             ? date("d-M-Y h:i A", strtotime($row['timetable_datetime']))
             : '-';
-        $pdf->Cell(32, 7, $scheduledTime, 1, 0, 'L');
+        $pdf->Cell(40, 7, $scheduledTime, 1, 0, 'L');
         $attendanceTime = ($row['attendance_datetime'] && $row['attendance_datetime'] !== '0000-00-00 00:00:00')
             ? date("d-M-Y h:i A", strtotime($row['attendance_datetime']))
             : '-';
-        $pdf->Cell(32, 7, $attendanceTime, 1, 0, 'L');
+        $pdf->Cell(40, 7, $attendanceTime, 1, 0, 'L');
         $pdf->Cell(28, 7, $row['hours_attended'], 1, 0, 'L');
         $pdf->Cell(20, 7, ucfirst($row['status']), 1, 0, 'L');
-        $pdf->Cell(30, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
+        $pdf->Cell(50, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
     }
 
     ob_end_clean(); // Clear any buffered output
