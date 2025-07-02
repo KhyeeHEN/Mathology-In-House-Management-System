@@ -57,7 +57,7 @@ WHERE DATE(ar.attendance_datetime) = ?";
     $pdf->SetFont('helvetica', '', 9);
     while ($row = $result->fetch_assoc()) {
         $pdf->Cell(20, 7, $row['record_id'], 1, 0, 'L');
-        $pdf->Cell(30, 6, $row['student_name'], 1, 0, 'L');
+        $pdf->Cell(30, 7, $row['student_name'], 1, 0, 'L');
         $pdf->Cell(30, 7, $row['instructor_name'] ?? '-', 1, 0, 'L');
         $scheduledTime = ($row['timetable_datetime'] && $row['timetable_datetime'] !== '0000-00-00 00:00:00')
             ? date("d-M-Y h:i A", strtotime($row['timetable_datetime']))
@@ -69,7 +69,7 @@ WHERE DATE(ar.attendance_datetime) = ?";
         $pdf->Cell(40, 7, $attendanceTime, 1, 0, 'L');
         $pdf->Cell(28, 7, $row['hours_attended'], 1, 0, 'L');
         $pdf->Cell(20, 7, ucfirst($row['status']), 1, 0, 'L');
-        $pdf->Cell(50, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
+        $pdf->Cell(55, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
     }
 
     ob_end_clean(); // Clear any buffered output
