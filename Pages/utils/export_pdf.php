@@ -37,7 +37,8 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     ar.hours_replacement,
     ar.hours_remaining,
     ar.status,
-    c.course_name
+    c.course_name,
+    c.level
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
@@ -62,7 +63,7 @@ WHERE DATE(ar.attendance_datetime) = ?";
         $pdf->Cell(32, 6, $row['attendance_datetime'] ?? '-', 1, 0, 'L');
         $pdf->Cell(28, 6, $row['hours_attended'], 1, 0, 'L');
         $pdf->Cell(20, 6, ucfirst($row['status']), 1, 0, 'L');
-        $pdf->Cell(30, 6, $row['course_name'], 1, 1, 'L');
+        $pdf->Cell(30, 6, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
     }
 
     ob_end_clean(); // Clear any buffered output
