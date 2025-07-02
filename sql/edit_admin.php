@@ -1,80 +1,149 @@
 <?php
+// Include the database settings
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
-session_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../login.php");
-    exit;
-}
+// Fetch admin user_id from GET request
+$admin_id = isset($_GET['admin_id']) ? intval($_GET['admin_id']) : 0;
 
-$admin_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
-$message = '';
-$error = '';
+// Query to fetch admin details
+$query = "SELECT * FROM users WHERE user_id = $admin_id AND role = 'admin'";
+$result = $conn->query($query);
 
-if ($admin_id === 0) {
-    $error = "Invalid admin ID.";
+if ($result->num_rows > 0) {
+    $admin = $result->fetch_assoc();
 } else {
-    // Fetch admin details
-    $result = $conn->query("SELECT user_id, email FROM users WHERE user_id = $admin_id AND role = 'admin'");
-    if ($result && $result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
-    } else {
-        $error = "Admin not found.";
-    }
+    die("Admin not found.");
 }
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin'])) {
-    $email = $conn->real_escape_string($_POST['email']);
-    $password = trim($_POST['password']);
-    $update_query = "";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $conn->real_escape_string($_POST['Email']);
 
-    if (!empty($password)) {
-        $password_hash = password_hash($password, PASSWORD_BCRYPT);
-        $update_query = "UPDATE users SET email='$email', password='$password_hash' WHERE user_id=$admin_id AND role='admin'";
-    } else {
-        $update_query = "UPDATE users SET email='$email' WHERE user_id=$admin_id AND role='admin'";
+    // Update users table
+    $updateUserQuery = "
+        UPDATE users SET 
+            email = '$email'
+        WHERE user_id = $admin_id AND role = 'admin'
+    ";
+
+    // Only update password if not empty
+    if (!empty($_POST['password'])) {
+        $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
+        $updateUserPasswordQuery = "UPDATE users SET password='$password' WHERE user_id='$admin_id' AND role = 'admin'";
+        $conn->query($updateUserPasswordQuery);
     }
 
-    if ($conn->query($update_query)) {
-        $message = "Admin updated successfully.";
-        // Refresh admin details
-        $result = $conn->query("SELECT user_id, email FROM users WHERE user_id = $admin_id AND role = 'admin'");
-        $admin = $result->fetch_assoc();
+    // Execute queries and redirect
+    if ($conn->query($updateUserQuery)) {
+        header("Location: ../Pages/admin/users.php?active_tab=admins");
+        exit();
     } else {
-        $error = "Error updating admin: " . $conn->error;
+        echo "Error updating admin: " . $conn->error;
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Styles/common.css">
+    <link rel="stylesheet" href="/Styles/forms.css">
     <title>Edit Admin</title>
-    <link rel="stylesheet" href="../../Styles/common.css">
-    <link rel="stylesheet" href="../../Styles/forms.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Edit Admin</h2>
-        <?php if ($message) echo "<p class='success'>$message</p>"; ?>
-        <?php if ($error) echo "<p class='error'>$error</p>"; ?>
+    <style>
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
 
-        <?php if (isset($admin)) { ?>
-        <form method="POST">
-            <div class="form-row">
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($admin['email']); ?>" required>
-            </div>
-            <div class="form-row">
-                <label for="password">New Password:</label>
-                <input type="password" name="password" id="password" placeholder="Leave blank to keep unchanged">
-            </div>
-            <button type="submit" name="update_admin">Update Admin</button>
-            <a href="../Pages/admin/users.php?active_tab=admins">Back</a>
-        </form>
-        <?php } ?>
-    </div>
+        .form-row label {
+            min-width: 110px;
+            font-size: 0.96em;
+            margin-right: 6px;
+            white-space: nowrap;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            min-width: 140px;
+            flex: 1 1 140px;
+            padding: 6px 8px;
+            font-size: 1em;
+        }
+
+        form {
+            background: #fafbfc;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(60, 60, 60, 0.12);
+            padding: 18px 24px;
+            margin-top: 18px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button[type="submit"],
+        a[href$="users.php"] {
+            margin-top: 14px;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 800px) {
+            .form-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            form {
+                padding: 12px;
+            }
+        }
+
+        button {
+            background-color: #1f2937;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: rgb(71, 82, 95);
+        }
+
+        a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: rgb(71, 82, 95);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Edit Admin</h1>
+    <form method="POST">
+        <div class="form-row">
+            <label for="Email">Email:</label>
+            <input type="email" id="Email" name="Email" value="<?php echo htmlspecialchars($admin['email']); ?>" required>
+            <label for="admin_password">New Password:</label>
+            <input type="password" id="admin_password" name="password" placeholder="Leave blank to keep current password">
+        </div>
+        <button type="submit">Update</button>
+        <a href="../Pages/admin/users.php?active_tab=admins">Cancel</a>
+    </form>
 </body>
 </html>
