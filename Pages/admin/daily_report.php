@@ -114,7 +114,6 @@ $result = $stmt->get_result();
     <div class="dashboard-container">
 
         <main class="main-content">
-            <?php require("../includes/Top_Nav_Bar_Admin.php"); ?>
             <div class="container">
                 <h2>Daily Attendance Report for <?php echo htmlspecialchars($date); ?></h2>
 
@@ -127,8 +126,6 @@ $result = $stmt->get_result();
                             <th>Scheduled Time</th>
                             <th>Attendance Time</th>
                             <th>Hours Attended</th>
-                            <th>Replacement Hours</th>
-                            <th>Hours Remaining</th>
                             <th>Status</th>
                             <th>Course</th>
                         </tr>
@@ -145,8 +142,6 @@ $result = $stmt->get_result();
                                     <td><?= $row['timetable_datetime'] ?></td>
                                     <td><?= $row['attendance_datetime'] ?? '-' ?></td>
                                     <td><?= $row['hours_attended'] ?></td>
-                                    <td><?= $row['hours_replacement'] ?></td>
-                                    <td><?= $row['hours_remaining'] ?></td>
                                     <td><?= ucfirst($row['status']) ?></td>
                                     <td><?= $row['course'] ?></td>
                                 </tr>
