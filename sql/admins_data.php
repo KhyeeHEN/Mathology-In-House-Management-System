@@ -60,7 +60,14 @@ if ($result->num_rows > 0) {
                 <td>" . $row['user_id'] . "</td>
                 <td>" . $row['email'] . "</td>
                 <td>" . $row['created_at'] . "</td>
-              </tr>";
+                <td>";
+        echo "<a href='$edit_link'>Edit</a>";
+        if ($row['user_id'] != $_SESSION['user_id']) {
+            echo " | <a href='$delete_link' onclick=\"return confirm('Are you sure you want to delete this admin?');\">Delete</a>";
+        } else {
+            echo " | <span style='color:gray;'>Delete (disabled)</span>";
+        }
+        echo "</td>";
     }
     echo "</table>";
 
