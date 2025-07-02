@@ -13,7 +13,7 @@ $sql = "SELECT ar.*,
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
-LEFT JOIN courses c ON ar.course = c.course_i
+LEFT JOIN courses c ON ar.course = c.course_id
 WHERE DATE(ar.attendance_datetime) = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $date);
