@@ -15,6 +15,7 @@ $visible_columns = ['student_id', 'student_name', 'attendance_datetime', 'hours_
 $allowed_columns = [
     'record_id',
     'student_id',
+    'student_name',
     'instructor_id',
     'timetable_datetime',
     'attendance_datetime',
@@ -30,13 +31,19 @@ $allowed_columns = [
 if (!in_array($sort_column, $allowed_columns)) {
     $sort_column = 'timetable_datetime';
 }
-switch ($sort) {
-    case 'student_name':
+switch ($sort_column) {
+case 'student_name':
         $sort_column = "s.Last_Name";
         break;
     case 'student_id':
+        $sort_column = "ar.student_id";
+        break;
     case 'attendance_datetime':
+        $sort_column = "ar.attendance_datetime";
+        break;
     case 'hours_attended':
+        $sort_column = "ar.hours_attended";
+        break;
     case 'course':
         $sort_column = "c.course_name";
         break;
