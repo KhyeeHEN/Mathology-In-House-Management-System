@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_admin'])) {
                 <input type="password" name="password" id="password" placeholder="Leave blank to keep unchanged">
             </div>
             <button type="submit" name="update_admin">Update Admin</button>
-            <a href="users.php?active_tab=admins">Back</a>
+            <a href="../Pages/admin/users.php?active_tab=admins">Back</a>
         </form>
         <?php } ?>
     </div>
