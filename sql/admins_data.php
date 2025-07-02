@@ -68,7 +68,7 @@ if ($result->num_rows > 0) {
                         <i class='fas fa-edit'></i> 
                     </button>
                 </form>
-                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this admin?');\">
                     <input type='hidden' name='user_id' value='{$row['user_id']}'>
                     <button type='submit' class='action-btn delete'>
                         <i class='fas fa-trash'></i> 
