@@ -54,6 +54,7 @@ if ($result->num_rows > 0) {
                 <th>User ID</th>
                 <th>Email</th>
                 <th>Created At</th>
+                <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
