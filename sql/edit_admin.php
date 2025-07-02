@@ -3,10 +3,10 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Pages/setting.php';
 
 // Fetch admin user_id from GET request
-$admin_id = isset($_GET['admin_id']) ? intval($_GET['admin_id']) : 0;
+$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 
 // Query to fetch admin details
-$query = "SELECT * FROM users WHERE user_id = $admin_id AND role = 'admin'";
+$query = "SELECT * FROM users WHERE user_id = $user_id AND role = 'admin'";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updateUserQuery = "
         UPDATE users SET 
             email = '$email'
-        WHERE user_id = $admin_id AND role = 'admin'
+        WHERE user_id = $user_id AND role = 'admin'
     ";
 
     // Only update password if not empty
     if (!empty($_POST['password'])) {
         $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-        $updateUserPasswordQuery = "UPDATE users SET password='$password' WHERE user_id='$admin_id' AND role = 'admin'";
+        $updateUserPasswordQuery = "UPDATE users SET password='$password' WHERE user_id='$user_id' AND role = 'admin'";
         $conn->query($updateUserPasswordQuery);
     }
 
