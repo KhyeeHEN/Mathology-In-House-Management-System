@@ -7,10 +7,13 @@ $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 // Fetch attendance records for the given date
 $sql = "SELECT ar.*,
        CONCAT(s.Last_Name, ' ', s.First_Name) AS student_name,
-       CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name
+       CONCAT(i.Last_Name, ' ', i.First_Name) AS instructor_name,
+        c.course_name,
+       c.level
 FROM attendance_records ar
 LEFT JOIN students s ON ar.student_id = s.student_id
 LEFT JOIN instructor i ON ar.instructor_id = i.instructor_id
+LEFT JOIN courses c ON ar.course = c.course_i
 WHERE DATE(ar.attendance_datetime) = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $date);
@@ -143,7 +146,8 @@ $result = $stmt->get_result();
                                     <td><?= $row['attendance_datetime'] ?? '-' ?></td>
                                     <td><?= $row['hours_attended'] ?></td>
                                     <td><?= ucfirst($row['status']) ?></td>
-                                    <td><?= $row['course'] ?></td>
+                                    <td><?= ($row['course_name'] ?? '-') . ' (' . ($row['level'] ?? '-') . ')' ?></td>
+
                                 </tr>
                             <?php endwhile;
                         else:
