@@ -25,7 +25,7 @@ if (isset($_GET['download_pdf']) && $_GET['download_pdf'] == '1' && isset($_GET[
     $pdf->Cell(40, 7, 'Attendance Time', 1, 0, 'L');
     $pdf->Cell(28, 7, 'Hours Attended', 1, 0, 'L');
     $pdf->Cell(20, 7, 'Status', 1, 0, 'L');
-    $pdf->Cell(50, 7, 'Course', 1, 1, 'L');
+    $pdf->Cell(60, 7, 'Course', 1, 1, 'L');
 
     $sql = "SELECT
     ar.record_id,
@@ -69,7 +69,7 @@ WHERE DATE(ar.attendance_datetime) = ?";
         $pdf->Cell(40, 7, $attendanceTime, 1, 0, 'L');
         $pdf->Cell(28, 7, $row['hours_attended'], 1, 0, 'L');
         $pdf->Cell(20, 7, ucfirst($row['status']), 1, 0, 'L');
-        $pdf->Cell(55, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
+        $pdf->Cell(60, 7, $row['course_name'] . ' (' . $row['level'] . ')', 1, 1, 'L');
     }
 
     ob_end_clean(); // Clear any buffered output
