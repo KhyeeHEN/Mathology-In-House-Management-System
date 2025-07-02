@@ -19,8 +19,8 @@ if ($record_id > 0) {
         header("Location: ../instructors/attendance_instructors.php?message=Record+deleted");
         exit;
     } else {
-        header("Location: ../instructors/attendance_instructors.php?error=Unauthorized+or+record+not+found");
-        exit;
+        die("DEBUG: Could not delete. SQL affected_rows=0.
+             Check if record_id exists and belongs to instructor_id = $instructor_id");
     }
 } else {
     header("Location: ../instructors/attendance_instructors.php?error=Invalid+ID");
