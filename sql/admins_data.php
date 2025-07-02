@@ -54,13 +54,28 @@ if ($result->num_rows > 0) {
                 <th>User ID</th>
                 <th>Email</th>
                 <th>Created At</th>
+                <th>Actions</th>
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
                 <td>" . $row['user_id'] . "</td>
                 <td>" . $row['email'] . "</td>
                 <td>" . $row['created_at'] . "</td>
-              </tr>";
+                <td class='actions-cell'> 
+                <form method='get' action='../../sql/edit_admin.php' title='Edit'>
+                    <input type='hidden' name='user_id' value='{$row['user_id']}'>
+                    <button type='submit' class='action-btn edit'>
+                        <i class='fas fa-edit'></i> 
+                    </button>
+                </form>
+                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this student?');\">
+                    <input type='hidden' name='user_id' value='{$row['user_id']}'>
+                    <button type='submit' class='action-btn delete'>
+                        <i class='fas fa-trash'></i> 
+                    </button>
+                </form>
+                </td>
+        </tr>";
     }
     echo "</table>";
 
