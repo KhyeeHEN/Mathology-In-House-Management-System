@@ -52,9 +52,10 @@ $direction = isset($_GET['direction']) ? $_GET['direction'] : 'DESC';
                         <option value="DESC" <?php if ($direction === 'DESC') echo 'selected'; ?>>Descending</option>
                     </select>
 
-                    <button type="submit">Search/Sort</button>
-                    <button type="button" id="reset-button" onclick="window.location='attendance_instructors.php'">Reset</button>
-                    <button type="button" onclick="window.location='../../sql/add_attendance_instructor.php'">Add</button>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                    <button type="button" id="reset-button" onclick="window.location='attendance_instructors.php'"><i
+                            class="fas fa-undo"></i></button>
+                    <button type="button" onclick="window.location='../../sql/add_attendance_instructor.php'"><i class="fas fa-user-plus"></i></</button>
                 </form>
             </div>
 
