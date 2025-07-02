@@ -135,7 +135,7 @@ if ($result && $result->num_rows > 0) {
         <a href='../../sql/edit_attendance.php?record_id={$row['record_id']}' class='edit'>
             <i class='fas fa-edit'></i>
         </a>
-        <a href='../../sql/delete_attendance_instructor.php?id={$row['record_id']}'
+        <a href='../../sql/delete_attendance.php?id={$row['record_id']}'
         onclick=\"return confirm('Are you sure you want to delete this attendance record?');\" class='delete'>
         <i class='fas fa-trash'></i>
         </a>
