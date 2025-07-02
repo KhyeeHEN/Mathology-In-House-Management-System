@@ -4,6 +4,7 @@ $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : 
 $limit = 10; // Default limit per page
 $page = isset($_GET['admins_page']) ? intval($_GET['admins_page']) : 1; // Default page
 $offset = ($page - 1) * $limit;
+$current_admin_id = $_SESSION['user_id'];
 
 // Get total rows for pagination
 $countQuery = "SELECT COUNT(*) AS total FROM users WHERE role = 'admin'";
@@ -58,23 +59,29 @@ if ($result->num_rows > 0) {
             </tr>";
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
-                <td>" . $row['user_id'] . "</td>
-                <td>" . $row['email'] . "</td>
-                <td>" . $row['created_at'] . "</td>
-                <td class='actions-cell'> 
-                <form method='get' action='../../sql/edit_admin.php' title='Edit'>
+            <td>" . $row['user_id'] . "</td>
+            <td>" . htmlspecialchars($row['email']) . "</td>
+            <td>" . $row['created_at'] . "</td>
+            <td class='actions-cell'> 
+                <form method='get' action='../../sql/edit_admin.php' title='Edit' style='display:inline;'>
                     <input type='hidden' name='user_id' value='{$row['user_id']}'>
                     <button type='submit' class='action-btn edit'>
-                        <i class='fas fa-edit'></i> 
+                        <i class='fas fa-edit'></i>
                     </button>
                 </form>
-                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this admin?');\">
-                    <input type='hidden' name='user_id' value='{$row['user_id']}'>
-                    <button type='submit' class='action-btn delete'>
-                        <i class='fas fa-trash'></i> 
-                    </button>
-                </form>
-                </td>
+                <form method='get' action='../../sql/delete_admin.php' title='Delete' onsubmit=\"return confirm('Are you sure you want to delete this admin?');\" style='display:inline;'>
+                    <input type='hidden' name='user_id' value='{$row['user_id']}'>";
+        if ($row['user_id'] == $current_admin_id) {
+            echo "<button type='submit' class='action-btn delete' disabled style='color:#aaa;cursor:not-allowed;'>
+                <i class='fas fa-trash'></i>
+              </button>";
+        } else {
+            echo "<button type='submit' class='action-btn delete'>
+                <i class='fas fa-trash'></i>
+              </button>";
+        }
+        echo "</form>
+            </td>
         </tr>";
     }
     echo "</table>";
